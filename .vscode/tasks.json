@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0"
+    ,"tasks": [
+        {
+            "label": "Conan install Deps"
+            ,"type": "shell"
+            ,"command": "cd build/Debug && conan install --build=missing ../../"
+        },
+        {
+            "label": "Generate Cert/Key"
+            ,"type": "shell"
+            ,"command": "cd build/Debug && openssl req -nodes -new -x509 -keyout key.pem -out cert.pem"
+        }
+    ]
+}
