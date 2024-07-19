@@ -62,9 +62,26 @@ set(LIB_DEPENDECIES
     nebulaatom::nebulaatom
 )
 
+# Header
+set(HEADER
+    ${PROJECT_BINARY_DIR}
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/functions
+)
+
+# Sources
+set(
+    SOURCES
+    ${PROJECT_SOURCE_DIR}/src/structbi_server.cpp
+    ${PROJECT_SOURCE_DIR}/src/web_server.cpp
+    ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/forms.cpp
+)
+
 # Executable
-add_executable(structbi-server src/main.cpp) 
+add_executable(structbi-server ${SOURCES}) 
 target_link_libraries(structbi-server PUBLIC ${LIB_DEPENDECIES})
+target_include_directories(structbi-server PUBLIC ${HEADER})
 
 # Copy properties file
 file(COPY ${CMAKE_SOURCE_DIR}/properties.yaml
