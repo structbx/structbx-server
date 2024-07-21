@@ -21,6 +21,7 @@ class Forms
 
     protected:
         void Read_();
+        void ReadSpecific_();
         void Add_();
         void Modify_();
         void Delete_();

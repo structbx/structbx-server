@@ -5,6 +5,7 @@
 Forms::Forms()
 {
     Read_();
+    ReadSpecific_();
     Add_();
     Modify_();
     Delete_();
@@ -18,6 +19,30 @@ void Forms::Read_()
 
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM forms");
+
+    functions_.push_back(function);
+}
+
+void Forms::ReadSpecific_()
+{
+    // Function GET /api/forms/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("SELECT * FROM forms WHERE id = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("form_id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 
     functions_.push_back(function);
 }
@@ -124,7 +149,7 @@ void Forms::Add_()
 
 void Forms::Modify_()
 {
-
+    
 }
 
 void Forms::Delete_()
