@@ -1,6 +1,5 @@
 
 #include "functions/forms.h"
-#include <functions/action.h>
 
 Forms::Forms()
 {
@@ -272,5 +271,24 @@ void Forms::Modify_()
 
 void Forms::Delete_()
 {
+    // Function DEL /api/forms/delete
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
 
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("DELETE FROM forms WHERE id = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
