@@ -1,5 +1,6 @@
 
 #include "functions/forms.h"
+#include <functions/action.h>
 
 Forms::Forms()
 {
@@ -11,29 +12,52 @@ Forms::Forms()
 
 void Forms::Read_()
 {
-    // Function GET /api/forms
+    // Function GET /api/forms/read
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM forms");
-    action->set_final(true);
 
     functions_.push_back(function);
 }
 
 void Forms::Add_()
 {
-    // Function POST /api/forms
+    // Function POST /api/forms/add
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
 
-    auto action = function->AddAction_("a1");
-    action->set_sql_code("INSERT INTO forms (identifier, name, state, description, id_cloud_organization) VALUES (?, ?, ?, ?, 1)");
-    action->set_final(true);
+    // Action 1: Verify that the form identifier don't exists
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT id FROM forms WHERE identifier = ?");
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action* action)
+    {
+        if(action->get_results()->size() > 0)
+        {
+            action->set_custom_error("Un formulario con este identificador ya existe");
+            return false;
+        }
 
-    // Parameters and conditions
-    action->AddParameter_("identifier", Tools::DValue(""), true)
+        return true;
+    });
+
+    action1->AddParameter_("identifier", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Action 2: Add the new form
+    auto action2 = function->AddAction_("a2");
+    action2->set_sql_code("INSERT INTO forms (identifier, name, state, description, id_cloud_organization) VALUES (?, ?, ?, ?, 1)");
+
+    action2->AddParameter_("identifier", Tools::DValue(""), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
@@ -53,7 +77,7 @@ void Forms::Add_()
         }
         return true;
     });
-    action->AddParameter_("name", Tools::DValue(""), true)
+    action2->AddParameter_("name", Tools::DValue(""), true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
@@ -73,7 +97,7 @@ void Forms::Add_()
         }
         return true;
     });
-    action->AddParameter_("state", Tools::DValue(""), true)
+    action2->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
@@ -93,7 +117,7 @@ void Forms::Add_()
         }
         return true;
     });
-    action->AddParameter_("description", Tools::DValue(""), true);
+    action2->AddParameter_("description", Tools::DValue(""), true);
 
     functions_.push_back(function);
 }
