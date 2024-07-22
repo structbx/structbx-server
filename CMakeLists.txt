@@ -76,6 +76,7 @@ set(
     ${PROJECT_SOURCE_DIR}/src/web_server.cpp
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/dashboards.cpp
 )
 
 # Executable
