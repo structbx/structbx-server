@@ -5,6 +5,7 @@
 #include "core/nebula_atom.h"
 #include "handlers/backend_handler.h"
 #include "functions/function.h"
+#include "tools/id_checker.h"
 
 using namespace Atom;
 

@@ -32,12 +32,12 @@ void Forms::ReadSpecific_()
     action->set_sql_code("SELECT * FROM forms WHERE id = ?");
 
     // Parameters and conditions
-    action->AddParameter_("form_id", Tools::DValue(""), true)
+    action->AddParameter_("id", Tools::DValue(""), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
         {
-            param->set_error("El identificador del formulario no puede estar vacío");
+            param->set_error("El id del formulario no puede estar vacío");
             return false;
         }
         return true;
@@ -84,19 +84,26 @@ void Forms::Add_()
     action2->AddParameter_("identifier", Tools::DValue(""), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
+        auto string_param = param->get_value().ToString_();
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
         }
-        if(param->get_value().ToString_() == "")
+        if(string_param == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
         }
-        if(param->get_value().ToString_().size() < 3)
+        if(string_param.size() < 3)
         {
             param->set_error("El identificador no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = IDChecker().Check_(string_param);
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9, \"-\" y \"_\"");
             return false;
         }
         return true;
