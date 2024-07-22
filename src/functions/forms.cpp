@@ -55,11 +55,11 @@ void Forms::Add_()
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT id FROM forms WHERE identifier = ?");
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action* action)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
-        if(action->get_results()->size() > 0)
+        if(self.get_results()->size() > 0)
         {
-            action->set_custom_error("Un formulario con este identificador ya existe");
+            self.set_custom_error("Un formulario con este identificador ya existe");
             return false;
         }
 
@@ -155,11 +155,11 @@ void Forms::Modify_()
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ?");
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action* action)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
-        if(action->get_results()->size() > 0)
+        if(self.get_results()->size() > 0)
         {
-            action->set_custom_error("Un formulario con este identificador ya existe");
+            self.set_custom_error("Un formulario con este identificador ya existe");
             return false;
         }
 
