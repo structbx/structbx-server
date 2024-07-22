@@ -3,10 +3,18 @@
 
 void BackendServer::AddFunctions_()
 {
+    // Forms
     auto forms = Forms();
-    for(auto form : forms.get_functions())
+    for(auto it : forms.get_functions())
     {
-        get_functions_manager().get_functions().insert(std::make_pair(form->get_endpoint(), form));
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    }
+
+    // Dashboards
+    auto dashboards = Dashboards();
+    for(auto it : dashboards.get_functions())
+    {
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     }
 }
 
@@ -23,7 +31,7 @@ void BackendServer::Process_()
     // Route identification
     if(!IdentifyRoute_())
     {
-        JSONResponse_(HTTP::Status::kHTTP_NOT_FOUND, "The requested endpoint ("+get_method()+") is not available.");
+        JSONResponse_(HTTP::Status::kHTTP_NOT_FOUND, "The requested endpoint (" + get_properties().method + ") is not available.");
         return;
     }
 

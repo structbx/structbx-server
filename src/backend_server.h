@@ -3,6 +3,7 @@
 #include "handlers/backend_handler.h"
 
 #include "functions/forms.h"
+#include "functions/dashboards.h"
 
 using namespace Atom;
 
