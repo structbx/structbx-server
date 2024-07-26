@@ -24,6 +24,26 @@ void Dashboards::Read_()
 
 void Dashboards::ReadSpecific_()
 {
+    // Function GET /api/dashboards/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/dashboards/read/id", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("SELECT * FROM dashboards WHERE id = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id del dashboard no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
 
 void Dashboards::Add_()
