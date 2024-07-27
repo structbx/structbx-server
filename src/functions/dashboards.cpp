@@ -99,19 +99,9 @@ void Dashboards::Add_()
     action2->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("El estado debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("El estado no puede estar vac&iacute;o");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("El estado no puede ser menor a 3 caracteres");
             return false;
         }
         return true;
@@ -119,19 +109,9 @@ void Dashboards::Add_()
     action2->AddParameter_("privacity", Tools::DValue(""), true)
     ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("La privacidad debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("La privacidad no puede estar vac&iacute;a");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("La privacidad no puede ser menor a 3 caracteres");
             return false;
         }
         return true;
@@ -222,19 +202,9 @@ void Dashboards::Modify_()
     action2->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("El estado debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("El estado no puede estar vac&iacute;o");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("El estado no puede ser menor a 3 caracteres");
             return false;
         }
         return true;
@@ -242,19 +212,9 @@ void Dashboards::Modify_()
     action2->AddParameter_("privacity", Tools::DValue(""), true)
     ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("La privacidad debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("La privacidad no puede estar vac&iacute;a");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("La privacidad no puede ser menor a 3 caracteres");
             return false;
         }
         return true;
