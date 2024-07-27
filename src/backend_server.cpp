@@ -16,6 +16,13 @@ void BackendServer::AddFunctions_()
     {
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     }
+
+    // Reports
+    auto reports = Reports();
+    for(auto it : reports.get_functions())
+    {
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    }
 }
 
 void BackendServer::Process_()

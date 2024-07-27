@@ -4,6 +4,7 @@
 
 #include "functions/forms.h"
 #include "functions/dashboards.h"
+#include "functions/reports.h"
 
 using namespace Atom;
 
