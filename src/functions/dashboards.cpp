@@ -298,4 +298,24 @@ void Dashboards::Modify_()
 
 void Dashboards::Delete_()
 {
+    // Function DEL /api/dashboards/delete
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/dashboards/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("DELETE FROM dashboards WHERE id = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador del dashboard no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
