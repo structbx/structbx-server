@@ -77,6 +77,7 @@ set(
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/dashboards.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/reports.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
 )
 
