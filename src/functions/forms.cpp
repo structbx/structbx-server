@@ -131,19 +131,9 @@ void Forms::Add_()
     action2->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("El estado debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("El estado no puede estar vacío");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("El estado no puede ser menor a 3 dígitos");
             return false;
         }
         return true;
@@ -243,19 +233,9 @@ void Forms::Modify_()
     action2->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("El estado debe ser una cadena de texto");
-            return false;
-        }
         if(param->get_value().ToString_() == "")
         {
             param->set_error("El estado no puede estar vacío");
-            return false;
-        }
-        if(param->get_value().ToString_().size() < 3)
-        {
-            param->set_error("El estado no puede ser menor a 3 dígitos");
             return false;
         }
         return true;
@@ -287,7 +267,7 @@ void Forms::Delete_()
 
     // Parameters and conditions
     action->AddParameter_("id", Tools::DValue(""), true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
         {
