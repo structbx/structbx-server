@@ -5,8 +5,9 @@
 #include "functions/forms.h"
 #include "functions/dashboards.h"
 #include "functions/reports.h"
+#include "functions/reports_graphs.h"
 
-using namespace Atom;
+using namespace NAF;
 
 class BackendServer : public Handlers::BackendHandler
 {
