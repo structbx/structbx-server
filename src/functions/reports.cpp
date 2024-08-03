@@ -30,7 +30,33 @@ void Reports::Read_()
 
 void Reports::ReadSpecific_()
 {
+    // Function GET /api/reports/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/reports/read/id", HTTP::EnumMethods::kHTTP_GET);
 
+    auto action = function->AddAction_("a1");
+    action->set_sql_code(
+        "SELECT " \
+            "r.id AS id, r.name AS name, r.state AS state, r.privacity AS privacity, r.description AS description " \
+            ",r.sql_code AS sql_code, r.created_at AS created_at, rg.id AS rg_id, rg.name AS rg_name, rg.created_at AS rg_created_at " \
+        "FROM reports r " \
+        "LEFT JOIN reports_graphs rg ON rg.id = r.id_graph " \
+        "WHERE r.id = ?"
+    );
+
+    // Parameters and conditions
+    action->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id del reporte no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
 
 void Reports::Add_()
