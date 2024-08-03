@@ -7,7 +7,7 @@
 #include "functions/function.h"
 #include "tools/dvalue.h"
 
-using namespace Atom;
+using namespace NAF;
 
 class Reports
 {
