@@ -7,7 +7,7 @@
 #include "functions/function.h"
 #include "tools/id_checker.h"
 
-using namespace Atom;
+using namespace NAF;
 
 class Forms
 {

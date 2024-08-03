@@ -11,7 +11,7 @@
 #include "web_server.h"
 #include "backend_server.h"
 
-using namespace Atom;
+using namespace NAF;
 
 int main(int argc, char** argv)
 {
@@ -36,19 +36,19 @@ int main(int argc, char** argv)
             switch(route.get_current_route_type())
             {
                 // Manage Frontend
-                case Atom::Tools::RouteType::kEntrypoint:
+                case Tools::RouteType::kEntrypoint:
                 {
                     handler = new Webserver;
                     break;
                 }
 
                 // Manage Backend
-                case Atom::Tools::RouteType::kEndpoint:
+                case Tools::RouteType::kEndpoint:
                 {
                     // Routes
-                    Atom::Tools::Route requested_route(info.uri);
-                    Atom::Tools::Route login_route({"api", "system", "login"});
-                    Atom::Tools::Route logout_route({"api", "system", "logout"});
+                    Tools::Route requested_route(info.uri);
+                    Tools::Route login_route({"api", "system", "login"});
+                    Tools::Route logout_route({"api", "system", "logout"});
 
                     if(requested_route == login_route || requested_route == logout_route)
                         handler = new Handlers::LoginHandler();
