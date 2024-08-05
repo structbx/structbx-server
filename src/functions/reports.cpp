@@ -148,7 +148,107 @@ void Reports::Add_()
 
 void Reports::Modify_()
 {
+    // Function PUT /api/reports/modify
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/reports/modify", HTTP::EnumMethods::kHTTP_PUT);
 
+    // Action 1: Verify that the report name don't exists
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT id FROM reports WHERE name = ? AND id != ?");
+    action1->SetupCondition_("verify-report-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Un reporte con este nombre ya existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action1->AddParameter_("name", Tools::DValue(""), true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action1->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Action 2: Modify report
+    auto action2 = function->AddAction_("a1");
+    action2->set_sql_code("UPDATE reports SET name = ?, state = ?, privacity = ?, sql_code = ?, description = ?, id_graph = ? WHERE id = ?");
+
+    // Parameters and conditions
+    action2->AddParameter_("name", Tools::DValue(""), true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 caracteres");
+            return false;
+        }
+        return true;
+    });
+    action2->AddParameter_("state", Tools::DValue(""), true)
+    ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El estado no puede estar vac&iacute;o");
+            return false;
+        }
+        return true;
+    });
+    action2->AddParameter_("privacity", Tools::DValue(""), true)
+    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("La privacidad no puede estar vac&iacute;a");
+            return false;
+        }
+        return true;
+    });
+    action2->AddParameter_("sql_code", Tools::DValue(""), true)
+    ->SetupCondition_("condition-sql_code", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El c&oacute;digo SQL no puede estar vac&iacute;o");
+            return false;
+        }
+        return true;
+    });
+    action2->AddParameter_("description", Tools::DValue(""), true);
+
+    action2->AddParameter_("id_graph", Tools::DValue(), true);
+    
+    action2->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
 
 void Reports::Delete_()
