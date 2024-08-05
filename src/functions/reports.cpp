@@ -253,5 +253,24 @@ void Reports::Modify_()
 
 void Reports::Delete_()
 {
-    
+    // Function DEL /api/reports/delete
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/reports/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("DELETE FROM reports WHERE id = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador del reporte no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    functions_.push_back(function);
 }
