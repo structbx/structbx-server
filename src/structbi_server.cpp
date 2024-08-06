@@ -20,10 +20,8 @@ int main(int argc, char** argv)
 
         Query::DatabaseManager::StartMySQL_();
         Tools::SettingsManager::ReadBasicProperties_();
-        //Security::PermissionsManager::LoadPermissions_();
-
-    // Read sessions
-        //Tools::SessionsManager::ReadSessions_();
+        Security::PermissionsManager::LoadPermissions_();
+        Tools::SessionsManager::ReadSessions_();
 
     // Custom Handler Creator
         app.CustomHandlerCreator_([&](Core::HTTPRequestInfo& info)
@@ -47,8 +45,8 @@ int main(int argc, char** argv)
                 {
                     // Routes
                     Tools::Route requested_route(info.uri);
-                    Tools::Route login_route({"api", "system", "login"});
-                    Tools::Route logout_route({"api", "system", "logout"});
+                    Tools::Route login_route("/api/system/login");
+                    Tools::Route logout_route("/api/system/logout");
 
                     if(requested_route == login_route || requested_route == logout_route)
                         handler = new Handlers::LoginHandler();
