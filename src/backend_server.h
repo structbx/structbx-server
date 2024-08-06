@@ -6,6 +6,7 @@
 #include "functions/dashboards.h"
 #include "functions/reports.h"
 #include "functions/reports_graphs.h"
+#include "functions/reports_parameters.h"
 
 using namespace NAF;
 

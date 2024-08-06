@@ -30,6 +30,13 @@ void BackendServer::AddFunctions_()
     {
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     }
+
+    // Reports parameters
+    auto reports_parameters = ReportsParameters();
+    for(auto it : reports_parameters.get_functions())
+    {
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    }
 }
 
 void BackendServer::Process_()
@@ -49,7 +56,7 @@ void BackendServer::Process_()
         return;
     }
 
-    /*if(!VerifySession_())
+    if(!VerifySession_())
     {
         JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Session not found.");
         return;
@@ -59,7 +66,7 @@ void BackendServer::Process_()
     {
         JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "The user does not have the permissions to perform this operation.");
         return;
-    }*/
+    }
 
     // Process actions
     ProcessActions_();
