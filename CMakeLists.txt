@@ -79,6 +79,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/dashboards.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/reports.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/reports_graphs.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/reports_parameters.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/organizations.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
 )
 
