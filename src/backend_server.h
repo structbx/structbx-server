@@ -7,6 +7,7 @@
 #include "functions/reports.h"
 #include "functions/reports_graphs.h"
 #include "functions/reports_parameters.h"
+#include "functions/organizations.h"
 
 using namespace NAF;
 

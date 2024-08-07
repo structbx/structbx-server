@@ -37,17 +37,33 @@ void BackendServer::AddFunctions_()
     {
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     }
+
+    // Organizations
+    auto username = get_users_manager().get_current_user().get_username();
+    auto organizations = Organizations(username);
+    for(auto it : organizations.get_functions())
+    {
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    }
 }
 
 void BackendServer::Process_()
 {
-    AddFunctions_();
-
     // Set security type
     set_security_type(Extras::SecurityType::kDisableAll);
     
     // Process the request body
     ManageRequestBody_();
+
+    // Verify sessions
+    if(!VerifySession_())
+    {
+        JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Session not found.");
+        return;
+    }
+
+    // Add functions
+    AddFunctions_();
 
     // Route identification
     if(!IdentifyRoute_())
@@ -56,12 +72,7 @@ void BackendServer::Process_()
         return;
     }
 
-    if(!VerifySession_())
-    {
-        JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Session not found.");
-        return;
-    }
-
+    // Verify permissions
     if(!VerifyPermissions_())
     {
         JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "The user does not have the permissions to perform this operation.");
