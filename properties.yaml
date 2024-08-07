@@ -7,7 +7,7 @@ db_port : "3306"
 db_name : "structbi"
 db_user : "root"
 db_password : "0UHC72zNvywZ"
-session_max_age : 3600
+session_max_age : 2592000
 directory_base : "/srv/www/app1.structbi.com"
 directory_for_uploaded_files : "/srv/www/app1.structbi.com-uploaded"
 directory_for_temp_files : "/tmp"
