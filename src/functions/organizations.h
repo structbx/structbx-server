@@ -25,6 +25,7 @@ class Organizations
         void ReadSpecific_(std::string& username);
         void Add_();
         void Modify_(std::string& username);
+        void ModifyLogo_(std::string& username);
         void Delete_();
 
     private:

@@ -7,6 +7,7 @@ Organizations::Organizations(std::string& username)
     ReadSpecific_(username);
     Add_();
     Modify_(username);
+    ModifyLogo_(username);
     Delete_();
 }
 
@@ -42,9 +43,9 @@ void Organizations::Add_()
 
 void Organizations::Modify_(std::string& username)
 {
-    // Function PUT /api/organization/general/modify/id
+    // Function PUT /api/organization/general/modify
     Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/organization/general/modify/id", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<Functions::Function>("/api/organization/general/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     // Action 1: Modify organization
     auto action1 = function->AddAction_("a1");
@@ -82,6 +83,28 @@ void Organizations::Modify_(std::string& username)
 
     functions_.push_back(function);
 }
+
+    void Organizations::ModifyLogo_(std::string& username)
+    {
+        // Function PUT /api/organization/logo/modify/
+        Functions::Function::Ptr function = 
+            std::make_shared<Functions::Function>("/api/organization/logo/modify", HTTP::EnumMethods::kHTTP_PUT);
+
+        // Action 1: Modify organization
+        auto action1 = function->AddAction_("a1");
+        action1->set_sql_code(
+            "UPDATE cloud_organizations co " \
+            "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
+            "SET co.logo = ? " \
+            "WHERE cu.email = ?"
+        );
+
+        // Parameters and conditions
+        action1->AddParameter_("logo", Tools::DValue(""), true);
+        action1->AddParameter_("email", Tools::DValue(username), false);
+
+        functions_.push_back(function);
+    }
 
 void Organizations::Delete_()
 {
