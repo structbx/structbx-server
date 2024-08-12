@@ -39,8 +39,7 @@ void BackendServer::AddFunctions_()
     }
 
     // Organizations
-    auto username = get_users_manager().get_current_user().get_username();
-    auto organizations = Organizations(username);
+    auto organizations = Organizations(get_users_manager().get_current_user().get_username());
     for(auto it : organizations.get_functions())
     {
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
@@ -49,6 +48,8 @@ void BackendServer::AddFunctions_()
 
 void BackendServer::Process_()
 {
+    get_files_parameters()->set_directory_base(Tools::SettingsManager::get_basic_properties_().directory_base);
+    
     // Set security type
     set_security_type(Extras::SecurityType::kDisableAll);
     
