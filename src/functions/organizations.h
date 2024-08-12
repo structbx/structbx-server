@@ -1,18 +1,23 @@
 
 
+#include <string>
 #include <list>
 
 #include "core/nebula_atom.h"
 #include "handlers/backend_handler.h"
 #include "functions/function.h"
 #include "tools/dvalue.h"
+#include <files/file_manager.h>
+#include <functions/action.h>
+#include <tools/output_logger.h>
+#include <tools/settings_manager.h>
 
 using namespace NAF;
 
 class Organizations
 {
     public:
-        Organizations(std::string& username);
+        Organizations(std::string username);
 
         std::list<Functions::Function::Ptr>& get_functions()
         {
@@ -22,12 +27,14 @@ class Organizations
 
     protected:
         void Read_();
-        void ReadSpecific_(std::string& username);
+        void ReadSpecific_();
+        void ReadLogo_();
         void Add_();
-        void Modify_(std::string& username);
-        void ModifyLogo_(std::string& username);
+        void Modify_();
+        void ModifyLogo_();
         void Delete_();
 
     private:
+        std::string username_;
         std::list<Functions::Function::Ptr> functions_;
 };
