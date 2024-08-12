@@ -2,7 +2,6 @@
 #include "core/nebula_atom.h"
 #include "functions/action.h"
 #include "handlers/custom_handler.h"
-#include "handlers/frontend_handler.h"
 #include "handlers/root_handler.h"
 #include "tools/route.h"
 #include <query/parameter.h>
