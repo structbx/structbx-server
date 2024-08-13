@@ -181,12 +181,12 @@ void Organizations::ModifyLogo_()
         }
         if(!self.get_file_manager()->IsSupported_())
         {
-            self.HTMLResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Archivo no soportado, debe ser formato PNG.");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Archivo no soportado, debe ser formato PNG.");
             return;
         }
         if(!self.get_file_manager()->VerifyMaxFileSize_())
         {
-            self.HTMLResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El archivo debe ser de menos de 15MB.");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El archivo debe ser de menos de 15MB.");
             return;
         }
         self.get_file_manager()->UploadFile_();
