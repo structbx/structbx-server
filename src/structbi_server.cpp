@@ -17,8 +17,9 @@ int main(int argc, char** argv)
     // Setup
         Core::NebulaAtom app(true);
 
+        Tools::SettingsManager::ReadSettings_();
+        app.SetupSettings_();
         Query::DatabaseManager::StartMySQL_();
-        Tools::SettingsManager::ReadBasicProperties_();
         Security::PermissionsManager::LoadPermissions_();
         Tools::SessionsManager::ReadSessions_();
 

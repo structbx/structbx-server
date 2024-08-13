@@ -48,7 +48,7 @@ void BackendServer::AddFunctions_()
 
 void BackendServer::Process_()
 {
-    get_files_parameters()->set_directory_base(Tools::SettingsManager::get_basic_properties_().directory_base);
+    get_files_parameters()->set_directory_base(Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
     
     // Set security type
     set_security_type(Extras::SecurityType::kDisableAll);
