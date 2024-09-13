@@ -1,8 +1,8 @@
 
 #include "functions/organizations.h"
 
-Organizations::Organizations(std::string username) :
-    username_(username)
+Organizations::Organizations(int id_user) :
+    id_user_(id_user)
 {
     Read_();
     ReadSpecific_();
@@ -26,14 +26,14 @@ void Organizations::ReadSpecific_()
 
     auto action = function->AddAction_("a1");
     action->set_sql_code(
-        "SELECT co.id AS id, co.name AS name, co.state AS state, co.description AS description, co.created_at AS created_at " \
-        "FROM cloud_organizations co " \
-        "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
-        "WHERE cu.email = ?"
+        "SELECT o.id AS id, o.name AS name, o.state AS state, o.description AS description, o.created_at AS created_at " \
+        "FROM organizations o " \
+        "JOIN organizations_users ou ON ou.id_organization = o.id " \
+        "WHERE ou.id_naf_user = ?"
     );
 
     // Parameters and conditions
-    action->AddParameter_("email", Tools::DValue(username_), false);
+    action->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
 
     functions_.push_back(function);
 }
@@ -49,10 +49,10 @@ void Organizations::ReadLogo_()
 
     auto action = function->AddAction_("a1");
     action->set_sql_code(
-        "SELECT co.logo AS logo " \
-        "FROM cloud_organizations co " \
-        "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
-        "WHERE cu.email = ?"
+        "SELECT o.logo AS logo " \
+        "FROM organizations o " \
+        "JOIN organizations_users ou ON ou.id_organization = o.id " \
+        "WHERE ou.id_naf_user = ?"
     );
     action->SetupCondition_("condition-action", Query::ConditionType::kWarning, [](Functions::Action& self)
     {
@@ -71,7 +71,7 @@ void Organizations::ReadLogo_()
     });
 
     // Parameters and conditions
-    action->AddParameter_("email", Tools::DValue(username_), false);
+    action->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
 
     functions_.push_back(function);
 }
@@ -90,10 +90,10 @@ void Organizations::Modify_()
     // Action 1: Modify organization
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "UPDATE cloud_organizations co " \
-        "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
-        "SET co.name = ?, co.description = ? " \
-        "WHERE cu.email = ?"
+        "UPDATE organizations o " \
+        "JOIN organizations_users ou ON ou.idorganization = o.id " \
+        "SET o.name = ?, o.description = ? " \
+        "WHERE ou.id_naf_user = ?"
     );
 
     // Parameters and conditions
@@ -119,7 +119,7 @@ void Organizations::Modify_()
     });
     action1->AddParameter_("description", Tools::DValue(""), true);
 
-    action1->AddParameter_("email", Tools::DValue(username_), false);
+    action1->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
 
     functions_.push_back(function);
 }
@@ -138,12 +138,12 @@ void Organizations::ModifyLogo_()
         // Request logo path in DB
         Functions::Action a1("a1");
         a1.set_sql_code(
-            "SELECT co.logo AS logo " \
-            "FROM cloud_organizations co " \
-            "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
-            "WHERE cu.email = ?"
+            "SELECT o.logo AS logo " \
+            "FROM organizations co " \
+            "JOIN organizations_users ou ON ou.id_organization = o.id " \
+            "WHERE ou.id_naf_user = ?"
         );
-        a1.AddParameter_("email", Tools::DValue(self.get_current_user().get_username()), false);
+        a1.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
 
         a1.ComposeQuery_();
         a1.ExecuteQuery_();
@@ -194,15 +194,15 @@ void Organizations::ModifyLogo_()
         // Save path in DB
         Functions::Action a2("a2");
         a2.set_sql_code(
-            "UPDATE cloud_organizations co " \
-            "JOIN cloud_users cu ON cu.id_cloud_organization = co.id " \
-            "SET co.logo = ? " \
-            "WHERE cu.email = ?"
+            "UPDATE organizations o " \
+            "JOIN organizations_users ou ON ou.id_organization = o.id " \
+            "SET o.logo = ? " \
+            "WHERE ou.id_naf_user = ?"
         );
         
         a2.AddParameter_("logo", Tools::DValue(front_file.get_requested_path()->getFileName()), false);
-        auto user = Tools::DValue(self.get_current_user().get_username());
-        a2.AddParameter_("email", user, false);
+        auto user = Tools::DValue(self.get_current_user().get_id());
+        a2.AddParameter_("id_naf_user", user, false);
 
         a2.ComposeQuery_();
         a2.ExecuteQuery_();

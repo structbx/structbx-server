@@ -17,7 +17,7 @@ using namespace NAF;
 class Organizations
 {
     public:
-        Organizations(std::string username);
+        Organizations(int id_user_);
 
         std::list<Functions::Function::Ptr>& get_functions()
         {
@@ -35,6 +35,6 @@ class Organizations
         void Delete_();
 
     private:
-        std::string username_;
+        int id_user_;
         std::list<Functions::Function::Ptr> functions_;
 };
