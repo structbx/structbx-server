@@ -39,7 +39,7 @@ void BackendServer::AddFunctions_()
     }
 
     // Organizations
-    auto organizations = Organizations(get_users_manager().get_current_user().get_username());
+    auto organizations = Organizations(get_users_manager().get_current_user().get_id());
     for(auto it : organizations.get_functions())
     {
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
