@@ -65,8 +65,7 @@ set(LIB_DEPENDECIES
 # Header
 set(HEADER
     ${PROJECT_BINARY_DIR}
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/functions
+    ${PROJECT_SOURCE_DIR}/src/include
 )
 
 # Sources
@@ -80,7 +79,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/reports.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/reports_graphs.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/reports_parameters.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/organizations.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/spaces.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/spaces_users.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
 )
 
