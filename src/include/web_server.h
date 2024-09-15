@@ -1,4 +1,8 @@
 
+
+#ifndef STRUCTBI_WEBSERVER
+#define STRUCTBI_WEBSERVER
+
 #include "core/nebula_atom.h"
 #include "handlers/root_handler.h"
 
@@ -15,3 +19,5 @@ class Webserver : public Handlers::RootHandler
     private:
         Files::FileManager file_manager_;
 };
+
+#endif //STRUCTBI_WEBSERVER
