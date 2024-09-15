@@ -1,4 +1,6 @@
 
+#ifndef STRUCTBI_TOOLS_IDCHECKER
+#define STRUCTBI_TOOLS_IDCHECKER
 
 #include <list>
 #include <string>
@@ -16,3 +18,5 @@ class IDChecker
 
         std::string id_;
 };
+
+#endif //STRUCTBI_TOOLS_IDCHECKER
