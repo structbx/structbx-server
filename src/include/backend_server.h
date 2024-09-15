@@ -1,24 +1,30 @@
 
+#ifndef STRUCTBI_BACKENDSERVER
+#define STRUCTBI_BACKENDSERVER
+
 #include "core/nebula_atom.h"
 #include "handlers/backend_handler.h"
 
+#include "function_data.h"
 #include "functions/forms.h"
 #include "functions/dashboards.h"
 #include "functions/reports.h"
-#include "functions/reports_graphs.h"
-#include "functions/reports_parameters.h"
 #include "functions/spaces.h"
-#include "functions/spaces_users.h"
 
 using namespace NAF;
 
 class BackendServer : public Handlers::BackendHandler
 {
     public:
-        BackendServer() : Handlers::BackendHandler(){}
+        BackendServer();
         virtual ~BackendServer() {}
 
         void AddFunctions_();
 
         void Process_() override;
+
+    private:
+        FunctionData function_data_;
 };
+
+#endif //STRUCTBI_BACKENDSERVER

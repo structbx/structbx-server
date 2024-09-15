@@ -1,56 +1,34 @@
 
 #include "backend_server.h"
 
+BackendServer::BackendServer()
+{
+
+}
+
 void BackendServer::AddFunctions_()
 {
+    function_data_.set_id_user(get_users_manager().get_current_user().get_id());
+    
     // Forms
-    auto forms = Forms();
-    for(auto it : forms.get_functions())
-    {
+    auto forms = Forms(function_data_);
+    for(auto it : *forms.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
 
     // Dashboards
-    auto dashboards = Dashboards();
-    for(auto it : dashboards.get_functions())
-    {
+    auto dashboards = Dashboards(function_data_);
+    for(auto it : *dashboards.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
 
     // Reports
-    auto reports = Reports();
-    for(auto it : reports.get_functions())
-    {
+    auto reports = Reports(function_data_);
+    for(auto it : *reports.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
-
-    // Reports Graphs
-    auto reports_graphs = ReportsGraphs();
-    for(auto it : reports_graphs.get_functions())
-    {
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
-
-    // Reports parameters
-    auto reports_parameters = ReportsParameters();
-    for(auto it : reports_parameters.get_functions())
-    {
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
 
     // Spaces
-    auto spaces = Spaces(get_users_manager().get_current_user().get_id());
-    for(auto it : spaces.get_functions())
-    {
+    auto spaces = Spaces(function_data_);
+    for(auto it : *spaces.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
-
-    // Space users
-    auto spaces_users = SpacesUsers(get_users_manager().get_current_user().get_id());
-    for(auto it : spaces_users.get_functions())
-    {
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    }
 }
 
 void BackendServer::Process_()
