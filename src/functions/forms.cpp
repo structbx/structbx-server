@@ -1,8 +1,11 @@
 
 #include "functions/forms.h"
 
-Forms::Forms()
+Forms::Forms(FunctionData& function_data)
 {
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
     Read_();
     ReadSpecific_();
     Add_();
@@ -19,7 +22,7 @@ void Forms::Read_()
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM forms");
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Forms::ReadSpecific_()
@@ -43,7 +46,7 @@ void Forms::ReadSpecific_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Forms::Add_()
@@ -140,7 +143,7 @@ void Forms::Add_()
     });
     action2->AddParameter_("description", Tools::DValue(""), true);
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Forms::Modify_()
@@ -253,7 +256,7 @@ void Forms::Modify_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Forms::Delete_()
@@ -277,5 +280,5 @@ void Forms::Delete_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }

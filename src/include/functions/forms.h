@@ -1,24 +1,13 @@
 
+#ifndef STRUCTBI_FUNCTIONS_FORMS
+#define STRUCTBI_FUNCTIONS_FORMS
 
-#include <list>
+#include "function_data.h"
 
-#include "core/nebula_atom.h"
-#include "handlers/backend_handler.h"
-#include "functions/function.h"
-#include "tools/id_checker.h"
-
-using namespace NAF;
-
-class Forms
+class Forms : public FunctionData
 {
     public:
-        Forms();
-
-        std::list<Functions::Function::Ptr>& get_functions()
-        {
-            auto& var = functions_;
-            return var;
-        }
+        Forms(FunctionData& function_data);
 
     protected:
         void Read_();
@@ -26,7 +15,6 @@ class Forms
         void Add_();
         void Modify_();
         void Delete_();
-
-    private:
-        std::list<Functions::Function::Ptr> functions_;
 };
+
+#endif //STRUCTBI_FUNCTIONS_FORMS
