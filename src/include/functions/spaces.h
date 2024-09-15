@@ -14,10 +14,10 @@
 
 using namespace NAF;
 
-class Organizations
+class Spaces
 {
     public:
-        Organizations(int id_user_);
+        Spaces(int id_user_);
 
         std::list<Functions::Function::Ptr>& get_functions()
         {

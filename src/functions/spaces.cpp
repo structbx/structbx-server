@@ -1,7 +1,7 @@
 
-#include "functions/organizations.h"
+#include "functions/spaces.h"
 
-Organizations::Organizations(int id_user) :
+Spaces::Spaces(int id_user) :
     id_user_(id_user)
 {
     Read_();
@@ -13,22 +13,22 @@ Organizations::Organizations(int id_user) :
     Delete_();
 }
 
-void Organizations::Read_()
+void Spaces::Read_()
 {
 
 }
 
-void Organizations::ReadSpecific_()
+void Spaces::ReadSpecific_()
 {
-    // Function GET /api/organization/general/read/id
+    // Function GET /api/spaces/general/read/id
     Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/organization/general/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<Functions::Function>("/api/spaces/general/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     action->set_sql_code(
         "SELECT o.id AS id, o.name AS name, o.state AS state, o.description AS description, o.created_at AS created_at " \
-        "FROM organizations o " \
-        "JOIN organizations_users ou ON ou.id_organization = o.id " \
+        "FROM spaces o " \
+        "JOIN spaces_users ou ON ou.id_space = o.id " \
         "WHERE ou.id_naf_user = ?"
     );
 
@@ -38,11 +38,11 @@ void Organizations::ReadSpecific_()
     functions_.push_back(function);
 }
 
-void Organizations::ReadLogo_()
+void Spaces::ReadLogo_()
 {
-    // Function GET /api/organization/logo/read/id
+    // Function GET /api/spaces/logo/read/id
     Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/organization/logo/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<Functions::Function>("/api/spaces/logo/read/id", HTTP::EnumMethods::kHTTP_GET);
     function->set_response_type(Functions::Function::ResponseType::kFile);
     function->get_file_manager()->set_directory_base("/srv/www/app1.structbi.com-uploaded");
     function->get_file_manager()->AddBasicSupportedFiles_();
@@ -50,8 +50,8 @@ void Organizations::ReadLogo_()
     auto action = function->AddAction_("a1");
     action->set_sql_code(
         "SELECT o.logo AS logo " \
-        "FROM organizations o " \
-        "JOIN organizations_users ou ON ou.id_organization = o.id " \
+        "FROM spaces o " \
+        "JOIN spaces_users ou ON ou.id_space = o.id " \
         "WHERE ou.id_naf_user = ?"
     );
     action->SetupCondition_("condition-action", Query::ConditionType::kWarning, [](Functions::Action& self)
@@ -76,22 +76,22 @@ void Organizations::ReadLogo_()
     functions_.push_back(function);
 }
 
-void Organizations::Add_()
+void Spaces::Add_()
 {
 
 }
 
-void Organizations::Modify_()
+void Spaces::Modify_()
 {
-    // Function PUT /api/organization/general/modify
+    // Function PUT /api/spaces/general/modify
     Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/organization/general/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    // Action 1: Modify organization
+    // Action 1: Modify space
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "UPDATE organizations o " \
-        "JOIN organizations_users ou ON ou.idorganization = o.id " \
+        "UPDATE spaces o " \
+        "JOIN spaces_users ou ON ou.id_space = o.id " \
         "SET o.name = ?, o.description = ? " \
         "WHERE ou.id_naf_user = ?"
     );
@@ -124,11 +124,11 @@ void Organizations::Modify_()
     functions_.push_back(function);
 }
 
-void Organizations::ModifyLogo_()
+void Spaces::ModifyLogo_()
 {
-    // Function PUT /api/organization/logo/modify/
+    // Function PUT /api/spaces/logo/modify/
     Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/organization/logo/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<Functions::Function>("/api/spaces/logo/modify", HTTP::EnumMethods::kHTTP_PUT);
     function->set_response_type(Functions::Function::ResponseType::kCustom);
     function->get_file_manager()->set_directory_base("/srv/www/app1.structbi.com-uploaded");
     function->get_file_manager()->AddSupportedFile_("png", Files::FileProperties{"image/png", true, {""}});
@@ -139,8 +139,8 @@ void Organizations::ModifyLogo_()
         Functions::Action a1("a1");
         a1.set_sql_code(
             "SELECT o.logo AS logo " \
-            "FROM organizations co " \
-            "JOIN organizations_users ou ON ou.id_organization = o.id " \
+            "FROM spaces co " \
+            "JOIN spaces_users ou ON ou.id_space = o.id " \
             "WHERE ou.id_naf_user = ?"
         );
         a1.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
@@ -194,8 +194,8 @@ void Organizations::ModifyLogo_()
         // Save path in DB
         Functions::Action a2("a2");
         a2.set_sql_code(
-            "UPDATE organizations o " \
-            "JOIN organizations_users ou ON ou.id_organization = o.id " \
+            "UPDATE spaces o " \
+            "JOIN spaces_users ou ON ou.id_space = o.id " \
             "SET o.logo = ? " \
             "WHERE ou.id_naf_user = ?"
         );
@@ -214,7 +214,7 @@ void Organizations::ModifyLogo_()
     functions_.push_back(function);
 }
 
-void Organizations::Delete_()
+void Spaces::Delete_()
 {
     
 }
