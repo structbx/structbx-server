@@ -1,44 +1,16 @@
 
 #include "functions/spaces.h"
 
-Spaces::Spaces(int id_user) :
-    id_user_(id_user)
+SpacesLogo::SpacesLogo(FunctionData& function_data)
 {
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
     Read_();
-    ReadSpecific_();
-    ReadLogo_();
-    Add_();
     Modify_();
-    ModifyLogo_();
-    Delete_();
 }
 
-void Spaces::Read_()
-{
-
-}
-
-void Spaces::ReadSpecific_()
-{
-    // Function GET /api/spaces/general/read/id
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/general/read/id", HTTP::EnumMethods::kHTTP_GET);
-
-    auto action = function->AddAction_("a1");
-    action->set_sql_code(
-        "SELECT o.id AS id, o.name AS name, o.state AS state, o.description AS description, o.created_at AS created_at " \
-        "FROM spaces o " \
-        "JOIN spaces_users ou ON ou.id_space = o.id " \
-        "WHERE ou.id_naf_user = ?"
-    );
-
-    // Parameters and conditions
-    action->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
-
-    functions_.push_back(function);
-}
-
-void Spaces::ReadLogo_()
+void SpacesLogo::Read_()
 {
     // Function GET /api/spaces/logo/read/id
     Functions::Function::Ptr function = 
@@ -71,60 +43,12 @@ void Spaces::ReadLogo_()
     });
 
     // Parameters and conditions
-    action->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
+    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
-void Spaces::Add_()
-{
-
-}
-
-void Spaces::Modify_()
-{
-    // Function PUT /api/spaces/general/modify
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
-
-    // Action 1: Modify space
-    auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
-        "UPDATE spaces o " \
-        "JOIN spaces_users ou ON ou.id_space = o.id " \
-        "SET o.name = ?, o.description = ? " \
-        "WHERE ou.id_naf_user = ?"
-    );
-
-    // Parameters and conditions
-    action1->AddParameter_("name", Tools::DValue(""), true)
-    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
-        {
-            param->set_error("El nombre debe ser una cadena de texto");
-            return false;
-        }
-        if(param->ToString_() == "")
-        {
-            param->set_error("El nombre no puede estar vacío");
-            return false;
-        }
-        if(param->ToString_().size() < 3)
-        {
-            param->set_error("El nombre no puede ser menor a 3 dígitos");
-            return false;
-        }
-        return true;
-    });
-    action1->AddParameter_("description", Tools::DValue(""), true);
-
-    action1->AddParameter_("id_naf_user", Tools::DValue(id_user_), false);
-
-    functions_.push_back(function);
-}
-
-void Spaces::ModifyLogo_()
+void SpacesLogo::Modify_()
 {
     // Function PUT /api/spaces/logo/modify/
     Functions::Function::Ptr function = 
@@ -211,7 +135,118 @@ void Spaces::ModifyLogo_()
         self.CompoundFillResponse_(HTTP::Status::kHTTP_OK, self.get_file_manager()->get_result(), "Ok.");
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
+}
+
+SpacesUsers::SpacesUsers(FunctionData& function_data)
+{
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
+    Read_();
+}
+
+void SpacesUsers::Read_()
+{
+    // Function GET /api/spaces/users/read
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/spaces/users/read", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code(
+        "SELECT nu.username, nu.status, nu.created_at, ng.id AS id_group, ng.`group` AS 'group' " \
+        "FROM _naf_users nu " \
+        "JOIN _naf_groups ng ON ng.id = nu.id_group"
+    );
+
+    get_functions()->push_back(function);
+}
+
+Spaces::Spaces(FunctionData& function_data) :
+    spaces_logo_(function_data)
+    ,spaces_users_(function_data)
+{
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
+    Read_();
+    ReadSpecific_();
+    Add_();
+    Modify_();
+    Delete_();
+}
+
+void Spaces::Read_()
+{
+
+}
+
+void Spaces::ReadSpecific_()
+{
+    // Function GET /api/spaces/general/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/spaces/general/read/id", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code(
+        "SELECT o.id AS id, o.name AS name, o.state AS state, o.description AS description, o.created_at AS created_at " \
+        "FROM spaces o " \
+        "JOIN spaces_users ou ON ou.id_space = o.id " \
+        "WHERE ou.id_naf_user = ?"
+    );
+
+    // Parameters and conditions
+    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
+
+    get_functions()->push_back(function);
+}
+
+void Spaces::Add_()
+{
+
+}
+
+void Spaces::Modify_()
+{
+    // Function PUT /api/spaces/general/modify
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
+
+    // Action 1: Modify space
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "UPDATE spaces o " \
+        "JOIN spaces_users ou ON ou.id_space = o.id " \
+        "SET o.name = ?, o.description = ? " \
+        "WHERE ou.id_naf_user = ?"
+    );
+
+    // Parameters and conditions
+    action1->AddParameter_("name", Tools::DValue(""), true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        {
+            param->set_error("El nombre debe ser una cadena de texto");
+            return false;
+        }
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 dígitos");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("description", Tools::DValue(""), true);
+
+    action1->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
+
+    get_functions()->push_back(function);
 }
 
 void Spaces::Delete_()

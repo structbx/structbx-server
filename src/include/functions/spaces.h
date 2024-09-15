@@ -1,40 +1,44 @@
 
+#ifndef STRUCTBI_FUNCTIONS_SPACES
+#define STRUCTBI_FUNCTIONS_SPACES
 
-#include <string>
-#include <list>
 
-#include "core/nebula_atom.h"
-#include "handlers/backend_handler.h"
-#include "functions/function.h"
-#include "tools/dvalue.h"
-#include <files/file_manager.h>
-#include <functions/action.h>
-#include <tools/output_logger.h>
-#include <tools/settings_manager.h>
+#include "function_data.h"
 
-using namespace NAF;
-
-class Spaces
+class SpacesLogo : public FunctionData
 {
     public:
-        Spaces(int id_user_);
-
-        std::list<Functions::Function::Ptr>& get_functions()
-        {
-            auto& var = functions_;
-            return var;
-        }
+        SpacesLogo(FunctionData& function_data);
 
     protected:
         void Read_();
+        void Modify_();
+};
+
+class SpacesUsers : public FunctionData
+{
+    public:
+        SpacesUsers(FunctionData& function_data);
+    
+    protected:
+        void Read_();
+};
+
+class Spaces : public FunctionData
+{
+    public:
+        Spaces(FunctionData& function_data);
+        
+    protected:
+        void Read_();
         void ReadSpecific_();
-        void ReadLogo_();
         void Add_();
         void Modify_();
-        void ModifyLogo_();
         void Delete_();
 
     private:
-        int id_user_;
-        std::list<Functions::Function::Ptr> functions_;
+        SpacesLogo spaces_logo_;
+        SpacesUsers spaces_users_;
 };
+
+#endif //STRUCTBI_FUNCTIONS_SPACES
