@@ -1,8 +1,11 @@
 
 #include "functions/dashboards.h"
 
-Dashboards::Dashboards()
+Dashboards::Dashboards(FunctionData& function_data)
 {
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
     Read_();
     ReadSpecific_();
     Add_();
@@ -19,7 +22,7 @@ void Dashboards::Read_()
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM dashboards ORDER BY position ASC");
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Dashboards::ReadSpecific_()
@@ -43,7 +46,7 @@ void Dashboards::ReadSpecific_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Dashboards::Add_()
@@ -139,7 +142,7 @@ void Dashboards::Add_()
     
     action2->AddParameter_("description", Tools::DValue(""), true);
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Dashboards::Modify_()
@@ -253,7 +256,7 @@ void Dashboards::Modify_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Dashboards::Delete_()
@@ -277,5 +280,5 @@ void Dashboards::Delete_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }

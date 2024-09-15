@@ -1,24 +1,13 @@
 
+#ifndef STRUCTBI_FUNCTIONS_DASHBOARDS
+#define STRUCTBI_FUNCTIONS_DASHBOARDS
 
-#include <list>
+#include "function_data.h"
 
-#include "core/nebula_atom.h"
-#include "handlers/backend_handler.h"
-#include "functions/function.h"
-#include "tools/dvalue.h"
-
-using namespace NAF;
-
-class Dashboards
+class Dashboards : public FunctionData
 {
     public:
-        Dashboards();
-
-        std::list<Functions::Function::Ptr>& get_functions()
-        {
-            auto& var = functions_;
-            return var;
-        }
+        Dashboards(FunctionData& function_data);
 
     protected:
         void Read_();
@@ -26,7 +15,6 @@ class Dashboards
         void Add_();
         void Modify_();
         void Delete_();
-
-    private:
-        std::list<Functions::Function::Ptr> functions_;
 };
+
+#endif //STRUCTBI_FUNCTIONS_DASHBOARDS
