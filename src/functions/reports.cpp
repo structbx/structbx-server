@@ -1,8 +1,65 @@
 
 #include "functions/reports.h"
 
-Reports::Reports()
+ReportsGraphs::ReportsGraphs(FunctionData& function_data)
 {
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
+    Read_();
+}
+
+void ReportsGraphs::Read_()
+{
+    // Function GET /api/reports/graphs/read
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/reports/graphs/read", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("SELECT id, name, created_at FROM reports_graphs");
+
+    get_functions()->push_back(function);
+}
+
+ReportsParameters::ReportsParameters(FunctionData& function_data)
+{
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
+    Read_();
+}
+
+void ReportsParameters::Read_()
+{
+    // Function GET /api/reports/parameters/read/
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/reports/parameters/read", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("SELECT * FROM reports_parameters WHERE id_report = ?");
+
+    // Parameters and conditions
+    action->AddParameter_("report_id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-report_id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id del reporte no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    get_functions()->push_back(function);
+}
+
+Reports::Reports(FunctionData& function_data) :
+    reports_graphs_(function_data)
+    ,reports_parameters_(function_data)
+{
+    set_id_user(function_data.get_id_user());
+    set_functions(function_data.get_functions());
+
     Read_();
     ReadSpecific_();
     Add_();
@@ -25,7 +82,7 @@ void Reports::Read_()
         "LEFT JOIN reports_graphs rg ON rg.id = r.id_graph"
     );
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Reports::ReadSpecific_()
@@ -56,7 +113,7 @@ void Reports::ReadSpecific_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Reports::Add_()
@@ -143,7 +200,7 @@ void Reports::Add_()
 
     action2->AddParameter_("id_graph", Tools::DValue(), true);
     
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Reports::Modify_()
@@ -248,7 +305,7 @@ void Reports::Modify_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }
 
 void Reports::Delete_()
@@ -272,5 +329,5 @@ void Reports::Delete_()
         return true;
     });
 
-    functions_.push_back(function);
+    get_functions()->push_back(function);
 }

@@ -1,25 +1,32 @@
 
+#ifndef STRUCTBI_FUNCTIONS_REPORTS
+#define STRUCTBI_FUNCTIONS_REPORTS
 
-#include <list>
+#include "function_data.h"
 
-#include "core/nebula_atom.h"
-#include "handlers/backend_handler.h"
-#include "functions/function.h"
-#include "tools/dvalue.h"
-
-using namespace NAF;
-
-class Reports
+class ReportsGraphs : public FunctionData
 {
     public:
-        Reports();
+        ReportsGraphs(FunctionData& function_data);
+        
+    protected:
+        void Read_();
+};
 
-        std::list<Functions::Function::Ptr>& get_functions()
-        {
-            auto& var = functions_;
-            return var;
-        }
+class ReportsParameters : public FunctionData
+{
+    public:
+        ReportsParameters(FunctionData& function_data);
+        
+    protected:
+        void Read_();
+};
 
+class Reports : public FunctionData
+{
+    public:
+        Reports(FunctionData& function_data);
+        
     protected:
         void Read_();
         void ReadSpecific_();
@@ -28,5 +35,8 @@ class Reports
         void Delete_();
 
     private:
-        std::list<Functions::Function::Ptr> functions_;
+        ReportsGraphs reports_graphs_;
+        ReportsParameters reports_parameters_;
 };
+
+#endif //STRUCTBI_FUNCTIONS_REPORTS
