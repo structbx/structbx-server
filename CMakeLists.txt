@@ -65,7 +65,7 @@ set(LIB_DEPENDECIES
 # Header
 set(HEADER
     ${PROJECT_BINARY_DIR}
-    ${PROJECT_SOURCE_DIR}/src/include
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 # Sources
