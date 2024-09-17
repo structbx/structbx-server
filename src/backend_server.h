@@ -23,6 +23,9 @@ class BackendServer : public Handlers::BackendHandler
 
         void Process_() override;
 
+    protected:
+        void SetupFunctionData_();
+
     private:
         FunctionData function_data_;
 };

@@ -8,8 +8,6 @@ BackendServer::BackendServer()
 
 void BackendServer::AddFunctions_()
 {
-    function_data_.set_id_user(get_users_manager().get_current_user().get_id());
-    
     // Forms
     auto forms = Forms(function_data_);
     for(auto it : *forms.get_functions())
@@ -48,6 +46,9 @@ void BackendServer::Process_()
         return;
     }
 
+    // Setup Function Data
+    SetupFunctionData_();
+
     // Add functions
     AddFunctions_();
 
@@ -67,4 +68,18 @@ void BackendServer::Process_()
 
     // Process actions
     ProcessActions_();
+}
+
+void BackendServer::SetupFunctionData_()
+{
+    // Setup User ID
+    function_data_.set_id_user(get_users_manager().get_current_user().get_id());
+    
+    // Setup Current Space
+    Poco::Net::NameValueCollection cookies;
+    get_http_server_request().value()->getCookies(cookies);
+    auto cookie_space_id = cookies.find("structbi-space-id");
+
+    if(cookie_space_id != cookies.end())
+        function_data_.set_space_id(cookie_space_id->second);
 }
