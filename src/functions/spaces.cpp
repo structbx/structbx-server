@@ -196,7 +196,74 @@ void Spaces::Read_()
 
 void Spaces::ReadSpecific_()
 {
-    // Function GET /api/spaces/general/read/id
+    // Function GET /api/spaces/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
+
+    function->SetupCustomProcess_([](Functions::Function& self)
+    {
+        // Extract space ID
+        std::string space_id;
+        Poco::Net::NameValueCollection cookies;
+        self.get_http_server_request().value()->getCookies(cookies);
+        auto cookie_space_id = cookies.find("structbi-space-id");
+
+        Functions::Action action("a1");
+
+        if(cookie_space_id == cookies.end())
+        {
+            // Request space ID in DB
+            action.set_sql_code(
+                "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+                "FROM spaces s " \
+                "JOIN spaces_users su ON su.id_space = s.id " \
+                "WHERE su.id_naf_user = ?"
+            );
+            action.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
+        }
+        else
+        {
+            // Request space ID in Cookie
+            action.set_sql_code(
+                "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+                "FROM spaces s " \
+                "JOIN spaces_users su ON su.id_space = s.id " \
+                "WHERE su.id_naf_user = ? AND s.id = ?"
+            );
+            action.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
+            action.AddParameter_("id_space", Tools::DValue(cookie_space_id->second), false);
+        }
+
+        // Execute action
+        if(!action.Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action.get_custom_error());
+            return;
+        }
+        auto result = action.get_json_result();
+
+        // Set Space ID Cookie to the client
+        auto field = action.get_results()->First_();
+        if(!field->IsNull_())
+        {
+            if(cookie_space_id == cookies.end())
+            {
+                Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
+                cookie.setPath("/");
+
+                auto& response = self.get_http_server_response().value();
+                response->addCookie(cookie);
+            }
+
+            self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
+        }
+        else
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
+    });
+
+    get_functions()->push_back(function);
+}
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/spaces/general/read/id", HTTP::EnumMethods::kHTTP_GET);
 
