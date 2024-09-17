@@ -200,11 +200,12 @@ void Spaces::ReadSpecific_()
     auto space_id = get_space_id();
     function->SetupCustomProcess_([space_id](Functions::Function& self)
     {
+        // Function to request the current Space
         Functions::Action action("a1");
 
         if(space_id == "")
         {
-            // Request space ID in DB
+            // Request space ID in DB (Not found in cookie)
             action.set_sql_code(
                 "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
                 "FROM spaces s " \
@@ -240,6 +241,7 @@ void Spaces::ReadSpecific_()
         {
             if(space_id == "")
             {
+                // If space is empty, set the cookie
                 Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
                 cookie.setPath("/");
 
@@ -285,7 +287,7 @@ void Spaces::Change_()
 
     function->SetupCustomProcess_([&](Functions::Function& self)
     {
-
+        // Search first action
         auto action = *self.get_actions().begin();
         if(self.get_actions().begin() == self.get_actions().end())
         {
@@ -305,12 +307,14 @@ void Spaces::Change_()
         auto field = action->get_results()->First_();
         if(!field->IsNull_())
         {
+            // Set Cookie Space ID
             Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
             cookie.setPath("/");
 
             auto& response = self.get_http_server_response().value();
             response->addCookie(cookie);
-                
+            
+            // Send results
             self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
         }
         else
