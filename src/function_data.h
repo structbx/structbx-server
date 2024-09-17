@@ -19,12 +19,22 @@ class FunctionData
     public:
         using FunctionsList = std::shared_ptr<std::list<NAF::Functions::Function::Ptr>>;
 
-        FunctionData()
+        FunctionData() :
+            id_user_(-1)
+            ,space_id_("")
         {
             functions_ = std::make_shared<std::list<NAF::Functions::Function::Ptr>>();
         }
+        FunctionData(FunctionData& function_data) :
+            id_user_(function_data.get_id_user())
+            ,space_id_(function_data.get_space_id())
+            ,functions_(function_data.get_functions())
+        {
+            
+        }
 
         int get_id_user(){ return id_user_; }
+        std::string get_space_id(){ return space_id_; }
         FunctionsList& get_functions()
         {
             auto& var = functions_;
@@ -32,10 +42,12 @@ class FunctionData
         }
 
         void set_id_user(int id_user){ id_user_ = id_user; }
+        void set_space_id(std::string space_id){ space_id_ = space_id; }
         void set_functions(FunctionsList functions){ functions_ = functions; }
 
     private:
         int id_user_;
+        std::string space_id_;
         FunctionsList functions_;
 };
 
