@@ -32,6 +32,7 @@ class Spaces : public FunctionData
     protected:
         void Read_();
         void ReadSpecific_();
+        void Change_();
         void Add_();
         void Modify_();
         void Delete_();
