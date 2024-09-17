@@ -178,7 +178,20 @@ Spaces::Spaces(FunctionData& function_data) :
 
 void Spaces::Read_()
 {
+    // Function GET /api/spaces/read
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action = function->AddAction_("a1");
+    action->set_sql_code(
+        "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ?"
+    );
+    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
 
+    get_functions()->push_back(function);
 }
 
 void Spaces::ReadSpecific_()
