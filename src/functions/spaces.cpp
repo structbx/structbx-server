@@ -1,11 +1,10 @@
 
 #include "functions/spaces.h"
+#include "function_data.h"
 
-SpacesLogo::SpacesLogo(FunctionData& function_data)
+SpacesLogo::SpacesLogo(FunctionData& function_data) :
+    FunctionData(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
     Modify_();
 }
@@ -138,11 +137,9 @@ void SpacesLogo::Modify_()
     get_functions()->push_back(function);
 }
 
-SpacesUsers::SpacesUsers(FunctionData& function_data)
+SpacesUsers::SpacesUsers(FunctionData& function_data) :
+    FunctionData(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
 }
 
@@ -163,12 +160,10 @@ void SpacesUsers::Read_()
 }
 
 Spaces::Spaces(FunctionData& function_data) :
-    spaces_logo_(function_data)
+    FunctionData(function_data)
+    ,spaces_logo_(function_data)
     ,spaces_users_(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
     ReadSpecific_();
     Change_();
@@ -202,17 +197,12 @@ void Spaces::ReadSpecific_()
         std::make_shared<Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    function->SetupCustomProcess_([](Functions::Function& self)
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id](Functions::Function& self)
     {
-        // Extract space ID
-        std::string space_id;
-        Poco::Net::NameValueCollection cookies;
-        self.get_http_server_request().value()->getCookies(cookies);
-        auto cookie_space_id = cookies.find("structbi-space-id");
-
         Functions::Action action("a1");
 
-        if(cookie_space_id == cookies.end())
+        if(space_id == "")
         {
             // Request space ID in DB
             action.set_sql_code(
@@ -233,7 +223,7 @@ void Spaces::ReadSpecific_()
                 "WHERE su.id_naf_user = ? AND s.id = ?"
             );
             action.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
-            action.AddParameter_("id_space", Tools::DValue(cookie_space_id->second), false);
+            action.AddParameter_("id_space", Tools::DValue(space_id), false);
         }
 
         // Execute action
@@ -248,7 +238,7 @@ void Spaces::ReadSpecific_()
         auto field = action.get_results()->First_();
         if(!field->IsNull_())
         {
-            if(cookie_space_id == cookies.end())
+            if(space_id == "")
             {
                 Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
                 cookie.setPath("/");

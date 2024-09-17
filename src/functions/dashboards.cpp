@@ -1,11 +1,9 @@
 
 #include "functions/dashboards.h"
 
-Dashboards::Dashboards(FunctionData& function_data)
+Dashboards::Dashboards(FunctionData& function_data) :
+    FunctionData(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
     ReadSpecific_();
     Add_();

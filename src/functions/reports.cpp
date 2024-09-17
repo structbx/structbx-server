@@ -1,11 +1,9 @@
 
 #include "functions/reports.h"
 
-ReportsGraphs::ReportsGraphs(FunctionData& function_data)
+ReportsGraphs::ReportsGraphs(FunctionData& function_data) :
+    FunctionData(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
 }
 
@@ -21,11 +19,9 @@ void ReportsGraphs::Read_()
     get_functions()->push_back(function);
 }
 
-ReportsParameters::ReportsParameters(FunctionData& function_data)
+ReportsParameters::ReportsParameters(FunctionData& function_data) :
+    FunctionData(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
 }
 
@@ -54,12 +50,10 @@ void ReportsParameters::Read_()
 }
 
 Reports::Reports(FunctionData& function_data) :
-    reports_graphs_(function_data)
+    FunctionData(function_data)
+    ,reports_graphs_(function_data)
     ,reports_parameters_(function_data)
 {
-    set_id_user(function_data.get_id_user());
-    set_functions(function_data.get_functions());
-
     Read_();
     ReadSpecific_();
     Add_();
