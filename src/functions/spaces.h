@@ -38,8 +38,8 @@ class Spaces : public FunctionData
         void Delete_();
 
     private:
-        SpacesLogo spaces_logo_;
-        SpacesUsers spaces_users_;
+        SpacesLogo logo_;
+        SpacesUsers users_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_SPACES

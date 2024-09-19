@@ -1,6 +1,5 @@
 
 #include "functions/spaces.h"
-#include "function_data.h"
 
 SpacesLogo::SpacesLogo(FunctionData& function_data) :
     FunctionData(function_data)
@@ -161,8 +160,8 @@ void SpacesUsers::Read_()
 
 Spaces::Spaces(FunctionData& function_data) :
     FunctionData(function_data)
-    ,spaces_logo_(function_data)
-    ,spaces_users_(function_data)
+    ,logo_(function_data)
+    ,users_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -180,7 +179,7 @@ void Spaces::Read_()
     
     auto action = function->AddAction_("a1");
     action->set_sql_code(
-        "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+        "SELECT s.* " \
         "FROM spaces s " \
         "JOIN spaces_users su ON su.id_space = s.id " \
         "WHERE su.id_naf_user = ?"
@@ -207,7 +206,7 @@ void Spaces::ReadSpecific_()
         {
             // Request space ID in DB (Not found in cookie)
             action.set_sql_code(
-                "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+                "SELECT s.* " \
                 "FROM spaces s " \
                 "JOIN spaces_users su ON su.id_space = s.id " \
                 "WHERE su.id_naf_user = ?"
@@ -218,7 +217,7 @@ void Spaces::ReadSpecific_()
         {
             // Request space ID in Cookie
             action.set_sql_code(
-                "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+                "SELECT s.* " \
                 "FROM spaces s " \
                 "JOIN spaces_users su ON su.id_space = s.id " \
                 "WHERE su.id_naf_user = ? AND s.id = ?"
