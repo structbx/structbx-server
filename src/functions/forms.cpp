@@ -18,7 +18,14 @@ void Forms::Read_()
         std::make_shared<Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
-    action->set_sql_code("SELECT * FROM forms");
+    action->set_sql_code(
+        "SELECT " \
+            "* " \
+        "FROM forms " \
+        "WHERE " \
+            "id_space = ? "
+    );
+    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
 }
@@ -55,6 +62,7 @@ void Forms::Add_()
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
+    action1->set_final(false);
     action1->set_sql_code("SELECT id FROM forms WHERE identifier = ?");
     action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
@@ -80,7 +88,7 @@ void Forms::Add_()
 
     // Action 2: Add the new form
     auto action2 = function->AddAction_("a2");
-    action2->set_sql_code("INSERT INTO forms (identifier, name, state, description, id_cloud_organization) VALUES (?, ?, ?, ?, 1)");
+    action2->set_sql_code("INSERT INTO forms (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
 
     action2->AddParameter_("identifier", Tools::DValue(""), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -139,7 +147,18 @@ void Forms::Add_()
         }
         return true;
     });
+    action2->AddParameter_("privacity", Tools::DValue(""), true)
+    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("La privacidad no puede estar vacía");
+            return false;
+        }
+        return true;
+    });
     action2->AddParameter_("description", Tools::DValue(""), true);
+    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
 }
@@ -152,6 +171,7 @@ void Forms::Modify_()
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
+    action1->set_final(false);
     action1->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ?");
     action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
@@ -188,7 +208,11 @@ void Forms::Modify_()
 
     // Action 2: Modify form
     auto action2 = function->AddAction_("a1");
-    action2->set_sql_code("UPDATE forms SET identifier = ?, name = ?, state = ?, description = ? WHERE id = ?");
+    action2->set_sql_code(
+        "UPDATE forms " \
+        "SET identifier = ?, name = ?, state = ?, privacity = ?, description = ? " \
+        "WHERE id = ? AND id_space = ?"
+    );
 
     // Parameters and conditions
     action2->AddParameter_("identifier", Tools::DValue(""), true)
@@ -241,6 +265,16 @@ void Forms::Modify_()
         }
         return true;
     });
+    action2->AddParameter_("privacity", Tools::DValue(""), true)
+    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("La privacidad no puede estar vacía");
+            return false;
+        }
+        return true;
+    });
     action2->AddParameter_("description", Tools::DValue(""), true);
 
     action2->AddParameter_("id", Tools::DValue(""), true)
@@ -253,6 +287,7 @@ void Forms::Modify_()
         }
         return true;
     });
+    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
 }
@@ -264,7 +299,7 @@ void Forms::Delete_()
         std::make_shared<Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
 
     auto action = function->AddAction_("a1");
-    action->set_sql_code("DELETE FROM forms WHERE id = ?");
+    action->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
 
     // Parameters and conditions
     action->AddParameter_("id", Tools::DValue(""), true)
@@ -277,6 +312,7 @@ void Forms::Delete_()
         }
         return true;
     });
+    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
 }
