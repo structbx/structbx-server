@@ -18,15 +18,16 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
-
-message(${CMAKE_MODULE_PATH})
-
-# Find MySQL
-find_package(MySQL REQUIRED)
-if(NOT MySQL_FOUND)
-    message(FATAL_ERROR "MySQL not found")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_extra_modules)
 endif()
-list(APPEND HEADER ${MySQL_INCLUDE_DIRS})
+
+# Find libmysqlclient
+find_package(libmysqlclient REQUIRED)
+if(NOT libmysqlclient_FOUND)
+    message(FATAL_ERROR "libmysqlclient not found")
+endif()
+list(APPEND HEADER ${libmysqlclient_INCLUDE_DIRS_RELEASE})
 
 # Find yaml-cpp
 find_package(yaml-cpp REQUIRED)
