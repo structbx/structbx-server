@@ -4,12 +4,22 @@
         {
             "label": "Conan install Deps"
             ,"type": "shell"
-            ,"command": "cd build/Debug && conan install --build=missing ../../"
-        },
-        {
+            ,"command": "cd build/Debug && conan install ../../ --output-folder=./ --build=missing"
+        }
+        ,{
             "label": "Generate Cert/Key"
             ,"type": "shell"
             ,"command": "cd build/Debug && openssl req -nodes -new -x509 -keyout key.pem -out cert.pem"
+        }
+        ,{
+            "label": "Clean Build"
+            ,"type": "shell"
+            ,"command": "cd build/Debug && rm -r *"
+        }
+        ,{
+            "label": "Install"
+            ,"type": "shell"
+            ,"command": "cd build/Debug && sudo cmake --build . --target install"
         }
     ]
 }
