@@ -1,5 +1,6 @@
 
 #include "functions/forms.h"
+#include <algorithm>
 
 Forms::Forms(FunctionData& function_data) :
     FunctionData(function_data)
@@ -59,6 +60,8 @@ void Forms::Add_()
     // Function POST /api/forms/add
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
+
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
@@ -159,6 +162,74 @@ void Forms::Add_()
     });
     action2->AddParameter_("description", Tools::DValue(""), true);
     action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+
+    // Action 3: Get the table id and name
+    auto action3 = function->AddAction_("a3");
+    action3->set_sql_code("SELECT identifier, id_space FROM forms WHERE id_space = " + get_space_id() + " AND identifier = ?");
+
+    action3->AddParameter_("identifier", Tools::DValue(""), true);
+
+    // Setup Custom Process
+    function->SetupCustomProcess_([&](Functions::Function& self)
+    {
+        // Search first action
+        if(self.get_actions().begin() == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No actions found.");
+            return;
+        }
+
+        // Iterate over actions
+        for(auto action : self.get_actions())
+        {
+            // Execute action
+            if(!action->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action->get_custom_error());
+                return;
+            }
+        }
+
+        // Get results of action3
+        auto action3 = std::find_if(self.get_actions().begin(), self.get_actions().end(), [](Functions::Action::Ptr& action)
+        {
+            return action->get_identifier() == "a3";
+        });
+        if(action3 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 not found");
+            return;
+        }
+        auto form_identifier = action3->get()->get_results()->ExtractField_(0, 0);
+        if(form_identifier->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 results identifier is null");
+            return;
+        }
+        auto form_id_space = action3->get()->get_results()->ExtractField_(0, 1);
+        if(form_id_space->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 results id space is null");
+            return;
+        }
+
+        // Action 4: Create the table
+        Functions::Action action4("a4");
+        action4.set_sql_code(
+            "CREATE TABLE form_" + form_id_space->ToString_() + "_" + form_identifier->ToString_() + " " \
+            "(" \
+                "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_at DATETIME NOT NULL DEFAULT NOW() " \
+                ",INDEX idx_created_at (created_at) USING BTREE" \
+            ")"
+        );
+        if(!action4.Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action4.get_custom_error());
+            return;
+        }
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
