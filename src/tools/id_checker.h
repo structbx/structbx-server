@@ -12,7 +12,7 @@ class IDChecker
     public:
         IDChecker();
 
-        bool Check_(std::string& id);
+        bool Check_(std::string id);
 
         std::list<char> allowed_characters_;
 
