@@ -399,7 +399,7 @@ void Forms::Modify_()
             // Execute action
             if(!action->Work_())
             {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + "HbdcAS3FsT");
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": HbdcAS3FsT");
                 return;
             }
         }
@@ -449,11 +449,27 @@ void Forms::Delete_()
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    auto action = function->AddAction_("a1");
-    action->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Parameters and conditions
-    action->AddParameter_("id", Tools::DValue(""), true)
+    // Action 1: Get current identifier and id_space
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
+    action1->set_final(false);
+    action1->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Action 2: Delete form record
+    auto action2 = function->AddAction_("a2");
+    action2->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
+    action2->AddParameter_("id", Tools::DValue(""), true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
@@ -463,7 +479,56 @@ void Forms::Delete_()
         }
         return true;
     });
-    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+
+    // Setup Custom Process
+    function->SetupCustomProcess_([&](Functions::Function& self)
+    {
+        // Search first action
+        if(self.get_actions().begin() == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 7dCZ4eogZ8");
+            return;
+        }
+
+        // Iterate over actions
+        for(auto action : self.get_actions())
+        {
+            // Execute action
+            if(!action->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": XXFwxZhaNV");
+                return;
+            }
+        }
+
+        // Compare old identifier and new identifier
+        auto action1 = self.GetAction_("a1");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 9rR0LnKLCa");
+            return;
+        }
+        auto identifier = action1->get()->get_results()->ExtractField_(0, 0);
+        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
+
+        if(identifier->IsNull_() || id_space->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error J5pktjAN5K");
+            return;
+        }
+
+        // Action 3: Delete table
+        Functions::Action action3("a3");
+        action3.set_sql_code("DROP TABLE IF EXISTS form_" + id_space->ToString_() + "_" + identifier->ToString_());
+        if(!action3.Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error lOuU13kOu6");
+            return;
+        }
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
