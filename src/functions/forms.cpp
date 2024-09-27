@@ -112,10 +112,10 @@ void Forms::Add_()
             param->set_error("El identificador no puede ser menor a 3 dígitos");
             return false;
         }
-        bool result = IDChecker().Check_(string_param);
+        bool result = IDChecker().Check_(param->get_value().ToString_());
         if(!result)
         {
-            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9, \"-\" y \"_\"");
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
             return false;
         }
         return true;
@@ -240,32 +240,12 @@ void Forms::Modify_()
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    // Action 1: Verify that the form identifier don't exists
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Get current identifier and id_space
     auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action1->set_final(false);
-    action1->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ?");
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
-    {
-        if(self.get_results()->size() > 0)
-        {
-            self.set_custom_error("Un formulario con este identificador ya existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action1->AddParameter_("identifier", Tools::DValue(""), true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value().ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
     action1->AddParameter_("id", Tools::DValue(""), true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -277,16 +257,53 @@ void Forms::Modify_()
         return true;
     });
 
-    // Action 2: Modify form
-    auto action2 = function->AddAction_("a1");
-    action2->set_sql_code(
+    // Action 2: Verify that the form identifier don't exists
+    auto action2 = function->AddAction_("a2");
+    action2->set_final(false);
+    action2->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ?");
+    action2->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Un formulario con este identificador ya existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action2->AddParameter_("id", Tools::DValue(""), true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Action 3: Modify form
+    auto action3 = function->AddAction_("a3");
+    action3->set_sql_code(
         "UPDATE forms " \
         "SET identifier = ?, name = ?, state = ?, privacity = ?, description = ? " \
         "WHERE id = ? AND id_space = ?"
     );
 
     // Parameters and conditions
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action3->AddParameter_("identifier", Tools::DValue(""), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
@@ -304,9 +321,15 @@ void Forms::Modify_()
             param->set_error("El identificador no puede ser menor a 3 dígitos");
             return false;
         }
+        bool result = IDChecker().Check_(param->get_value().ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
         return true;
     });
-    action2->AddParameter_("name", Tools::DValue(""), true)
+    action3->AddParameter_("name", Tools::DValue(""), true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().get_type() != Tools::DValue::Type::kString)
@@ -326,7 +349,7 @@ void Forms::Modify_()
         }
         return true;
     });
-    action2->AddParameter_("state", Tools::DValue(""), true)
+    action3->AddParameter_("state", Tools::DValue(""), true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
@@ -336,7 +359,7 @@ void Forms::Modify_()
         }
         return true;
     });
-    action2->AddParameter_("privacity", Tools::DValue(""), true)
+    action3->AddParameter_("privacity", Tools::DValue(""), true)
     ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
@@ -346,9 +369,9 @@ void Forms::Modify_()
         }
         return true;
     });
-    action2->AddParameter_("description", Tools::DValue(""), true);
+    action3->AddParameter_("description", Tools::DValue(""), true);
 
-    action2->AddParameter_("id", Tools::DValue(""), true)
+    action3->AddParameter_("id", Tools::DValue(""), true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
@@ -358,7 +381,64 @@ void Forms::Modify_()
         }
         return true;
     });
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action3->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+
+    // Setup Custom Process
+    function->SetupCustomProcess_([&](Functions::Function& self)
+    {
+        // Search first action
+        if(self.get_actions().begin() == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UjR4f9nmIO");
+            return;
+        }
+
+        // Iterate over actions
+        for(auto action : self.get_actions())
+        {
+            // Execute action
+            if(!action->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + "HbdcAS3FsT");
+                return;
+            }
+        }
+
+        // Compare old identifier and new identifier
+        auto action1 = self.GetAction_("a1");
+        auto action2 = self.GetAction_("a2");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error EgdW7Wg5WV");
+            return;
+        }
+        auto old_identifier = action1->get()->get_results()->ExtractField_(0, 0);
+        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
+        auto new_identifier = action2->get()->GetParameter("identifier");
+
+        if(old_identifier->IsNull_() || id_space->IsNull_() || new_identifier == action2->get()->get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5sVP0geEXI");
+            return;
+        }
+
+        // Action 4: Modify the table
+        if(old_identifier->ToString_() != new_identifier->get()->ToString_())
+        {
+            Functions::Action action4("a4");
+            action4.set_sql_code(
+                "RENAME TABLE IF EXISTS " \
+                "form_" + id_space->ToString_() + "_" + old_identifier->ToString_() + " " \
+                "TO form_" + id_space->ToString_() + "_" + new_identifier->get()->ToString_());
+            if(!action4.Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error iFZCXs2XEN");
+                return;
+            }
+        }
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
