@@ -38,11 +38,10 @@ void Forms::ReadSpecific_()
         std::make_shared<Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
-    action->set_sql_code("SELECT * FROM forms WHERE id = ?");
+    action->set_sql_code("SELECT * FROM forms WHERE id = ? AND id_space = ?");
 
-    // Parameters and conditions
     action->AddParameter_("id", Tools::DValue(""), true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value().ToString_() == "")
         {
@@ -51,8 +50,30 @@ void Forms::ReadSpecific_()
         }
         return true;
     });
+    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
+
+    // Function GET /api/forms/read/identifier
+    Functions::Function::Ptr function2 = 
+        std::make_shared<Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action2 = function2->AddAction_("a1");
+    action2->set_sql_code("SELECT * FROM forms WHERE identifier = ? AND id_space = ?");
+
+    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+
+    get_functions()->push_back(function2);
 }
 
 void Forms::Add_()
