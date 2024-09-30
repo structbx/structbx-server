@@ -4,6 +4,15 @@
 
 #include "function_data.h"
 
+class FormsData : public FunctionData
+{
+    public:
+        FormsData(FunctionData& function_data);
+
+    protected:
+        void Read_();
+};
+
 class Forms : public FunctionData
 {
     public:
@@ -15,6 +24,9 @@ class Forms : public FunctionData
         void Add_();
         void Modify_();
         void Delete_();
+
+    private:
+        FormsData forms_data_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMS
