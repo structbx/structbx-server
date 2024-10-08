@@ -5,6 +5,7 @@ FormsData::FormsData(FunctionData& function_data) :
     FunctionData(function_data)
 {
     Read_();
+    ReadColumns_();
 }
 
 void FormsData::Read_()
@@ -125,6 +126,53 @@ void FormsData::Read_()
             json_result->set("message", action3.get_message());
             self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
     });
+
+    get_functions()->push_back(function);
+}
+
+void FormsData::ReadColumns_()
+{
+    // Function GET /api/forms/data/columns/read
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/data/columns/read", HTTP::EnumMethods::kHTTP_GET);
+
+    // Action 1: Get current identifier and id_space
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action1->set_final(false);
+    action1->AddParameter_("identifier", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action1->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+
+    // Action 2: Get form columns
+    auto action2 = function->AddAction_("a2");
+    action2->set_sql_code(
+        "SELECT fc.* " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value().ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
 
     get_functions()->push_back(function);
 }
