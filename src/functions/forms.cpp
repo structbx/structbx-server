@@ -36,8 +36,9 @@ void FormsData::Read_()
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
     action2->set_sql_code(
-        "SELECT fc.identifier, fc.name " \
+        "SELECT fc.*, fct.identifier AS column_type " \
         "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
@@ -109,22 +110,31 @@ void FormsData::Read_()
             else
                 columns += ", " + identifier->ToString_() + " AS '" + name->ToString_() + "'";
         }
+        if(columns == "")
+            columns = "*";
 
         // Action 3: Get Form data
-            Functions::Action action3("a3");
-            action3.set_sql_code(
-                "SELECT id, " + columns + " " \
-                "FROM form_" + id_space->ToString_() + "_" + identifier->ToString_());
-            if(!action3.Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
-                return;
-            }
+        Functions::Action action3("a3");
+        action3.set_sql_code(
+            "SELECT " + columns + " " \
+            "FROM form_" + id_space->ToString_() + "_" + identifier->ToString_());
+        if(!action3.Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
+            return;
+        }
 
-            auto json_result = action3.CreateJSONResult_();
-            json_result->set("status", action3.get_status());
-            json_result->set("message", action3.get_message());
-            self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
+        // Action 3 results
+        auto json_result = action3.CreateJSONResult_();
+        json_result->set("status", action3.get_status());
+        json_result->set("message", action3.get_message());
+
+        // Action 2 results
+        auto json_result_2 = action2->get()->CreateJSONResult_();
+        json_result->set("columns_meta", json_result_2);
+
+        // Send results
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
     });
 
     get_functions()->push_back(function);
@@ -156,8 +166,9 @@ void FormsData::ReadColumns_()
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
     action2->set_sql_code(
-        "SELECT fc.* " \
+        "SELECT fc.*, fct.identifier AS column_type " \
         "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
