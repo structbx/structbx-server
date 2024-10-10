@@ -5,25 +5,6 @@
 
 #include "function_data.h"
 
-class SpacesLogo : public FunctionData
-{
-    public:
-        SpacesLogo(FunctionData& function_data);
-
-    protected:
-        void Read_();
-        void Modify_();
-};
-
-class SpacesUsers : public FunctionData
-{
-    public:
-        SpacesUsers(FunctionData& function_data);
-    
-    protected:
-        void Read_();
-};
-
 class Spaces : public FunctionData
 {
     public:
@@ -37,9 +18,6 @@ class Spaces : public FunctionData
         void Modify_();
         void Delete_();
 
-    private:
-        SpacesLogo logo_;
-        SpacesUsers users_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_SPACES
