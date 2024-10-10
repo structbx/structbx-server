@@ -6,8 +6,11 @@
 #include "handlers/backend_handler.h"
 
 #include "function_data.h"
-#include "functions/spaces.h"
-#include "functions/forms.h"
+#include "functions/spaces/spaces.h"
+#include "functions/spaces/spaces_users.h"
+#include "functions/spaces/spaces_logo.h"
+#include "functions/forms/forms.h"
+#include "functions/forms/forms_data.h"
 
 using namespace NAF;
 
