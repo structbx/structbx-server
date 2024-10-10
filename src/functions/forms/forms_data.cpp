@@ -172,9 +172,15 @@ void FormsData::Add_()
 
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get current identifier and id_space
-    auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    // Action 1: Get form columns
+    auto action1 = function->AddAction_("a2");
+    action1->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
     action1->set_final(false);
     action1->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -189,71 +195,41 @@ void FormsData::Add_()
 
     action1->AddParameter_("id_space", get_space_id(), false);
 
-    // Action 2: Get form columns
-    auto action2 = function->AddAction_("a2");
-    action2->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action2->set_final(false);
-    action2->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action2->AddParameter_("id_space", get_space_id(), false);
-
-    // Action 3: Save new record
-    function->AddAction_("a3");
-
     // Setup Custom Process
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
-        // Get actions
-        auto action1 = self.GetAction_("a1");
-        auto action2 = self.GetAction_("a2");
-        auto action3 = self.GetAction_("a3");
-        if(action1 == self.get_actions().end() || action2 == self.get_actions().end() || action3 == self.get_actions().end())
+        // Action 3: Save new record
+        auto action3 = self.AddAction_("a3");
+
+        // Get action 1
+        auto action1 = self.GetAction_("a2");
+        if(action1 == self.get_actions().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error obLuu4LBe9");
             return;
         }
 
-        // Execute actions
+        // Execute action 1
         if(!action1->get()->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": WceLQjCC9V");
-            return;
-        }
-        if(!action2->get()->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get()->get_identifier() + ": twQ1cxcgZs");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": twQ1cxcgZs");
             return;
         }
 
         // Get form info
-        auto identifier = action1->get()->get_results()->ExtractField_(0, 0);
-        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
+        auto form_identifier = self.GetParameter_("form-identifier");
 
-        if(identifier->IsNull_() || id_space->IsNull_())
+        if(form_identifier == self.get_parameters().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error ABcWG9ZSel");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 1VxAfjpkhN");
             return;
         }
 
         // Get columns
         std::string columns = "";
         std::string values = "";
-        for(auto it : *action2->get()->get_results())
+        for(auto it : *action1->get()->get_results())
         {
             // Get column
             auto identifier = it.get()->ExtractField_("identifier");
@@ -283,7 +259,7 @@ void FormsData::Add_()
             }
 
             // Setup parameter
-            action3->get()->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action3->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
@@ -314,13 +290,13 @@ void FormsData::Add_()
         }
 
         // Set SQL Code to action 3
-        action3->get()->set_sql_code(
-            "INSERT INTO  form_" + id_space->ToString_() + "_" + identifier->ToString_() + " " \
+        action3->set_sql_code(
+            "INSERT INTO  form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
-        self.IdentifyParameters_(*action3);
-        if(!action3->get()->Work_())
+        self.IdentifyParameters_(action3);
+        if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
