@@ -20,10 +20,10 @@ void FormsData::Read_()
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
     action1->set_final(false);
-    action1->AddParameter_("identifier", Tools::DValue(""), true)
+    action1->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -31,7 +31,7 @@ void FormsData::Read_()
         return true;
     });
 
-    action1->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
@@ -43,10 +43,10 @@ void FormsData::Read_()
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
     action2->set_final(false);
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action2->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -54,7 +54,7 @@ void FormsData::Read_()
         return true;
     });
 
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
@@ -150,10 +150,10 @@ void FormsData::ReadColumns_()
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
     action1->set_final(false);
-    action1->AddParameter_("identifier", Tools::DValue(""), true)
+    action1->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -161,7 +161,7 @@ void FormsData::ReadColumns_()
         return true;
     });
 
-    action1->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
@@ -170,12 +170,12 @@ void FormsData::ReadColumns_()
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier != 'id'"
     );
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action2->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -183,7 +183,11 @@ void FormsData::ReadColumns_()
         return true;
     });
 
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("id_space", get_space_id(), false);
+
+    get_functions()->push_back(function);
+}
+
 
     get_functions()->push_back(function);
 }
@@ -213,7 +217,7 @@ void Forms::Read_()
         "WHERE " \
             "id_space = ? "
     );
-    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 }
@@ -227,17 +231,17 @@ void Forms::ReadSpecific_()
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM forms WHERE id = ? AND id_space = ?");
 
-    action->AddParameter_("id", Tools::DValue(""), true)
+    action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El id del formulario no puede estar vacío");
             return false;
         }
         return true;
     });
-    action->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 
@@ -248,17 +252,17 @@ void Forms::ReadSpecific_()
     auto action2 = function2->AddAction_("a1");
     action2->set_sql_code("SELECT * FROM forms WHERE identifier = ? AND id_space = ?");
 
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action2->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador del formulario no puede estar vacío");
             return false;
         }
         return true;
     });
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function2);
 }
@@ -286,10 +290,10 @@ void Forms::Add_()
         return true;
     });
 
-    action1->AddParameter_("identifier", Tools::DValue(""), true)
+    action1->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -301,11 +305,11 @@ void Forms::Add_()
     auto action2 = function->AddAction_("a2");
     action2->set_sql_code("INSERT INTO forms (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
 
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action2->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        auto string_param = param->get_value().ToString_();
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        auto string_param = param->get_value()->ToString_();
+        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -320,7 +324,7 @@ void Forms::Add_()
             param->set_error("El identificador no puede ser menor a 3 dígitos");
             return false;
         }
-        bool result = IDChecker().Check_(param->get_value().ToString_());
+        bool result = IDChecker().Check_(param->get_value()->ToString_());
         if(!result)
         {
             param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
@@ -328,54 +332,54 @@ void Forms::Add_()
         }
         return true;
     });
-    action2->AddParameter_("name", Tools::DValue(""), true)
+    action2->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
         }
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El nombre no puede estar vacío");
             return false;
         }
-        if(param->get_value().ToString_().size() < 3)
+        if(param->get_value()->ToString_().size() < 3)
         {
             param->set_error("El nombre no puede ser menor a 3 dígitos");
             return false;
         }
         return true;
     });
-    action2->AddParameter_("state", Tools::DValue(""), true)
+    action2->AddParameter_("state", "", true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El estado no puede estar vacío");
             return false;
         }
         return true;
     });
-    action2->AddParameter_("privacity", Tools::DValue(""), true)
+    action2->AddParameter_("privacity", "", true)
     ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("La privacidad no puede estar vacía");
             return false;
         }
         return true;
     });
-    action2->AddParameter_("description", Tools::DValue(""), true);
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("description", "", true);
+    action2->AddParameter_("id_space", get_space_id(), false);
 
     // Action 3: Get the table id and name
     auto action3 = function->AddAction_("a3");
     action3->set_sql_code("SELECT identifier, id_space FROM forms WHERE id_space = " + get_space_id() + " AND identifier = ?");
 
-    action3->AddParameter_("identifier", Tools::DValue(""), true);
+    action3->AddParameter_("identifier", "", true);
 
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
@@ -454,10 +458,10 @@ void Forms::Modify_()
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action1->set_final(false);
-    action1->AddParameter_("id", Tools::DValue(""), true)
+    action1->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El id no puede estar vacío");
             return false;
@@ -480,10 +484,10 @@ void Forms::Modify_()
         return true;
     });
 
-    action2->AddParameter_("identifier", Tools::DValue(""), true)
+    action2->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
@@ -491,10 +495,10 @@ void Forms::Modify_()
         return true;
     });
 
-    action2->AddParameter_("id", Tools::DValue(""), true)
+    action2->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El id no puede estar vacío");
             return false;
@@ -511,25 +515,25 @@ void Forms::Modify_()
     );
 
     // Parameters and conditions
-    action3->AddParameter_("identifier", Tools::DValue(""), true)
+    action3->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
         }
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador no puede estar vacío");
             return false;
         }
-        if(param->get_value().ToString_().size() < 3)
+        if(param->get_value()->ToString_().size() < 3)
         {
             param->set_error("El identificador no puede ser menor a 3 dígitos");
             return false;
         }
-        bool result = IDChecker().Check_(param->get_value().ToString_());
+        bool result = IDChecker().Check_(param->get_value()->ToString_());
         if(!result)
         {
             param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
@@ -537,59 +541,59 @@ void Forms::Modify_()
         }
         return true;
     });
-    action3->AddParameter_("name", Tools::DValue(""), true)
+    action3->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
         }
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El nombre no puede estar vacío");
             return false;
         }
-        if(param->get_value().ToString_().size() < 3)
+        if(param->get_value()->ToString_().size() < 3)
         {
             param->set_error("El nombre no puede ser menor a 3 dígitos");
             return false;
         }
         return true;
     });
-    action3->AddParameter_("state", Tools::DValue(""), true)
+    action3->AddParameter_("state", "", true)
     ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El estado no puede estar vacío");
             return false;
         }
         return true;
     });
-    action3->AddParameter_("privacity", Tools::DValue(""), true)
+    action3->AddParameter_("privacity", "", true)
     ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("La privacidad no puede estar vacía");
             return false;
         }
         return true;
     });
-    action3->AddParameter_("description", Tools::DValue(""), true);
+    action3->AddParameter_("description", "", true);
 
-    action3->AddParameter_("id", Tools::DValue(""), true)
+    action3->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El id no puede estar vacío");
             return false;
         }
         return true;
     });
-    action3->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action3->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
@@ -663,10 +667,10 @@ void Forms::Delete_()
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action1->set_final(false);
-    action1->AddParameter_("id", Tools::DValue(""), true)
+    action1->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El id no puede estar vacío");
             return false;
@@ -677,17 +681,17 @@ void Forms::Delete_()
     // Action 2: Delete form record
     auto action2 = function->AddAction_("a2");
     action2->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
-    action2->AddParameter_("id", Tools::DValue(""), true)
+    action2->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().ToString_() == "")
+        if(param->get_value()->ToString_() == "")
         {
             param->set_error("El identificador del formulario no puede estar vacío");
             return false;
         }
         return true;
     });
-    action2->AddParameter_("id_space", Tools::DValue(get_space_id()), false);
+    action2->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
