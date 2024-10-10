@@ -60,10 +60,12 @@ void FormsData::Read_()
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
     {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
+        // Get actions
+        auto action1 = self.GetAction_("a1");
+        auto action2 = self.GetAction_("a2");
+        if(action1 == self.get_actions().end() || action2 == self.get_actions().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error FkwTVZabIw");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
             return;
         }
 
@@ -76,15 +78,6 @@ void FormsData::Read_()
                 self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": MS46GLPi6D");
                 return;
             }
-        }
-
-        // Get actions
-        auto action1 = self.GetAction_("a1");
-        auto action2 = self.GetAction_("a2");
-        if(action1 == self.get_actions().end() || action2 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
-            return;
         }
 
         // Get form info
@@ -115,20 +108,20 @@ void FormsData::Read_()
             columns = "*";
 
         // Action 3: Get Form data
-        Functions::Action action3("a3");
-        action3.set_sql_code(
+        auto action3 = self.AddAction_("a3");
+        action3->set_sql_code(
             "SELECT " + columns + " " \
             "FROM form_" + id_space->ToString_() + "_" + identifier->ToString_());
-        if(!action3.Work_())
+        if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
             return;
         }
 
         // Action 3 results
-        auto json_result = action3.CreateJSONResult_();
-        json_result->set("status", action3.get_status());
-        json_result->set("message", action3.get_message());
+        auto json_result = action3->CreateJSONResult_();
+        json_result->set("status", action3->get_status());
+        json_result->set("message", action3->get_message());
 
         // Action 2 results
         auto json_result_2 = action2->get()->CreateJSONResult_();
@@ -237,33 +230,31 @@ void FormsData::Add_()
 
     action2->AddParameter_("id_space", get_space_id(), false);
 
+    // Action 3: Save new record
+    function->AddAction_("a3");
+
     // Setup Custom Process
     function->SetupCustomProcess_([&](Functions::Function& self)
     {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error sS3gm6VK0x");
-            return;
-        }
-
-        // Iterate over actions
-        for(auto action : self.get_actions())
-        {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": 4bdZ3J4sVq");
-                return;
-            }
-        }
-
         // Get actions
         auto action1 = self.GetAction_("a1");
         auto action2 = self.GetAction_("a2");
-        if(action1 == self.get_actions().end() || action2 == self.get_actions().end())
+        auto action3 = self.GetAction_("a3");
+        if(action1 == self.get_actions().end() || action2 == self.get_actions().end() || action3 == self.get_actions().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error obLuu4LBe9");
+            return;
+        }
+
+        // Execute actions
+        if(!action1->get()->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": WceLQjCC9V");
+            return;
+        }
+        if(!action2->get()->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get()->get_identifier() + ": twQ1cxcgZs");
             return;
         }
 
@@ -276,9 +267,6 @@ void FormsData::Add_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error ABcWG9ZSel");
             return;
         }
-
-        // Action 3: Save new record
-        Functions::Action action3("a3");
 
         // Get columns
         std::string columns = "";
@@ -313,7 +301,7 @@ void FormsData::Add_()
             }
 
             // Setup parameter
-            action3.AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action3->get()->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
@@ -343,28 +331,21 @@ void FormsData::Add_()
             return;
         }
 
-        // Set SQL Code to action 3s
-        action3.set_sql_code(
+        // Set SQL Code to action 3
+        action3->get()->set_sql_code(
             "INSERT INTO  form_" + id_space->ToString_() + "_" + identifier->ToString_() + " " \
-            "VALUES (" + columns + ") ");
+            "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
-        if(!action3.Work_())
+        self.IdentifyParameters_(*action3);
+        if(!action3->get()->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
         }
 
-        // Add and verify parameters
-        
-
-        // Action 3 results
-        auto json_result = action3.CreateJSONResult_();
-        json_result->set("status", action3.get_status());
-        json_result->set("message", action3.get_message());
-
         // Send results
-        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
     });
 
     get_functions()->push_back(function);
