@@ -1,5 +1,7 @@
 
 #include "functions/forms/forms_data.h"
+#include <exception>
+#include <tools/output_logger.h>
 
 FormsData::FormsData(FunctionData& function_data) :
     FunctionData(function_data)
@@ -17,9 +19,15 @@ void FormsData::Read_()
 
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get current identifier and id_space
+    // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action1->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
     action1->set_final(false);
     action1->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -34,57 +42,32 @@ void FormsData::Read_()
 
     action1->AddParameter_("id_space", get_space_id(), false);
 
-    // Action 2: Get form columns
-    auto action2 = function->AddAction_("a2");
-    action2->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action2->set_final(false);
-    action2->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action2->AddParameter_("id_space", get_space_id(), false);
-
     // Setup Custom Process
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
         // Get actions
         auto action1 = self.GetAction_("a1");
-        auto action2 = self.GetAction_("a2");
-        if(action1 == self.get_actions().end() || action2 == self.get_actions().end())
+        if(action1 == self.get_actions().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
             return;
         }
 
-        // Iterate over actions
-        for(auto action : self.get_actions())
+        // Execute action
+        if(!action1->get()->Work_())
         {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": MS46GLPi6D");
-                return;
-            }
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": MS46GLPi6D");
+            return;
         }
 
-        // Get form info
-        auto identifier = action1->get()->get_results()->ExtractField_(0, 0);
-        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
+        // Get JSON Results
+        auto json_result1 = action1->get()->CreateJSONResult_();
 
-        if(identifier->IsNull_() || id_space->IsNull_())
+        // Get form info
+        auto form_identifier = self.GetParameter_("identifier");
+
+        if(form_identifier == self.get_parameters().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
             return;
@@ -92,43 +75,42 @@ void FormsData::Read_()
 
         // Get columns
         std::string columns = "";
-        for(auto it : *action2->get()->get_results())
+        for(auto it : *action1->get()->get_results())
         {
-            auto identifier = it.get()->ExtractField_("identifier");
-            auto name = it.get()->ExtractField_("name");
+            Query::Field::Ptr identifier = it.get()->ExtractField_("identifier");
+            Query::Field::Ptr name = it.get()->ExtractField_("name");
             if(identifier->IsNull_() || name->IsNull_())
                 continue;
 
-            if(it == *action2->get()->get_results()->begin())
+            if(it == *action1->get()->get_results()->begin())
                 columns = identifier->ToString_() + " AS '" + name->ToString_() + "'";
             else
                 columns += ", " + identifier->ToString_() + " AS '" + name->ToString_() + "'";
         }
+
+        // Verify if columns is empty
         if(columns == "")
             columns = "*";
 
-        // Action 3: Get Form data
-        auto action3 = self.AddAction_("a3");
-        action3->set_sql_code(
+        // Action 2: Get Form data
+        auto action2 = self.AddAction_("a2");
+        action2->set_sql_code(
             "SELECT " + columns + " " \
-            "FROM form_" + id_space->ToString_() + "_" + identifier->ToString_());
-        if(!action3->Work_())
+            "FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_());
+        if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
             return;
         }
 
-        // Action 3 results
-        auto json_result = action3->CreateJSONResult_();
-        json_result->set("status", action3->get_status());
-        json_result->set("message", action3->get_message());
-
         // Action 2 results
-        auto json_result_2 = action2->get()->CreateJSONResult_();
-        json_result->set("columns_meta", json_result_2);
+        auto json_result2 = action2->CreateJSONResult_();
+        json_result2->set("status", action2->get_status());
+        json_result2->set("message", action2->get_message());
+        json_result2->set("columns_meta", json_result1);
 
         // Send results
-        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
     });
 
     get_functions()->push_back(function);
