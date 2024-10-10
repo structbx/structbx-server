@@ -346,7 +346,7 @@ void Spaces::Modify_()
     action1->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
