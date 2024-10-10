@@ -30,18 +30,18 @@ void SpacesLogo::Read_()
         if(first->IsNull_())
         {
             auto row = self.get_results()->AddRow_();
-            row->AddField_("logo", Tools::DValue("noimage.png"));
+            row->AddField_("logo", Tools::DValue::Ptr(new Tools::DValue("noimage.png")));
         }
-        else if(first->get_value().TypeIsIqual_(Tools::DValue::Type::kEmpty))
+        else if(first->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
         {
-            first->set_value(Tools::DValue("noimage.png"));
+            first->set_value(Tools::DValue::Ptr(new Tools::DValue("noimage.png")));
         }
         
         return true;
     });
 
     // Parameters and conditions
-    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
+    action->AddParameter_("id_naf_user", get_id_user(), false);
 
     get_functions()->push_back(function);
 }
@@ -65,7 +65,7 @@ void SpacesLogo::Modify_()
             "JOIN spaces_users ou ON ou.id_space = o.id " \
             "WHERE ou.id_naf_user = ?"
         );
-        a1.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
+        a1.AddParameter_("id_naf_user", self.get_current_user().get_id(), false);
 
         a1.ComposeQuery_();
         a1.ExecuteQuery_();
@@ -74,7 +74,7 @@ void SpacesLogo::Modify_()
         auto field = a1.get_results()->First_();
         if(!field->IsNull_())
         {
-            if(!field->get_value().TypeIsIqual_(Tools::DValue::Type::kEmpty))
+            if(!field->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
             {
                 std::string logo_path = field->ToString_();
 
@@ -122,9 +122,8 @@ void SpacesLogo::Modify_()
             "WHERE ou.id_naf_user = ?"
         );
         
-        a2.AddParameter_("logo", Tools::DValue(front_file.get_requested_path()->getFileName()), false);
-        auto user = Tools::DValue(self.get_current_user().get_id());
-        a2.AddParameter_("id_naf_user", user, false);
+        a2.AddParameter_("logo", front_file.get_requested_path()->getFileName(), false);
+        a2.AddParameter_("id_naf_user", self.get_current_user().get_id(), false);
 
         a2.ComposeQuery_();
         a2.ExecuteQuery_();
@@ -184,7 +183,7 @@ void Spaces::Read_()
         "JOIN spaces_users su ON su.id_space = s.id " \
         "WHERE su.id_naf_user = ?"
     );
-    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
+    action->AddParameter_("id_naf_user", get_id_user(), false);
 
     get_functions()->push_back(function);
 }
@@ -211,7 +210,7 @@ void Spaces::ReadSpecific_()
                 "JOIN spaces_users su ON su.id_space = s.id " \
                 "WHERE su.id_naf_user = ?"
             );
-            action.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
+            action.AddParameter_("id_naf_user", self.get_current_user().get_id(), false);
         }
         else
         {
@@ -222,8 +221,8 @@ void Spaces::ReadSpecific_()
                 "JOIN spaces_users su ON su.id_space = s.id " \
                 "WHERE su.id_naf_user = ? AND s.id = ?"
             );
-            action.AddParameter_("id_naf_user", Tools::DValue(self.get_current_user().get_id()), false);
-            action.AddParameter_("id_space", Tools::DValue(space_id), false);
+            action.AddParameter_("id_naf_user", self.get_current_user().get_id(), false);
+            action.AddParameter_("id_space", space_id, false);
         }
 
         // Execute action
@@ -272,8 +271,8 @@ void Spaces::Change_()
         "JOIN spaces_users su ON su.id_space = s.id " \
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
-    action->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
-    action->AddParameter_("id_space", Tools::DValue(), true)
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("id_space", Tools::DValue::Ptr(new Tools::DValue()), true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
@@ -344,10 +343,10 @@ void Spaces::Modify_()
     );
 
     // Parameters and conditions
-    action1->AddParameter_("name", Tools::DValue(""), true)
+    action1->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value().get_type() != Tools::DValue::Type::kString)
+        if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -364,9 +363,9 @@ void Spaces::Modify_()
         }
         return true;
     });
-    action1->AddParameter_("description", Tools::DValue(""), true);
+    action1->AddParameter_("description", "", true);
 
-    action1->AddParameter_("id_naf_user", Tools::DValue(get_id_user()), false);
+    action1->AddParameter_("id_naf_user", get_id_user(), false);
 
     get_functions()->push_back(function);
 }
