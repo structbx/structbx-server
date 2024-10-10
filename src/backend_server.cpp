@@ -8,24 +8,14 @@ BackendServer::BackendServer()
 
 void BackendServer::AddFunctions_()
 {
-    // Forms
-    auto forms = Forms(function_data_);
-    for(auto it : *forms.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-
-    // Dashboards
-    auto dashboards = Dashboards(function_data_);
-    for(auto it : *dashboards.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-
-    // Reports
-    auto reports = Reports(function_data_);
-    for(auto it : *reports.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-
     // Spaces
     auto spaces = Spaces(function_data_);
     for(auto it : *spaces.get_functions())
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    
+    // Forms
+    auto forms = Forms(function_data_);
+    for(auto it : *forms.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 }
 
