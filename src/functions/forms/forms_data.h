@@ -12,6 +12,7 @@ class FormsData : public FunctionData
     protected:
         void Read_();
         void ReadColumns_();
+        void ReadSpecific_();
         void Add_();
 };
 

@@ -8,6 +8,7 @@ FormsData::FormsData(FunctionData& function_data) :
 {
     Read_();
     ReadColumns_();
+    ReadSpecific_();
     Add_();
 }
 
@@ -160,6 +161,127 @@ void FormsData::ReadColumns_()
     });
 
     action2->AddParameter_("id_space", get_space_id(), false);
+
+    get_functions()->push_back(function);
+}
+
+void FormsData::ReadSpecific_()
+{
+    // Function GET /api/forms/data/read/id
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/data/read/id", HTTP::EnumMethods::kHTTP_GET);
+
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Get form columns
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action1->set_final(false);
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action1->AddParameter_("id_space", get_space_id(), false);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    {
+        // Get actions
+        auto action1 = self.GetAction_("a1");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
+            return;
+        }
+
+        // Execute action
+        if(!action1->get()->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": MS46GLPi6D");
+            return;
+        }
+
+        // Get JSON Results
+        auto json_result1 = action1->get()->CreateJSONResult_();
+
+        // Get form info
+        auto form_identifier = self.GetParameter_("form-identifier");
+
+        if(form_identifier == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
+            return;
+        }
+
+        // Get columns
+        std::string columns = "";
+        for(auto it : *action1->get()->get_results())
+        {
+            Query::Field::Ptr identifier = it.get()->ExtractField_("identifier");
+            Query::Field::Ptr name = it.get()->ExtractField_("name");
+            if(identifier->IsNull_() || name->IsNull_())
+                continue;
+
+            if(columns == "")
+                columns = identifier->ToString_() + " AS '" + name->ToString_() + "'";
+            else
+                columns += ", " + identifier->ToString_() + " AS '" + name->ToString_() + "'";
+        }
+
+        // Verify if columns is empty
+        if(columns == "")
+            columns = "*";
+
+        // Action 2: Get Form data
+        auto action2 = self.AddAction_("a2");
+        action2->set_sql_code(
+            "SELECT " + columns + " " \
+            "FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
+            "WHERE id = ?");
+
+        // Add id parameter to action 2
+        action2->AddParameter_("id", "", true)
+        ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+        {
+            if(param->get_value()->ToString_() == "")
+            {
+                param->set_error("El id no puede estar vacío");
+                return false;
+            }
+            return true;
+        });
+
+        // Identify parameters and work
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
+            return;
+        }
+
+        // Action 2 results
+        auto json_result2 = action2->CreateJSONResult_();
+        json_result2->set("status", action2->get_status());
+        json_result2->set("message", action2->get_message());
+        json_result2->set("columns_meta", json_result1);
+
+        // Send results
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
+    });
 
     get_functions()->push_back(function);
 }
