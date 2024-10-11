@@ -296,7 +296,7 @@ void FormsData::Add_()
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
     // Action 1: Get form columns
-    auto action1 = function->AddAction_("a2");
+    auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
         "FROM forms_columns fc " \
@@ -322,11 +322,11 @@ void FormsData::Add_()
     auto id_space = get_space_id();
     function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
-        // Action 3: Save new record
-        auto action3 = self.AddAction_("a3");
+        // Action 2: Save new record
+        auto action2 = self.AddAction_("a2");
 
         // Get action 1
-        auto action1 = self.GetAction_("a2");
+        auto action1 = self.GetAction_("a1");
         if(action1 == self.get_actions().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error obLuu4LBe9");
@@ -382,28 +382,11 @@ void FormsData::Add_()
             }
 
             // Setup parameter
-            action3->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action2->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
-                if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
-                {
-                    if(required->Int_() == 1)
-                    {
-                        if(default_value->ToString_() == "")
-                            return false;
-                        else
-                            param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
-                    }
-                    else
-                    {
-                        if(default_value->ToString_() == "")
-                            return true;
-                        else
-                            param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
-                    }
-                }
-
-                return true;
+                ParameterVerification pv;
+                return pv.Verify(param, length, required, default_value);
             });
         }
         if(columns == "")
@@ -412,14 +395,14 @@ void FormsData::Add_()
             return;
         }
 
-        // Set SQL Code to action 3
-        action3->set_sql_code(
+        // Set SQL Code to action 2
+        action2->set_sql_code(
             "INSERT INTO  form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
-        // Execute action 3
-        self.IdentifyParameters_(action3);
-        if(!action3->Work_())
+        // Execute action 2
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
@@ -527,25 +510,8 @@ void FormsData::Modify_()
             action2->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
-                if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
-                {
-                    if(required->Int_() == 1)
-                    {
-                        if(default_value->ToString_() == "")
-                            return false;
-                        else
-                            param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
-                    }
-                    else
-                    {
-                        if(default_value->ToString_() == "")
-                            return true;
-                        else
-                            param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
-                    }
-                }
-
-                return true;
+                ParameterVerification pv;
+                return pv.Verify(param, length, required, default_value);
             });
         }
 
@@ -586,4 +552,30 @@ void FormsData::Modify_()
     });
 
     get_functions()->push_back(function);
+}
+
+bool FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value)
+{
+    if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
+    {
+        if(required->Int_() == 1)
+        {
+            if(default_value->ToString_() == "")
+            {
+                param->set_error("Este parámetro es obligatorio");
+                return false;
+            }
+            else
+                param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
+        }
+        else
+        {
+            if(default_value->ToString_() == "")
+                return true;
+            else
+                param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
+        }
+    }
+
+    return true;
 }

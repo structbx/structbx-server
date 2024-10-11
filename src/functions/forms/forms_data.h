@@ -10,6 +10,11 @@ class FormsData : public FunctionData
         FormsData(FunctionData& function_data);
 
     protected:
+        struct ParameterVerification
+        {
+            bool Verify(Query::Parameter::Ptr param, Query::Field::Ptr length, Query::Field::Ptr required, Query::Field::Ptr default_value);
+        };
+
         void Read_();
         void ReadColumns_();
         void ReadSpecific_();
