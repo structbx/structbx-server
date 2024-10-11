@@ -14,6 +14,7 @@ class FormsData : public FunctionData
         void ReadColumns_();
         void ReadSpecific_();
         void Add_();
+        void Modify_();
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMSDATA
