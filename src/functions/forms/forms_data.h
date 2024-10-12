@@ -20,6 +20,7 @@ class FormsData : public FunctionData
         void ReadSpecific_();
         void Add_();
         void Modify_();
+        void Delete_();
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMSDATA

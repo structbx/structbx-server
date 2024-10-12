@@ -1,7 +1,5 @@
 
 #include "functions/forms/forms_data.h"
-#include <exception>
-#include <tools/output_logger.h>
 
 FormsData::FormsData(FunctionData& function_data) :
     FunctionData(function_data)
@@ -11,6 +9,7 @@ FormsData::FormsData(FunctionData& function_data) :
     ReadSpecific_();
     Add_();
     Modify_();
+    Delete_();
 }
 
 void FormsData::Read_()
@@ -636,4 +635,97 @@ bool FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query
     }
 
     return true;
+}
+
+void FormsData::Delete_()
+{
+    // Function GET /api/forms/data/delete
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Verify form existence
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ?");
+    action1->set_final(false);
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    {
+        // Get action 1
+        auto action1 = self.GetAction_("a1");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error obLuu4LBe9");
+            return;
+        }
+
+        // Execute action 1
+        if(!action1->get()->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": twQ1cxcgZs");
+            return;
+        }
+
+        // Get form info
+        auto form_identifier = self.GetParameter_("form-identifier");
+
+        if(form_identifier == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UFwgqfZp59");
+            return;
+        }
+
+        // Action 2: Save new record
+        auto action2 = self.AddAction_("a2");
+        action2->set_sql_code(
+            "DELETE FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " WHERE id = ?");
+
+        action2->AddParameter_("id", "", true)
+        ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+        {
+            if(param->get_value()->ToString_() == "")
+            {
+                param->set_error("El id de registro no puede estar vacío");
+                return false;
+            }
+            return true;
+        });
+
+        // Execute action 2
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+    });
+
+    get_functions()->push_back(function);
 }
