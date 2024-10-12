@@ -452,17 +452,43 @@ void FormsData::Modify_()
 
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get form columns
+    // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ?");
+    action1->set_final(false);
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    // Action 2: Get form columns
+    auto action2 = function->AddAction_("a2");
+    action2->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
-    action1->set_final(false);
-    action1->AddParameter_("form-identifier", "", true)
+    action2->set_final(false);
+    action2->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -473,28 +499,27 @@ void FormsData::Modify_()
         return true;
     });
 
-    action1->AddParameter_("id_space", get_space_id(), false);
+    action2->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
     auto id_space = get_space_id();
     function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
-        // Action 2: Save new record
-        auto action2 = self.AddAction_("a2");
-
-        // Get action 1
-        auto action1 = self.GetAction_("a1");
-        if(action1 == self.get_actions().end())
+        // Verify if exists actions
+        if(self.get_actions().begin() == self.get_actions().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error obLuu4LBe9");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error fpnd6GDTxF");
             return;
         }
 
-        // Execute action 1
-        if(!action1->get()->Work_())
+        // Execute actions
+        for(auto action : self.get_actions())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": twQ1cxcgZs");
-            return;
+            if(!action->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": CnMsvrA4aa");
+                return;
+            }
         }
 
         // Get form info
@@ -506,9 +531,13 @@ void FormsData::Modify_()
             return;
         }
 
-        // Get columns
+        // Action 3: Save new record
+        auto action3 = self.AddAction_("a3");
+
+        // Get columns from action 2
+        auto action2 = self.GetAction_("a2");
         std::string columns = "";
-        for(auto it : *action1->get()->get_results())
+        for(auto it : *action2->get()->get_results())
         {
             // Get column
             auto identifier = it.get()->ExtractField_("identifier");
@@ -536,7 +565,7 @@ void FormsData::Modify_()
             }
 
             // Setup parameters
-            action2->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action3->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
@@ -545,10 +574,10 @@ void FormsData::Modify_()
         }
 
         // Add id parameter
-        action2->AddParameter_("id", "", true)
+        action3->AddParameter_("id", "", true)
         ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
         {
-            if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
+            if(param->get_value()->ToString_() == "")
             {
                 param->set_error("El id no puede estar vacío");
             }
@@ -563,14 +592,14 @@ void FormsData::Modify_()
             return;
         }
 
-        // Set SQL Code to action 2
-        action2->set_sql_code(
+        // Set SQL Code to action 3
+        action3->set_sql_code(
             "UPDATE form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "SET " + columns + " WHERE id = ?");
 
         // Execute action 2
-        self.IdentifyParameters_(action2);
-        if(!action2->Work_())
+        self.IdentifyParameters_(action3);
+        if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
