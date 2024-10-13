@@ -86,12 +86,12 @@ void Forms::Add_()
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
     action1->set_final(false);
-    action1->set_sql_code("SELECT id FROM forms WHERE identifier = ?");
+    action1->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
     action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un formulario con este identificador ya existe");
+            self.set_custom_error("Un formulario con este identificador para este espacio ya existe");
             return false;
         }
 
@@ -108,6 +108,8 @@ void Forms::Add_()
         }
         return true;
     });
+
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     // Action 2: Add the new form
     auto action2 = function->AddAction_("a2");
@@ -183,14 +185,9 @@ void Forms::Add_()
     action2->AddParameter_("description", "", true);
     action2->AddParameter_("id_space", get_space_id(), false);
 
-    // Action 3: Get the table id and name
-    auto action3 = function->AddAction_("a3");
-    action3->set_sql_code("SELECT identifier, id_space FROM forms WHERE id_space = " + get_space_id() + " AND identifier = ?");
-
-    action3->AddParameter_("identifier", "", true);
-
     // Setup Custom Process
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id](Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -210,41 +207,20 @@ void Forms::Add_()
             }
         }
 
-        // Get results of action3
-        auto action3 = std::find_if(self.get_actions().begin(), self.get_actions().end(), [](Functions::Action::Ptr& action)
-        {
-            return action->get_identifier() == "a3";
-        });
-        if(action3 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 not found");
-            return;
-        }
-        auto form_identifier = action3->get()->get_results()->ExtractField_(0, 0);
-        if(form_identifier->IsNull_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 results identifier is null");
-            return;
-        }
-        auto form_id_space = action3->get()->get_results()->ExtractField_(0, 1);
-        if(form_id_space->IsNull_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Action 3 results id space is null");
-            return;
-        }
+        // Get form identifier
+        auto form_identifier = self.GetParameter_("identifier");
 
-        // Action 4: Create the table
-        Functions::Action action4("a4");
-        action4.set_sql_code(
-            "CREATE TABLE form_" + form_id_space->ToString_() + "_" + form_identifier->ToString_() + " " \
+        // Action 3: Create the table
+        auto action3 = self.AddAction_("a3");
+        action3->set_sql_code(
+            "CREATE TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "(" \
-                "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_at DATETIME NOT NULL DEFAULT NOW() " \
-                ",INDEX idx_created_at (created_at) USING BTREE" \
+                "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
         );
-        if(!action4.Work_())
+        if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action4.get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action3->get_custom_error());
             return;
         }
 
@@ -262,10 +238,21 @@ void Forms::Modify_()
 
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get current identifier and id_space
+    // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action1->set_final(false);
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
     action1->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -285,7 +272,7 @@ void Forms::Modify_()
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un formulario con este identificador ya existe");
+            self.set_custom_error("Un formulario con este identificador en este espacio ya existe");
             return false;
         }
 
@@ -404,7 +391,8 @@ void Forms::Modify_()
     action3->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -433,10 +421,9 @@ void Forms::Modify_()
             return;
         }
         auto old_identifier = action1->get()->get_results()->ExtractField_(0, 0);
-        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
         auto new_identifier = action2->get()->GetParameter("identifier");
 
-        if(old_identifier->IsNull_() || id_space->IsNull_() || new_identifier == action2->get()->get_parameters().end())
+        if(old_identifier->IsNull_() || new_identifier == action2->get()->get_parameters().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5sVP0geEXI");
             return;
@@ -445,12 +432,12 @@ void Forms::Modify_()
         // Action 4: Modify the table
         if(old_identifier->ToString_() != new_identifier->get()->ToString_())
         {
-            Functions::Action action4("a4");
-            action4.set_sql_code(
+            auto action4 = self.AddAction_("a4");
+            action4->set_sql_code(
                 "RENAME TABLE IF EXISTS " \
-                "form_" + id_space->ToString_() + "_" + old_identifier->ToString_() + " " \
-                "TO form_" + id_space->ToString_() + "_" + new_identifier->get()->ToString_());
-            if(!action4.Work_())
+                "form_" + id_space + "_" + old_identifier->ToString_() + " " \
+                "TO form_" + id_space + "_" + new_identifier->get()->ToString_());
+            if(!action4->Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error iFZCXs2XEN");
                 return;
@@ -471,10 +458,21 @@ void Forms::Delete_()
 
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get current identifier and id_space
+    // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action1->set_final(false);
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
     action1->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -502,7 +500,8 @@ void Forms::Delete_()
     action2->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -530,18 +529,17 @@ void Forms::Delete_()
             return;
         }
         auto identifier = action1->get()->get_results()->ExtractField_(0, 0);
-        auto id_space = action1->get()->get_results()->ExtractField_(0, 1);
 
-        if(identifier->IsNull_() || id_space->IsNull_())
+        if(identifier->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error J5pktjAN5K");
             return;
         }
 
         // Action 3: Delete table
-        Functions::Action action3("a3");
-        action3.set_sql_code("DROP TABLE IF EXISTS form_" + id_space->ToString_() + "_" + identifier->ToString_());
-        if(!action3.Work_())
+        auto action3 = self.AddAction_("a3");
+        action3->set_sql_code("DROP TABLE IF EXISTS form_" + id_space + "_" + identifier->ToString_());
+        if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error lOuU13kOu6");
             return;
