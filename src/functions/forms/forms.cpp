@@ -252,6 +252,25 @@ void Forms::Add_()
     action2->AddParameter_("description", "", true);
     action2->AddParameter_("id_space", get_space_id(), false);
 
+    // Action 2_1: Add the ID Column to the form
+    auto action2_1 = function->AddAction_("a2_1");
+    action2_1->set_sql_code(
+        "INSERT INTO forms_columns (identifier, name, length, required, id_column_type, id_form) " \
+        "SELECT " \
+            "? " \
+            ",? " \
+            ",? " \
+            ",? " \
+            ",(SELECT id FROM forms_columns_types WHERE identifier = 'int-number') " \
+            ",(SELECT id FROM forms WHERE identifier = ?) "
+    );
+
+    action2_1->AddParameter_("identifier", "id", false);
+    action2_1->AddParameter_("name", "ID", false);
+    action2_1->AddParameter_("length", "11", false);
+    action2_1->AddParameter_("required", 1, false);
+    action2_1->AddParameter_("identifier", "", true);
+
     // Setup Custom Process
     auto space_id = get_space_id();
     function->SetupCustomProcess_([space_id](Functions::Function& self)
