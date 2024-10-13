@@ -546,7 +546,7 @@ void Forms::Delete_()
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
+    action1->set_sql_code("SELECT identifier FROM forms WHERE id = ?");
     action1->set_final(false);
     action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
@@ -564,30 +564,15 @@ void Forms::Delete_()
     {
         if(param->get_value()->ToString_() == "")
         {
-            param->set_error("El id no puede estar vacío");
+            param->set_error("El id del formulario no puede estar vacío");
             return false;
         }
         return true;
     });
-
-    // Action 2: Delete form record
-    auto action2 = function->AddAction_("a2");
-    action2->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
-    action2->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador del formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action2->AddParameter_("id_space", get_space_id(), false);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id](Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -607,14 +592,14 @@ void Forms::Delete_()
             }
         }
 
-        // Compare old identifier and new identifier
+        // Get form identifier
         auto action1 = self.GetAction_("a1");
         if(action1 == self.get_actions().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 9rR0LnKLCa");
             return;
         }
-        auto identifier = action1->get()->get_results()->ExtractField_(0, 0);
+        auto identifier = action1->get()->get_results()->First_();
 
         if(identifier->IsNull_())
         {
@@ -622,12 +607,24 @@ void Forms::Delete_()
             return;
         }
 
-        // Action 3: Delete table
+        // Action 3: Drop table
         auto action3 = self.AddAction_("a3");
-        action3->set_sql_code("DROP TABLE IF EXISTS form_" + id_space + "_" + identifier->ToString_());
+        action3->set_sql_code("DROP TABLE IF EXISTS form_" + space_id + "_" + identifier->ToString_());
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
+            return;
+        }
+
+        // Action 2: Delete form record
+        auto action2 = self.AddAction_("a2");
+        action2->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
+        action2->AddParameter_("id", "", true);
+        action2->AddParameter_("id_space", space_id, false);
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error kJ79T9LBRw");
             return;
         }
 
