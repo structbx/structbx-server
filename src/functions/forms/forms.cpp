@@ -627,7 +627,7 @@ void Forms::Delete_()
         action3->set_sql_code("DROP TABLE IF EXISTS form_" + id_space + "_" + identifier->ToString_());
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error lOuU13kOu6");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
             return;
         }
 
