@@ -32,6 +32,11 @@ void BackendServer::AddFunctions_()
     auto forms_data = FormsData(function_data_);
     for(auto it : *forms_data.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+
+    // Forms Columns
+    auto forms_columns = FormsColumns(function_data_);
+    for(auto it : *forms_columns.get_functions())
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 }
 
 void BackendServer::Process_()

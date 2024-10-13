@@ -11,6 +11,7 @@
 #include "functions/spaces/spaces_logo.h"
 #include "functions/forms/forms.h"
 #include "functions/forms/forms_data.h"
+#include "functions/forms/forms_columns.h"
 
 using namespace NAF;
 
