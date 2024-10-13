@@ -17,15 +17,82 @@ void Forms::Read_()
     Functions::Function::Ptr function = 
         std::make_shared<Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
 
+    function->set_response_type(Functions::Function::ResponseType::kCustom);
+
     auto action = function->AddAction_("a1");
     action->set_sql_code(
         "SELECT " \
-            "* " \
-        "FROM forms " \
+            "f.* " \
+        "FROM forms f " \
         "WHERE " \
             "id_space = ? "
     );
     action->AddParameter_("id_space", get_space_id(), false);
+
+    // Setup custom process
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id](Functions::Function& self)
+    {
+        // Search first action
+        if(self.get_actions().begin() == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5svQHcqqHH");
+            return;
+        }
+
+        // Iterate over actions
+        for(auto action : self.get_actions())
+        {
+            // Execute action
+            if(!action->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": T9eBepMcTA");
+                return;
+            }
+        }
+
+        // Get action1
+        auto action1 = self.GetAction_("a1");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error g56U7d8ljv");
+            return;
+        }
+        
+        // Iterate over results
+        for(auto row : *action1->get()->get_results())
+        {
+            // Get form identifier
+            auto identifier = row->ExtractField_("identifier");
+            if(identifier->IsNull_())
+                continue;
+
+            // Action 2: COUNT
+            auto action2 = Functions::Action("a2");
+            action2.set_sql_code(
+                "SELECT COUNT(1) AS total " \
+                "FROM form_" + space_id + "_" + identifier->ToString_());
+            if(!action2.Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error JNt2Std2sh");
+                return;
+            }
+
+            // Get results
+            auto total = action2.get_results()->First_();
+            if(total->IsNull_())
+                continue;
+
+            row->AddField_("total", Tools::DValue::Ptr(new Tools::DValue(total->Int_())));
+
+        }
+
+        // JSON Results
+        auto json_results = action1->get()->CreateJSONResult_();
+
+        // Send results
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_results);
+    });
 
     get_functions()->push_back(function);
 }
