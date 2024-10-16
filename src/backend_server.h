@@ -30,6 +30,8 @@ class BackendServer : public Handlers::BackendHandler
 
     private:
         FunctionData function_data_;
+        HTTP::Cookie space_id_cookie_;
+        bool add_space_id_cookie_;
 };
 
 #endif //STRUCTBI_BACKENDSERVER

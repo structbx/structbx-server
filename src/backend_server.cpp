@@ -1,7 +1,9 @@
 
 #include "backend_server.h"
 
-BackendServer::BackendServer()
+BackendServer::BackendServer() :
+    space_id_cookie_("1f3efd18688d2b844f4fa1e800712c9b5750c031", "")
+    ,add_space_id_cookie_(false)
 {
 
 }
@@ -69,6 +71,10 @@ void BackendServer::Process_()
         return;
     }
 
+    // Setup space id cookie
+    if(add_space_id_cookie_)
+        get_current_function()->AddCookie_(space_id_cookie_);
+
     // Verify permissions
     if(!VerifyPermissions_())
     {
@@ -85,11 +91,48 @@ void BackendServer::SetupFunctionData_()
     // Setup User ID
     function_data_.set_id_user(get_users_manager().get_current_user().get_id());
     
-    // Setup Current Space
+    // Get Cookie Space ID
     Poco::Net::NameValueCollection cookies;
     get_http_server_request().value()->getCookies(cookies);
-    auto cookie_space_id = cookies.find("structbi-space-id");
+    auto cookie_space_id = cookies.find("1f3efd18688d2b844f4fa1e800712c9b5750c031");
 
+    // Save Space ID if it was established
     if(cookie_space_id != cookies.end())
-        function_data_.set_space_id(cookie_space_id->second);
+    {
+        auto space_id_decoded = Base64Tool().Decode_(cookie_space_id->second);
+        function_data_.set_space_id(space_id_decoded);
+    }
+    else
+    {
+        add_space_id_cookie_ = true;
+
+        // Get Space ID Cookie if it was not established
+        auto action = Functions::Action("a1");
+        action.set_sql_code(
+            "SELECT s.id " \
+            "FROM spaces s " \
+            "JOIN spaces_users su ON su.id_space = s.id " \
+            "WHERE su.id_naf_user = ? LIMIT 1"
+        );
+        action.AddParameter_("id_naf_user", function_data_.get_id_user(), false);
+        if(action.Work_())
+        {
+            auto space_id = action.get_results()->First_();
+            if(!space_id->IsNull_())
+            {
+                // Save Space ID
+                function_data_.set_space_id(space_id->ToString_());
+
+                // Save Space ID to Cookie
+                auto space_id_encoded = Base64Tool().Encode_(space_id->ToString_());
+
+                Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
+                cookie.setPath("/");
+                cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
+                cookie.setSecure(true);
+                cookie.setHttpOnly();
+                space_id_cookie_ = HTTP::Cookie(cookie);
+            }
+        }
+    }
 }
