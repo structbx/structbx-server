@@ -1,5 +1,6 @@
 
 #include "functions/spaces/spaces.h"
+#include <Poco/Net/HTTPCookie.h>
 
 Spaces::Spaces(FunctionData& function_data) :
     FunctionData(function_data)
@@ -78,19 +79,7 @@ void Spaces::ReadSpecific_()
         // Set Space ID Cookie to the client
         auto field = action.get_results()->First_();
         if(!field->IsNull_())
-        {
-            if(space_id == "")
-            {
-                // If space is empty, set the cookie
-                Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
-                cookie.setPath("/");
-
-                auto& response = self.get_http_server_response().value();
-                response->addCookie(cookie);
-            }
-
             self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
-        }
         else
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
     });
@@ -148,8 +137,12 @@ void Spaces::Change_()
         if(!field->IsNull_())
         {
             // Set Cookie Space ID
-            Net::HTTPCookie cookie("structbi-space-id", field->ToString_());
+            auto space_id_encoded = Base64Tool().Encode_(field->ToString_());
+            Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
             cookie.setPath("/");
+            cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
+            cookie.setSecure(true);
+            cookie.setHttpOnly();
 
             auto& response = self.get_http_server_response().value();
             response->addCookie(cookie);

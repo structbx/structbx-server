@@ -4,6 +4,7 @@
 
 
 #include "function_data.h"
+#include "tools/base64_tool.h"
 
 class Spaces : public FunctionData
 {
