@@ -262,7 +262,7 @@ void Forms::Add_()
             ",? " \
             ",? " \
             ",(SELECT id FROM forms_columns_types WHERE identifier = 'int-number') " \
-            ",(SELECT id FROM forms WHERE identifier = ?) "
+            ",(SELECT id FROM forms WHERE identifier = ? and id_space = ?) "
     );
 
     action2_1->AddParameter_("identifier", "id", false);
@@ -270,6 +270,7 @@ void Forms::Add_()
     action2_1->AddParameter_("length", "11", false);
     action2_1->AddParameter_("required", 1, false);
     action2_1->AddParameter_("identifier", "", true);
+    action2_1->AddParameter_("space_id", get_space_id(), false);
 
     // Setup Custom Process
     auto space_id = get_space_id();
