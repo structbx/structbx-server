@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_ACTIONS_FORMSDATA
-#define STRUCTBI_ACTIONS_FORMSDATA
+#ifndef STRUCTBI_ACTIONS_FORMS
+#define STRUCTBI_ACTIONS_FORMS
 
 #include "actions/base_action.h"
 #include "function_data.h"
@@ -9,16 +9,16 @@ namespace StructBI
 {
     namespace Actions
     {
-        class FormsData;
+        class Forms;
     }
 }
 
 using namespace StructBI;
 
-class StructBI::Actions::FormsData
+class StructBI::Actions::Forms
 {
     public:
-        FormsData(FunctionData& function_data);
+        Forms(FunctionData& function_data);
 
         class ReadA01 : public Actions::BaseAction
         {
@@ -121,4 +121,4 @@ class StructBI::Actions::FormsData
 
 };
 
-#endif //STRUCTBI_ACTIONS_FORMSDATA
+#endif //STRUCTBI_ACTIONS_FORMS

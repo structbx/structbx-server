@@ -1,9 +1,9 @@
 
-#include "actions/forms_data.h"
+#include "actions/forms.h"
 
 using namespace StructBI;
 
-Actions::FormsData::FormsData(FunctionData& function_data) : 
+Actions::Forms::Forms(FunctionData& function_data) : 
     read_a01_(function_data)
     ,read_specific_a01_(function_data)
     ,read_specific_a02_(function_data)
@@ -19,13 +19,13 @@ Actions::FormsData::FormsData(FunctionData& function_data) :
     
 }
 
-Actions::FormsData::ReadA01::ReadA01(FunctionData& function_data) : 
+Actions::Forms::ReadA01::ReadA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -39,13 +39,13 @@ void Actions::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Actions::FormsData::ReadSpecificA01::ReadSpecificA01(FunctionData& function_data) : 
+Actions::Forms::ReadSpecificA01::ReadSpecificA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -64,13 +64,13 @@ void Actions::FormsData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-Actions::FormsData::ReadSpecificA02::ReadSpecificA02(FunctionData& function_data) : 
+Actions::Forms::ReadSpecificA02::ReadSpecificA02(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -90,13 +90,13 @@ void Actions::FormsData::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
 
 }
 
-Actions::FormsData::AddA01::AddA01(FunctionData& function_data) : 
+Actions::Forms::AddA01::AddA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::AddA01::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::AddA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -127,13 +127,13 @@ void Actions::FormsData::AddA01::Setup_(Functions::Action::Ptr action)
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-Actions::FormsData::AddA02::AddA02(FunctionData& function_data) : 
+Actions::Forms::AddA02::AddA02(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::AddA02::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::AddA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -210,13 +210,13 @@ void Actions::FormsData::AddA02::Setup_(Functions::Action::Ptr action)
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-Actions::FormsData::AddA03::AddA03(FunctionData& function_data) : 
+Actions::Forms::AddA03::AddA03(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::AddA03::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -239,13 +239,13 @@ void Actions::FormsData::AddA03::Setup_(Functions::Action::Ptr action)
     action_->AddParameter_("space_id", get_space_id(), false);
 }
 
-Actions::FormsData::ModifyA01::ModifyA01(FunctionData& function_data) : 
+Actions::Forms::ModifyA01::ModifyA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ModifyA01::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -274,13 +274,13 @@ void Actions::FormsData::ModifyA01::Setup_(Functions::Action::Ptr action)
     });
 }
 
-Actions::FormsData::ModifyA02::ModifyA02(FunctionData& function_data) : 
+Actions::Forms::ModifyA02::ModifyA02(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ModifyA02::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ModifyA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -320,13 +320,13 @@ void Actions::FormsData::ModifyA02::Setup_(Functions::Action::Ptr action)
     });
 }
 
-Actions::FormsData::ModifyA03::ModifyA03(FunctionData& function_data) : 
+Actions::Forms::ModifyA03::ModifyA03(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::ModifyA03::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -419,13 +419,13 @@ void Actions::FormsData::ModifyA03::Setup_(Functions::Action::Ptr action)
 
 }
 
-Actions::FormsData::Delete01::Delete01(FunctionData& function_data) : 
+Actions::Forms::Delete01::Delete01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::Delete01::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::Delete01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -454,13 +454,13 @@ void Actions::FormsData::Delete01::Setup_(Functions::Action::Ptr action)
     });
 }
 
-Actions::FormsData::Delete02::Delete02(FunctionData& function_data) : 
+Actions::Forms::Delete02::Delete02(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::FormsData::Delete02::Setup_(Functions::Action::Ptr action)
+void Actions::Forms::Delete02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
