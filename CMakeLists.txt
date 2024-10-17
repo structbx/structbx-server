@@ -81,8 +81,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_data.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_columns.cpp
-    ${PROJECT_SOURCE_DIR}/src/actions/spaces_data.cpp
-    ${PROJECT_SOURCE_DIR}/src/actions/forms_data.cpp
+    ${PROJECT_SOURCE_DIR}/src/actions/spaces.cpp
+    ${PROJECT_SOURCE_DIR}/src/actions/forms.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/base64_tool.cpp
 )
