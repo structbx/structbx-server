@@ -13,8 +13,10 @@ class IDChecker
         IDChecker();
 
         bool Check_(std::string id);
+        bool CheckNumbers_(std::string id);
 
         std::list<char> allowed_characters_;
+        std::list<char> allowed_characters_numbers_;
 
         std::string id_;
 };
