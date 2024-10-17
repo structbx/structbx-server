@@ -5,6 +5,9 @@
 
 #include "function_data.h"
 #include "tools/base64_tool.h"
+#include "actions/spaces_data.h"
+
+using namespace StructBI;
 
 class Spaces : public FunctionData
 {
@@ -18,6 +21,9 @@ class Spaces : public FunctionData
         void Add_();
         void Modify_();
         void Delete_();
+
+    private:
+        Actions::SpacesData spaces_data_;
 
 };
 
