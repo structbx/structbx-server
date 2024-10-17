@@ -3,7 +3,7 @@
 #define STRUCTBI_FUNCTIONS_FORMS
 
 #include "function_data.h"
-#include "actions/forms_data.h"
+#include "actions/forms.h"
 
 class Forms : public FunctionData
 {
@@ -18,7 +18,7 @@ class Forms : public FunctionData
         void Delete_();
 
     private:
-        Actions::FormsData forms_data_;
+        Actions::Forms forms_actions_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMS

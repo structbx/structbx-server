@@ -3,7 +3,7 @@
 
 Forms::Forms(FunctionData& function_data) :
     FunctionData(function_data)
-    ,forms_data_(function_data)
+    ,forms_actions_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -21,7 +21,7 @@ void Forms::Read_()
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    forms_data_.read_a01_.Setup_(action);
+    forms_actions_.read_a01_.Setup_(action);
 
     // Setup custom process
     auto space_id = get_space_id();
@@ -98,7 +98,7 @@ void Forms::ReadSpecific_()
         std::make_shared<Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
-    forms_data_.read_specific_a01_.Setup_(action);
+    forms_actions_.read_specific_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 
@@ -107,7 +107,7 @@ void Forms::ReadSpecific_()
         std::make_shared<Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
 
     auto action2 = function2->AddAction_("a2");
-    forms_data_.read_specific_a02_.Setup_(action2);
+    forms_actions_.read_specific_a02_.Setup_(action2);
 
     get_functions()->push_back(function2);
 }
@@ -122,15 +122,15 @@ void Forms::Add_()
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
-    forms_data_.add_a01_.Setup_(action1);
+    forms_actions_.add_a01_.Setup_(action1);
 
     // Action 2: Add the new form
     auto action2 = function->AddAction_("a2");
-    forms_data_.add_a02_.Setup_(action2);
+    forms_actions_.add_a02_.Setup_(action2);
     
     // Action 3: Add the ID Column to the form
     auto action3 = function->AddAction_("a3");
-    forms_data_.add_a03_.Setup_(action3);
+    forms_actions_.add_a03_.Setup_(action3);
     
     // Setup Custom Process
     auto space_id = get_space_id();
@@ -187,15 +187,15 @@ void Forms::Modify_()
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
-    forms_data_.modify_a01_.Setup_(action1);
+    forms_actions_.modify_a01_.Setup_(action1);
 
     // Action 2: Verify that the form identifier don't exists
     auto action2 = function->AddAction_("a2");
-    forms_data_.modify_a02_.Setup_(action2);
+    forms_actions_.modify_a02_.Setup_(action2);
 
     // Action 3: Modify form
     auto action3 = function->AddAction_("a3");
-    forms_data_.modify_a03_.Setup_(action3);
+    forms_actions_.modify_a03_.Setup_(action3);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -267,11 +267,11 @@ void Forms::Delete_()
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
-    forms_data_.delete_a01_.Setup_(action1);
+    forms_actions_.delete_a01_.Setup_(action1);
 
     // Action 2: Delete form from table
     auto action2 = function->AddAction_("a2");
-    forms_data_.delete_a02_.Setup_(action2);
+    forms_actions_.delete_a02_.Setup_(action2);
 
     // Setup Custom Process
     auto space_id = get_space_id();
