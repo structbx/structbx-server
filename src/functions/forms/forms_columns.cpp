@@ -37,3 +37,16 @@ void FormsColumns::Read_()
 
     get_functions()->push_back(function);
 }
+
+void FormsColumns::ReadTypes_()
+{
+    // Function GET /api/forms/columns/types/read
+    Functions::Function::Ptr function = 
+        std::make_shared<Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    action->set_sql_code("SELECT * FROM forms_columns_types ");
+
+    get_functions()->push_back(function);
+}
+

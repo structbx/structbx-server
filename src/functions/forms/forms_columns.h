@@ -11,6 +11,7 @@ class FormsColumns : public FunctionData
 
     protected:
         void Read_();
+        void ReadTypes_();
 
 };
 
