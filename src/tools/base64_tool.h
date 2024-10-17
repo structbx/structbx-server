@@ -13,27 +13,11 @@
 class Base64Tool
 {
     public:
-        Base64Tool(){}
+        Base64Tool();
 
-        std::string Encode_(std::string text_to_encode)
-        {
-            std::stringstream str_enc("");
+        std::string Encode_(std::string text_to_encode);
 
-            Poco::Base64Encoder encoder(str_enc);
-            encoder << text_to_encode;
-            encoder.close();
-
-            return str_enc.str();
-        }
-
-        std::string Decode_(std::string text_to_decode)
-        {
-            std::stringstream str_dec(text_to_decode);
-            Poco::Base64Decoder decoder(str_dec);
-            std::stringstream out;
-	        Poco::StreamCopier::copyStream(decoder, out);
-            return out.str();
-        }
+        std::string Decode_(std::string text_to_decode);
 };
 
 #endif //STRUCTBI_TOOLS_BASE64TOOL
