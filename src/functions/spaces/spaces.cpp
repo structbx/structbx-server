@@ -3,7 +3,7 @@
 
 Spaces::Spaces(FunctionData& function_data) :
     FunctionData(function_data)
-    ,spaces_data_(function_data)
+    ,spaces_actions_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -20,7 +20,7 @@ void Spaces::Read_()
         std::make_shared<Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action = function->AddAction_("a1");
-    spaces_data_.read_a01_.Setup_(action);
+    spaces_actions_.read_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 }
@@ -33,7 +33,7 @@ void Spaces::ReadSpecific_()
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    spaces_data_.read_specific_a01_.Setup_(action);
+    spaces_actions_.read_specific_a01_.Setup_(action);
 
     function->SetupCustomProcess_([](Functions::Function& self)
     {
@@ -73,7 +73,7 @@ void Spaces::Change_()
     function->set_response_type(Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    spaces_data_.change_a01_.Setup_(action);
+    spaces_actions_.change_a01_.Setup_(action);
 
     function->SetupCustomProcess_([&](Functions::Function& self)
     {
@@ -131,7 +131,7 @@ void Spaces::Modify_()
 
     // Action 1: Modify space
     auto action = function->AddAction_("a1");
-    spaces_data_.modify_a01_.Setup_(action);
+    spaces_actions_.modify_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 }
