@@ -1,9 +1,9 @@
 
-#include "actions/spaces_data.h"
+#include "actions/spaces.h"
 
 using namespace StructBI;
 
-Actions::SpacesData::SpacesData(FunctionData& function_data) : 
+Actions::Spaces::Spaces(FunctionData& function_data) : 
     read_a01_(function_data)
     ,read_specific_a01_(function_data)
     ,change_a01_(function_data)
@@ -12,13 +12,13 @@ Actions::SpacesData::SpacesData(FunctionData& function_data) :
     
 }
 
-Actions::SpacesData::ReadA01::ReadA01(FunctionData& function_data) : 
+Actions::Spaces::ReadA01::ReadA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::SpacesData::ReadA01::Setup_(Functions::Action::Ptr action)
+void Actions::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -32,13 +32,13 @@ void Actions::SpacesData::ReadA01::Setup_(Functions::Action::Ptr action)
 
 }
 
-Actions::SpacesData::ReadSpecificA01::ReadSpecificA01(FunctionData& function_data) : 
+Actions::Spaces::ReadSpecificA01::ReadSpecificA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::SpacesData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void Actions::Spaces::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -67,13 +67,13 @@ void Actions::SpacesData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
     }
 }
 
-Actions::SpacesData::ChangeA01::ChangeA01(FunctionData& function_data) : 
+Actions::Spaces::ChangeA01::ChangeA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::SpacesData::ChangeA01::Setup_(Functions::Action::Ptr action)
+void Actions::Spaces::ChangeA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -96,13 +96,13 @@ void Actions::SpacesData::ChangeA01::Setup_(Functions::Action::Ptr action)
     });
 }
 
-Actions::SpacesData::ModifyA01::ModifyA01(FunctionData& function_data) : 
+Actions::Spaces::ModifyA01::ModifyA01(FunctionData& function_data) : 
     Actions::BaseAction(function_data) 
 {
 
 }
 
-void Actions::SpacesData::ModifyA01::Setup_(Functions::Action::Ptr action)
+void Actions::Spaces::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 

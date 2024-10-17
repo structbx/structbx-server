@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_ACTIONS_SPACESDATA
-#define STRUCTBI_ACTIONS_SPACESDATA
+#ifndef STRUCTBI_ACTIONS_SPACES
+#define STRUCTBI_ACTIONS_SPACES
 
 #include "actions/base_action.h"
 #include "function_data.h"
@@ -9,16 +9,16 @@ namespace StructBI
 {
     namespace Actions
     {
-        class SpacesData;
+        class Spaces;
     }
 }
 
 using namespace StructBI;
 
-class StructBI::Actions::SpacesData
+class StructBI::Actions::Spaces
 {
     public:
-        SpacesData(FunctionData& function_data);
+        Spaces(FunctionData& function_data);
 
         class ReadA01 : public Actions::BaseAction
         {
@@ -28,7 +28,6 @@ class StructBI::Actions::SpacesData
                 virtual void Setup_(Functions::Action::Ptr action) override;
 
         } read_a01_;
-
 
         class ReadSpecificA01 : public Actions::BaseAction
         {
@@ -58,4 +57,4 @@ class StructBI::Actions::SpacesData
         } modify_a01_;
 };
 
-#endif //STRUCTBI_ACTIONS_SPACESDATA
+#endif //STRUCTBI_ACTIONS_SPACES
