@@ -23,6 +23,7 @@ class StructBI::Functions::FormsColumns : public Tools::FunctionData
 
     protected:
         void Read_();
+        void ReadSpecific_();
         void ReadTypes_();
         void Add_();
 

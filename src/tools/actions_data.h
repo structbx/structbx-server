@@ -349,6 +349,7 @@ class StructBI::Tools::ActionsData
         {
             FormsColumns(Tools::FunctionData& function_data) : 
                 read_a01_(function_data)
+                ,read_specific_a01_(function_data)
                 ,read_types_a01_(function_data)
                 ,add_a01_(function_data)
                 ,add_a02_(function_data)
@@ -365,6 +366,15 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } read_a01_;
+
+            class ReadSpecificA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_specific_a01_;
 
             class ReadTypesA01 : public Tools::BaseAction
             {

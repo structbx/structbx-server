@@ -812,6 +812,41 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
     });
 }
 
+void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "WHERE " \
+            "fc.id = ? AND id_space = ? AND f.identifier = ?"
+    );
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
 void StructBI::Tools::ActionsData::FormsColumns::ReadTypesA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;

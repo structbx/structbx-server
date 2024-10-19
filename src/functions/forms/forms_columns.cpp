@@ -7,6 +7,7 @@ StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_da
     ,actions_(function_data)
 {
     Read_();
+    ReadSpecific_();
     ReadTypes_();
     Add_();
 }
@@ -19,6 +20,18 @@ void StructBI::Functions::FormsColumns::Read_()
 
     auto action = function->AddAction_("a1");
     actions_.forms_columns_.read_a01_.Setup_(action);
+
+    get_functions()->push_back(function);
+}
+
+void StructBI::Functions::FormsColumns::ReadSpecific_()
+{
+    // Function GET /api/forms/columns/read/id
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    actions_.forms_columns_.read_specific_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 }
