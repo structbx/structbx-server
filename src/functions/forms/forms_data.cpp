@@ -239,54 +239,32 @@ void StructBI::Functions::FormsData::Add_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
     {
-        // Verify if exists actions
-        if(self.get_actions().begin() == self.get_actions().end())
+        // Execute actions
+        if(!action1->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error fpnd6GDTxF");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": nrjlOllSqm");
             return;
         }
-
-        // Execute actions
-        for(auto action : self.get_actions())
+        if(!action2->Work_())
         {
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": nrjlOllSqm");
-                return;
-            }
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": 9e8LhYKOdu");
+            return;
         }
 
         // Get form info
         auto form_identifier = self.GetParameter_("form-identifier");
-
         if(form_identifier == self.get_parameters().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error inbZDVtXXd");
             return;
         }
 
-        // Get columns from action 2
-        auto action2 = self.GetAction_("a2");
-        if(action2 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error Aq7Tne9xnk");
-            return;
-        }
-
-        // Action 3: Save new record
-        auto action3 = self.GetAction_("a3");
-        if(action3 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error bpLGdIQrBB");
-            return;
-        }
-
         // Iterate over action2 results
         std::string columns = "";
         std::string values = "";
-        for(auto it : *action2->get()->get_results())
+        for(auto it : *action2->get_results())
         {
             // Get column
             auto identifier = it.get()->ExtractField_("identifier");
@@ -316,7 +294,7 @@ void StructBI::Functions::FormsData::Add_()
             }
 
             // Setup parameter
-            action3->get()->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
@@ -330,13 +308,13 @@ void StructBI::Functions::FormsData::Add_()
         }
 
         // Set SQL Code to action 3
-        action3->get()->set_sql_code(
+        action3->set_sql_code(
             "INSERT INTO  form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
-        self.IdentifyParameters_(*action3);
-        if(!action3->get()->Work_())
+        self.IdentifyParameters_(action3);
+        if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
