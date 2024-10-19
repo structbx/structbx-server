@@ -1,12 +1,12 @@
 
 #include "tools/base64_tool.h"
 
-Base64Tool::Base64Tool()
+Tools::Base64Tool::Base64Tool()
 {
 
 }
 
-std::string Base64Tool::Encode_(std::string text_to_encode)
+std::string Tools::Base64Tool::Encode_(std::string text_to_encode)
 {
     std::stringstream str_enc("");
 
@@ -17,7 +17,7 @@ std::string Base64Tool::Encode_(std::string text_to_encode)
     return str_enc.str();
 }
 
-std::string Base64Tool::Decode_(std::string text_to_decode)
+std::string Tools::Base64Tool::Decode_(std::string text_to_decode)
 {
     std::stringstream str_dec(text_to_decode);
     Poco::Base64Decoder decoder(str_dec);

@@ -10,7 +10,16 @@
 #include "Poco/StreamCopier.h"
 
 
-class Base64Tool
+namespace StructBI
+{
+    namespace Tools
+    {
+        class Base64Tool;
+    }
+}
+
+using namespace StructBI;
+class StructBI::Tools::Base64Tool
 {
     public:
         Base64Tool();
