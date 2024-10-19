@@ -460,7 +460,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA03::Setup_(Functions::Action::P
 
 }
 
-void StructBI::Tools::ActionsData::Forms::Delete01::Setup_(Functions::Action::Ptr action)
+void StructBI::Tools::ActionsData::Forms::DeleteA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -489,7 +489,7 @@ void StructBI::Tools::ActionsData::Forms::Delete01::Setup_(Functions::Action::Pt
     });
 }
 
-void StructBI::Tools::ActionsData::Forms::Delete02::Setup_(Functions::Action::Ptr action)
+void StructBI::Tools::ActionsData::Forms::DeleteA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -736,4 +736,51 @@ void StructBI::Tools::ActionsData::FormsData::ModifyA03::Setup_(Functions::Actio
 {
     action_ = action;
 
+}
+
+void StructBI::Tools::ActionsData::FormsData::DeleteA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->set_final(false);
+    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void StructBI::Tools::ActionsData::FormsData::DeleteA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de registro no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 }

@@ -187,7 +187,7 @@ class StructBI::Tools::ActionsData
 
             } modify_a03_;
 
-            class Delete01 : public Tools::BaseAction
+            class DeleteA01 : public Tools::BaseAction
             {
                 public:
                     using Tools::BaseAction::BaseAction;
@@ -196,7 +196,7 @@ class StructBI::Tools::ActionsData
 
             } delete_a01_;
 
-            class Delete02 : public Tools::BaseAction
+            class DeleteA02 : public Tools::BaseAction
             {
                 public:
                     using Tools::BaseAction::BaseAction;
@@ -221,6 +221,8 @@ class StructBI::Tools::ActionsData
                 ,modify_01_(function_data)
                 ,modify_02_(function_data)
                 ,modify_03_(function_data)
+                ,delete_a01_(function_data)
+                ,delete_a02_(function_data)
             {
                 
             }
@@ -323,6 +325,24 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } modify_03_;
+
+            class DeleteA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } delete_a01_;
+
+            class DeleteA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } delete_a02_;
         } forms_data_;
 };
 
