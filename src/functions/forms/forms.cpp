@@ -1,9 +1,9 @@
 
 #include "functions/forms/forms.h"
 
-Forms::Forms(FunctionData& function_data) :
-    FunctionData(function_data)
-    ,forms_actions_(function_data)
+StructBI::Functions::Forms::Forms(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+    ,actions_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -12,20 +12,20 @@ Forms::Forms(FunctionData& function_data) :
     Delete_();
 }
 
-void Forms::Read_()
+void StructBI::Functions::Forms::Read_()
 {
     // Function GET /api/forms/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    forms_actions_.read_a01_.Setup_(action);
+    actions_.forms_.read_a01_.Setup_(action);
 
     // Setup custom process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](Functions::Function& self)
+    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -62,7 +62,7 @@ void Forms::Read_()
                 continue;
 
             // Action 2: COUNT
-            auto action2 = Functions::Action("a2");
+            auto action2 = NAF::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
                 "FROM form_" + space_id + "_" + identifier->ToString_());
@@ -77,7 +77,7 @@ void Forms::Read_()
             if(total->IsNull_())
                 continue;
 
-            row->AddField_("total", Tools::DValue::Ptr(new Tools::DValue(total->Int_())));
+            row->AddField_("total", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(total->Int_())));
 
         }
 
@@ -91,50 +91,50 @@ void Forms::Read_()
     get_functions()->push_back(function);
 }
 
-void Forms::ReadSpecific_()
+void StructBI::Functions::Forms::ReadSpecific_()
 {
     // Function GET /api/forms/read/id
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
-    forms_actions_.read_specific_a01_.Setup_(action);
+    actions_.forms_.read_specific_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 
     // Function GET /api/forms/read/identifier
-    Functions::Function::Ptr function2 = 
-        std::make_shared<Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function2 = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
 
     auto action2 = function2->AddAction_("a2");
-    forms_actions_.read_specific_a02_.Setup_(action2);
+    actions_.forms_.read_specific_a02_.Setup_(action2);
 
     get_functions()->push_back(function2);
 }
 
-void Forms::Add_()
+void StructBI::Functions::Forms::Add_()
 {
     // Function POST /api/forms/add
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
-    forms_actions_.add_a01_.Setup_(action1);
+    actions_.forms_.add_a01_.Setup_(action1);
 
     // Action 2: Add the new form
     auto action2 = function->AddAction_("a2");
-    forms_actions_.add_a02_.Setup_(action2);
+    actions_.forms_.add_a02_.Setup_(action2);
     
     // Action 3: Add the ID Column to the form
     auto action3 = function->AddAction_("a3");
-    forms_actions_.add_a03_.Setup_(action3);
+    actions_.forms_.add_a03_.Setup_(action3);
     
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](Functions::Function& self)
+    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -177,29 +177,29 @@ void Forms::Add_()
     get_functions()->push_back(function);
 }
 
-void Forms::Modify_()
+void StructBI::Functions::Forms::Modify_()
 {
     // Function PUT /api/forms/modify
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
-    forms_actions_.modify_a01_.Setup_(action1);
+    actions_.forms_.modify_a01_.Setup_(action1);
 
     // Action 2: Verify that the form identifier don't exists
     auto action2 = function->AddAction_("a2");
-    forms_actions_.modify_a02_.Setup_(action2);
+    actions_.forms_.modify_a02_.Setup_(action2);
 
     // Action 3: Modify form
     auto action3 = function->AddAction_("a3");
-    forms_actions_.modify_a03_.Setup_(action3);
+    actions_.forms_.modify_a03_.Setup_(action3);
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -257,25 +257,25 @@ void Forms::Modify_()
     get_functions()->push_back(function);
 }
 
-void Forms::Delete_()
+void StructBI::Functions::Forms::Delete_()
 {
     // Function DEL /api/forms/delete
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
-    forms_actions_.delete_a01_.Setup_(action1);
+    actions_.forms_.delete_a01_.Setup_(action1);
 
     // Action 2: Delete form from table
     auto action2 = function->AddAction_("a2");
-    forms_actions_.delete_a02_.Setup_(action2);
+    actions_.forms_.delete_a02_.Setup_(action2);
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](Functions::Function& self)
+    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())

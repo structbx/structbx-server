@@ -2,13 +2,24 @@
 #ifndef STRUCTBI_FUNCTIONS_FORMS
 #define STRUCTBI_FUNCTIONS_FORMS
 
-#include "function_data.h"
-#include "actions/forms.h"
+#include "tools/function_data.h"
+#include "tools/actions_data.h"
 
-class Forms : public FunctionData
+namespace StructBI
+{
+    namespace Functions
+    {
+        class Forms;
+    }
+}
+
+using namespace StructBI;
+using namespace NAF;
+
+class StructBI::Functions::Forms : public Tools::FunctionData
 {
     public:
-        Forms(FunctionData& function_data);
+        Forms(Tools::FunctionData& function_data);
 
     protected:
         void Read_();
@@ -18,7 +29,7 @@ class Forms : public FunctionData
         void Delete_();
 
     private:
-        Actions::Forms forms_actions_;
+        Tools::ActionsData actions_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMS
