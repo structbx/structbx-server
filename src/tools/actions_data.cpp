@@ -829,7 +829,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA01::Setup_(Functions::Actio
     {
         if(self.get_results()->size() < 1)
         {
-            self.set_custom_error("El formulario no existe o es erroneo");
+            self.set_custom_error("El formulario solicitado no existe");
             return false;
         }
 
@@ -855,8 +855,53 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Actio
     action_ = action;
 
     action_->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, length, required, default_value, description, id_column_type, id_form, id_space) " \
-        "SELECT ?, ?, ?, ?, ?, ?, (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
+        "SELECT fc.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.identifier = ? AND f.identifier = ?"
+    );
+
+    action_->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+    
+    action_->set_sql_code(
+        "INSERT INTO forms_columns (identifier, name, length, required, default_value, description, id_column_type, id_form) " \
+        "SELECT ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
     );
 
     action_->AddParameter_("identifier", "", true)
@@ -906,49 +951,42 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Actio
         }
         return true;
     });
-    action_->AddParameter_("state", "", true)
-    ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action_->AddParameter_("length", "", true);
+    action_->AddParameter_("required", "", true)
+    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(param->get_value()->ToString_() == "")
+        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
         {
-            param->set_error("El estado no puede estar vacío");
+            return true;
+        }
+        else
+        {
+            param->set_error("El valor de obligatorio debe ser boleano");
             return false;
         }
         return true;
     });
-    action_->AddParameter_("privacity", "", true)
-    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("La privacidad no puede estar vacía");
-            return false;
-        }
-        return true;
-    });
+    action_->AddParameter_("default_value", "", true);
     action_->AddParameter_("description", "", true);
+    action_->AddParameter_("id_column_type", "", true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El tipo de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
     action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, length, required, id_column_type, id_form) " \
-        "SELECT " \
-            "? " \
-            ",? " \
-            ",? " \
-            ",? " \
-            ",(SELECT id FROM forms_columns_types WHERE identifier = 'int-number') " \
-            ",(SELECT id FROM forms WHERE identifier = ? and id_space = ?) "
-    );
-
-    action_->AddParameter_("identifier", "id", false);
-    action_->AddParameter_("name", "ID", false);
-    action_->AddParameter_("length", "11", false);
-    action_->AddParameter_("required", 1, false);
-    action_->AddParameter_("identifier", "", true);
-    action_->AddParameter_("space_id", get_space_id(), false);
 }
