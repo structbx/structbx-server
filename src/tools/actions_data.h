@@ -344,6 +344,64 @@ class StructBI::Tools::ActionsData
 
             } delete_a02_;
         } forms_data_;
+
+        struct FormsColumns
+        {
+            FormsColumns(Tools::FunctionData& function_data) : 
+                read_a01_(function_data)
+                ,read_types_a01_(function_data)
+                ,add_a01_(function_data)
+                ,add_a02_(function_data)
+                ,add_a03_(function_data)
+            {
+
+            }
+
+            class ReadA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_a01_;
+
+            class ReadTypesA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_types_a01_;
+
+            class AddA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_a01_;
+
+            class AddA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_a02_;
+
+            class AddA03 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_a03_;
+        } forms_columns_;
 };
 
 #endif //STRUCTBI_TOOLS_ACTIONSDATA
