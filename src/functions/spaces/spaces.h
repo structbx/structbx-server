@@ -3,16 +3,24 @@
 #define STRUCTBI_FUNCTIONS_SPACES
 
 
-#include "function_data.h"
+#include "tools/function_data.h"
 #include "tools/base64_tool.h"
-#include "actions/spaces.h"
+#include "tools/actions_data.h"
+
+namespace StructBI
+{
+    namespace Functions
+    {
+        class Spaces;
+    }
+}
 
 using namespace StructBI;
-
-class Spaces : public FunctionData
+using namespace NAF;
+class StructBI::Functions::Spaces : public Tools::FunctionData
 {
     public:
-        Spaces(FunctionData& function_data);
+        Spaces(Tools::FunctionData& function_data);
         
     protected:
         void Read_();
@@ -23,7 +31,7 @@ class Spaces : public FunctionData
         void Delete_();
 
     private:
-        Actions::Spaces spaces_actions_;
+        Tools::ActionsData actions_;
 
 };
 

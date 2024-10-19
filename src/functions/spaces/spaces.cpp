@@ -1,9 +1,9 @@
 
 #include "functions/spaces/spaces.h"
 
-Spaces::Spaces(FunctionData& function_data) :
-    FunctionData(function_data)
-    ,spaces_actions_(function_data)
+StructBI::Functions::Spaces::Spaces(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+    ,actions_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -13,29 +13,29 @@ Spaces::Spaces(FunctionData& function_data) :
     Delete_();
 }
 
-void Spaces::Read_()
+void StructBI::Functions::Spaces::Read_()
 {
     // Function GET /api/spaces/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action = function->AddAction_("a1");
-    spaces_actions_.read_a01_.Setup_(action);
+    actions_.spaces_.read_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 }
 
-void Spaces::ReadSpecific_()
+void StructBI::Functions::Spaces::ReadSpecific_()
 {
     // Function GET /api/spaces/read/id
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    spaces_actions_.read_specific_a01_.Setup_(action);
+    actions_.spaces_.read_specific_a01_.Setup_(action);
 
-    function->SetupCustomProcess_([](Functions::Function& self)
+    function->SetupCustomProcess_([](NAF::Functions::Function& self)
     {
         // Action to request the current Space
         auto action = self.GetAction_("a1");
@@ -64,18 +64,18 @@ void Spaces::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void Spaces::Change_()
+void StructBI::Functions::Spaces::Change_()
 {
     // Function GET /api/spaces/change
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    spaces_actions_.change_a01_.Setup_(action);
+    actions_.spaces_.change_a01_.Setup_(action);
 
-    function->SetupCustomProcess_([&](Functions::Function& self)
+    function->SetupCustomProcess_([&](NAF::Functions::Function& self)
     {
         // Search first action
         auto action = *self.get_actions().begin();
@@ -98,7 +98,7 @@ void Spaces::Change_()
         if(!field->IsNull_())
         {
             // Set Cookie Space ID
-            auto space_id_encoded = Base64Tool().Encode_(field->ToString_());
+            auto space_id_encoded = Tools::Base64Tool().Encode_(field->ToString_());
             Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
             cookie.setPath("/");
             cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
@@ -118,25 +118,25 @@ void Spaces::Change_()
     get_functions()->push_back(function);
 }
 
-void Spaces::Add_()
+void StructBI::Functions::Spaces::Add_()
 {
 
 }
 
-void Spaces::Modify_()
+void StructBI::Functions::Spaces::Modify_()
 {
     // Function PUT /api/spaces/general/modify
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     // Action 1: Modify space
     auto action = function->AddAction_("a1");
-    spaces_actions_.modify_a01_.Setup_(action);
+    actions_.spaces_.modify_a01_.Setup_(action);
 
     get_functions()->push_back(function);
 }
 
-void Spaces::Delete_()
+void StructBI::Functions::Spaces::Delete_()
 {
     
 }
