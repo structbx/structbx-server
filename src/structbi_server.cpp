@@ -10,6 +10,7 @@
 #include "web_server.h"
 #include "backend_server.h"
 
+using namespace StructBI;
 using namespace NAF;
 
 int main(int argc, char** argv)
@@ -17,41 +18,41 @@ int main(int argc, char** argv)
     // Setup
         Core::NebulaAtom app(true);
 
-        Tools::SettingsManager::ReadSettings_();
+        NAF::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
-        Query::DatabaseManager::StartMySQL_();
-        Security::PermissionsManager::LoadPermissions_();
-        Tools::SessionsManager::ReadSessions_();
+        NAF::Query::DatabaseManager::StartMySQL_();
+        NAF::Security::PermissionsManager::LoadPermissions_();
+        NAF::Tools::SessionsManager::ReadSessions_();
 
     // Custom Handler Creator
         app.CustomHandlerCreator_([&](Core::HTTPRequestInfo& info)
         {
-            Handlers::RootHandler* handler;
+            NAF::Handlers::RootHandler* handler;
 
             // Manage the route type
-            Tools::Route route(info.uri);
+            NAF::Tools::Route route(info.uri);
 
             switch(route.get_current_route_type())
             {
                 // Manage Frontend
-                case Tools::RouteType::kEntrypoint:
+                case NAF::Tools::RouteType::kEntrypoint:
                 {
-                    handler = new Webserver;
+                    handler = new StructBI::Webserver;
                     break;
                 }
 
                 // Manage Backend
-                case Tools::RouteType::kEndpoint:
+                case NAF::Tools::RouteType::kEndpoint:
                 {
                     // Routes
-                    Tools::Route requested_route(info.uri);
-                    Tools::Route login_route("/api/system/login");
-                    Tools::Route logout_route("/api/system/logout");
+                    NAF::Tools::Route requested_route(info.uri);
+                    NAF::Tools::Route login_route("/api/system/login");
+                    NAF::Tools::Route logout_route("/api/system/logout");
 
                     if(requested_route == login_route || requested_route == logout_route)
-                        handler = new Handlers::LoginHandler();
+                        handler = new NAF::Handlers::LoginHandler();
                     else
-                        handler = new BackendServer;
+                        handler = new StructBI::BackendServer;
 
                     break;
                 }
@@ -66,6 +67,6 @@ int main(int argc, char** argv)
         auto code = app.Init_(argc, argv);
 
     // End
-        Query::DatabaseManager::StopMySQL_();
+        NAF::Query::DatabaseManager::StopMySQL_();
         return code;
 }
