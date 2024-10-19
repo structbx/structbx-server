@@ -20,6 +20,26 @@ class StructBI::Tools::ActionsData
     public:
         ActionsData(Tools::FunctionData& function_data);
 
+        /*
+        struct ElementName
+        {
+            ElementName(Tools::FunctionData& function_data) : 
+                read_a01_(function_data)
+            {
+                
+            }
+
+            class ReadA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_a01_;
+        } element_name_;
+        */
+
         struct Spaces
         {
             Spaces(Tools::FunctionData& function_data) : 
@@ -186,6 +206,64 @@ class StructBI::Tools::ActionsData
             } delete_a02_;
 
         } forms_;
+
+        struct FormsData
+        {
+            FormsData(Tools::FunctionData& function_data) : 
+                read_a01_(function_data)
+                ,read_columns_a01_(function_data)
+                ,read_columns_a02_(function_data)
+                ,read_specific_a01_(function_data)
+                ,read_specific_a02_(function_data)
+            {
+                
+            }
+
+            class ReadA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_a01_;
+
+            class ReadColumnsA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_columns_a01_;
+
+            class ReadColumnsA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_columns_a02_;
+
+            class ReadSpecificA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_specific_a01_;
+
+            class ReadSpecificA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_specific_a02_;
+        } forms_data_;
 };
 
 #endif //STRUCTBI_TOOLS_ACTIONSDATA
