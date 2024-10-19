@@ -20,41 +20,22 @@ void StructBI::Functions::Forms::Read_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
-    auto action = function->AddAction_("a1");
-    actions_.forms_.read_a01_.Setup_(action);
+    auto action1 = function->AddAction_("a1");
+    actions_.forms_.read_a01_.Setup_(action1);
 
     // Setup custom process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1](NAF::Functions::Function& self)
     {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
+        // Execute actions
+        if(!action1->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5svQHcqqHH");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
             return;
         }
 
-        // Iterate over actions
-        for(auto action : self.get_actions())
-        {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": T9eBepMcTA");
-                return;
-            }
-        }
-
-        // Get action1
-        auto action1 = self.GetAction_("a1");
-        if(action1 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error g56U7d8ljv");
-            return;
-        }
-        
         // Iterate over results
-        for(auto row : *action1->get()->get_results())
+        for(auto row : *action1->get_results())
         {
             // Get form identifier
             auto identifier = row->ExtractField_("identifier");
@@ -82,7 +63,7 @@ void StructBI::Functions::Forms::Read_()
         }
 
         // JSON Results
-        auto json_results = action1->get()->CreateJSONResult_();
+        auto json_results = action1->CreateJSONResult_();
 
         // Send results
         self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_results);
@@ -134,12 +115,12 @@ void StructBI::Functions::Forms::Add_()
     
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No actions found.");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UjR4f9nmIO");
             return;
         }
 
@@ -149,25 +130,30 @@ void StructBI::Functions::Forms::Add_()
             // Execute action
             if(!action->Work_())
             {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action->get_custom_error());
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
                 return;
             }
         }
 
         // Get form identifier
         auto form_identifier = self.GetParameter_("identifier");
+        if(form_identifier == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error Qe6SiPDQoM");
+            return;
+        }
 
-        // Action 3: Create the table
-        auto action3 = self.AddAction_("a3");
-        action3->set_sql_code(
+        // Action 4: Create the table
+        auto action4 = self.AddAction_("a4");
+        action4->set_sql_code(
             "CREATE TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "(" \
                 "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
         );
-        if(!action3->Work_())
+        if(!action4->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action3->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action4->get_custom_error());
             return;
         }
 
@@ -199,7 +185,7 @@ void StructBI::Functions::Forms::Modify_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
@@ -214,23 +200,16 @@ void StructBI::Functions::Forms::Modify_()
             // Execute action
             if(!action->Work_())
             {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": HbdcAS3FsT");
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
                 return;
             }
         }
 
         // Compare old identifier and new identifier
-        auto action1 = self.GetAction_("a1");
-        auto action2 = self.GetAction_("a2");
-        if(action1 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error EgdW7Wg5WV");
-            return;
-        }
-        auto old_identifier = action1->get()->get_results()->ExtractField_(0, 0);
-        auto new_identifier = action2->get()->GetParameter("identifier");
+        auto old_identifier = action1->get_results()->First_();
+        auto new_identifier = action2->GetParameter("identifier");
 
-        if(old_identifier->IsNull_() || new_identifier == action2->get()->get_parameters().end())
+        if(old_identifier->IsNull_() || new_identifier == action2->get_parameters().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5sVP0geEXI");
             return;
@@ -275,35 +254,17 @@ void StructBI::Functions::Forms::Delete_()
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2](NAF::Functions::Function& self)
     {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
+        // Execute actions
+        if(!action1->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 7dCZ4eogZ8");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
             return;
         }
-
-        // Iterate over actions
-        for(auto action : self.get_actions())
-        {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": XXFwxZhaNV");
-                return;
-            }
-        }
-
+            
         // Get form identifier
-        auto action1 = self.GetAction_("a1");
-        if(action1 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 9rR0LnKLCa");
-            return;
-        }
-        auto identifier = action1->get()->get_results()->First_();
-
+        auto identifier = action1->get_results()->First_();
         if(identifier->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error J5pktjAN5K");
@@ -320,14 +281,8 @@ void StructBI::Functions::Forms::Delete_()
         }
 
         // Action 2: Delete form record
-        auto action2 = self.GetAction_("a2");
-        if(action2 == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 3EPXm8sG2Q");
-            return;
-        }
-        self.IdentifyParameters_(*action2);
-        if(!action2->get()->Work_())
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error kJ79T9LBRw");
             return;
