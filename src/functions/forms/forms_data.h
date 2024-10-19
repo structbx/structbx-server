@@ -2,9 +2,20 @@
 #ifndef STRUCTBI_FUNCTIONS_FORMSDATA
 #define STRUCTBI_FUNCTIONS_FORMSDATA
 
-#include "function_data.h"
+#include "tools/function_data.h"
 
-class FormsData : public FunctionData
+namespace StructBI
+{
+    namespace Functions
+    {
+        class FormsData;
+    }
+}
+
+using namespace StructBI;
+using namespace NAF;
+
+class StructBI::Functions::FormsData : public Tools::FunctionData
 {
     public:
         FormsData(FunctionData& function_data);

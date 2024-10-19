@@ -1,7 +1,7 @@
 
 #include "functions/forms/forms_data.h"
 
-FormsData::FormsData(FunctionData& function_data) :
+StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
     FunctionData(function_data)
 {
     Read_();
@@ -12,13 +12,13 @@ FormsData::FormsData(FunctionData& function_data) :
     Delete_();
 }
 
-void FormsData::Read_()
+void StructBI::Functions::FormsData::Read_()
 {
     // Function GET /api/forms/data/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/read", HTTP::EnumMethods::kHTTP_GET);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
@@ -45,7 +45,7 @@ void FormsData::Read_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Get actions
         auto action1 = self.GetAction_("a1");
@@ -117,11 +117,11 @@ void FormsData::Read_()
     get_functions()->push_back(function);
 }
 
-void FormsData::ReadColumns_()
+void StructBI::Functions::FormsData::ReadColumns_()
 {
     // Function GET /api/forms/data/columns/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/columns/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/columns/read", HTTP::EnumMethods::kHTTP_GET);
 
     // Action 1: Get current identifier and id_space
     auto action1 = function->AddAction_("a1");
@@ -165,13 +165,13 @@ void FormsData::ReadColumns_()
     get_functions()->push_back(function);
 }
 
-void FormsData::ReadSpecific_()
+void StructBI::Functions::FormsData::ReadSpecific_()
 {
     // Function GET /api/forms/data/read/id
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/read/id", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/read/id", HTTP::EnumMethods::kHTTP_GET);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
@@ -198,7 +198,7 @@ void FormsData::ReadSpecific_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Get actions
         auto action1 = self.GetAction_("a1");
@@ -286,19 +286,19 @@ void FormsData::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void FormsData::Add_()
+void StructBI::Functions::FormsData::Add_()
 {
     // Function GET /api/forms/data/add
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/add", HTTP::EnumMethods::kHTTP_POST);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ?");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
     action1->set_final(false);
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -319,6 +319,7 @@ void FormsData::Add_()
         }
         return true;
     });
+    action1->AddParameter_("form-identifier", get_space_id(), false);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
@@ -345,7 +346,7 @@ void FormsData::Add_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Verify if exists actions
         if(self.get_actions().begin() == self.get_actions().end())
@@ -410,7 +411,7 @@ void FormsData::Add_()
             }
 
             // Setup parameter
-            action3->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
@@ -443,19 +444,19 @@ void FormsData::Add_()
     get_functions()->push_back(function);
 }
 
-void FormsData::Modify_()
+void StructBI::Functions::FormsData::Modify_()
 {
     // Function GET /api/forms/data/modify
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/modify", HTTP::EnumMethods::kHTTP_PUT);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ?");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
     action1->set_final(false);
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -476,6 +477,8 @@ void FormsData::Modify_()
         }
         return true;
     });
+
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
@@ -502,7 +505,7 @@ void FormsData::Modify_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Verify if exists actions
         if(self.get_actions().begin() == self.get_actions().end())
@@ -564,7 +567,7 @@ void FormsData::Modify_()
             }
 
             // Setup parameters
-            action3->AddParameter_(identifier->ToString_(), Tools::DValue::Ptr(new Tools::DValue()), true)
+            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
@@ -611,9 +614,9 @@ void FormsData::Modify_()
     get_functions()->push_back(function);
 }
 
-bool FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value)
+bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value)
 {
-    if(param->get_value()->TypeIsIqual_(Tools::DValue::Type::kEmpty))
+    if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
     {
         if(required->Int_() == 1)
         {
@@ -623,33 +626,33 @@ bool FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query
                 return false;
             }
             else
-                param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
+                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
         }
         else
         {
             if(default_value->ToString_() == "")
                 return true;
             else
-                param->set_value(Tools::DValue::Ptr(new Tools::DValue(default_value->ToString_())));
+                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
         }
     }
 
     return true;
 }
 
-void FormsData::Delete_()
+void StructBI::Functions::FormsData::Delete_()
 {
     // Function GET /api/forms/data/delete
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ?");
+    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
     action1->set_final(false);
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -671,9 +674,11 @@ void FormsData::Delete_()
         return true;
     });
 
+    action1->AddParameter_("id_space", get_space_id(), false);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](Functions::Function& self)
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
         // Get action 1
         auto action1 = self.GetAction_("a1");
