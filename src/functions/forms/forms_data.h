@@ -3,6 +3,7 @@
 #define STRUCTBI_FUNCTIONS_FORMSDATA
 
 #include "tools/function_data.h"
+#include "tools/actions_data.h"
 
 namespace StructBI
 {
@@ -32,6 +33,9 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
         void Add_();
         void Modify_();
         void Delete_();
+
+    private:
+        Tools::ActionsData actions_;
 };
 
 #endif //STRUCTBI_FUNCTIONS_FORMSDATA

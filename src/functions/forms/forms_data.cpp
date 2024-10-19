@@ -1,8 +1,10 @@
 
 #include "functions/forms/forms_data.h"
+#include "tools/actions_data.h"
 
 StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
     FunctionData(function_data)
+    ,actions_(function_data)
 {
     Read_();
     ReadColumns_();
@@ -22,26 +24,7 @@ void StructBI::Functions::FormsData::Read_()
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action1->set_final(false);
-    action1->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action1->AddParameter_("id_space", get_space_id(), false);
+    actions_.forms_data_.read_a01_.Setup_(action1);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -125,42 +108,11 @@ void StructBI::Functions::FormsData::ReadColumns_()
 
     // Action 1: Get current identifier and id_space
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
-    action1->set_final(false);
-    action1->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action1->AddParameter_("id_space", get_space_id(), false);
+    actions_.forms_data_.read_columns_a01_.Setup_(action1);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
-    action2->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier != 'id'"
-    );
-    action2->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action2->AddParameter_("id_space", get_space_id(), false);
+    actions_.forms_data_.read_columns_a02_.Setup_(action2);
 
     get_functions()->push_back(function);
 }
@@ -175,32 +127,17 @@ void StructBI::Functions::FormsData::ReadSpecific_()
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action1->set_final(false);
-    action1->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
+    actions_.forms_data_.read_specific_a01_.Setup_(action1);
 
-    action1->AddParameter_("id_space", get_space_id(), false);
+    // Action 2: Get Form data
+    auto action2 = function->AddAction_("a2");
+    actions_.forms_data_.read_specific_a02_.Setup_(action2);
 
     // Setup Custom Process
     auto id_space = get_space_id();
     function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
     {
-        // Get actions
+        // Get action 1
         auto action1 = self.GetAction_("a1");
         if(action1 == self.get_actions().end())
         {
@@ -247,36 +184,30 @@ void StructBI::Functions::FormsData::ReadSpecific_()
             columns = "*";
 
         // Action 2: Get Form data
-        auto action2 = self.AddAction_("a2");
-        action2->set_sql_code(
+        auto action2 = self.GetAction_("a2");
+        if(action1 == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error xTWsdae5pJ");
+            return;
+        }
+
+        action2->get()->set_sql_code(
             "SELECT " + columns + " " \
             "FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
             "WHERE id = ?");
 
-        // Add id parameter to action 2
-        action2->AddParameter_("id", "", true)
-        ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-        {
-            if(param->get_value()->ToString_() == "")
-            {
-                param->set_error("El id no puede estar vacío");
-                return false;
-            }
-            return true;
-        });
-
         // Identify parameters and work
-        self.IdentifyParameters_(action2);
-        if(!action2->Work_())
+        self.IdentifyParameters_(*action2);
+        if(!action2->get()->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
             return;
         }
 
         // Action 2 results
-        auto json_result2 = action2->CreateJSONResult_();
-        json_result2->set("status", action2->get_status());
-        json_result2->set("message", action2->get_message());
+        auto json_result2 = action2->get()->CreateJSONResult_();
+        json_result2->set("status", action2->get()->get_status());
+        json_result2->set("message", action2->get()->get_message());
         json_result2->set("columns_meta", json_result1);
 
         // Send results
