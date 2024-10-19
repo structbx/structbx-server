@@ -1,7 +1,7 @@
 
 #include "web_server.h"
 
-Webserver::Webserver() : 
+StructBI::Webserver::Webserver() : 
     RootHandler()
 {
     // Set headers
@@ -11,7 +11,7 @@ Webserver::Webserver() :
     AddHeader_("Access-Control-Allow-Origin", "https://localhost:3000");
 }
 
-void Webserver::Process_()
+void StructBI::Webserver::Process_()
 {
     SetupHeaders_();
     file_manager_.AddBasicSupportedFiles_();
@@ -33,7 +33,7 @@ void Webserver::Process_()
     }
 }
 
-void Webserver::DownloadProcess_()
+void StructBI::Webserver::DownloadProcess_()
 {
     // Manage the file
         auto& request = get_http_server_request().value();

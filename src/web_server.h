@@ -8,7 +8,15 @@
 
 using namespace NAF;
 
-class Webserver : public Handlers::RootHandler
+namespace StructBI
+{
+    class Webserver;
+}
+
+using namespace StructBI;
+using namespace NAF;
+
+class StructBI::Webserver : public Handlers::RootHandler
 {
     public:
         Webserver();
