@@ -1,14 +1,14 @@
 
-#ifndef STRUCTBI_PARAMETERS_BASEACTION
-#define STRUCTBI_PARAMETERS_BASEACTION
+#ifndef STRUCTBI_TOOLS_BASEACTION
+#define STRUCTBI_TOOLS_BASEACTION
 
 #include "functions/action.h"
 
-#include "function_data.h"
+#include "tools/function_data.h"
 
 namespace StructBI
 {
-    namespace Actions
+    namespace Tools
     {
         class BaseAction;
     }
@@ -17,11 +17,11 @@ namespace StructBI
 using namespace StructBI;
 using namespace NAF;
 
-class StructBI::Actions::BaseAction : public FunctionData
+class StructBI::Tools::BaseAction : public Tools::FunctionData
 {
     public:
-        BaseAction(FunctionData& function_data) : 
-            FunctionData(function_data)
+        BaseAction(Tools::FunctionData& function_data) : 
+            Tools::FunctionData(function_data)
         {
             action_ = Functions::Action::Ptr(new Functions::Action("a01"));
         }
@@ -36,4 +36,4 @@ class StructBI::Actions::BaseAction : public FunctionData
         Functions::Action::Ptr action_;
 };
 
-#endif //STRUCTBI_PARAMETERS_BASEACTION
+#endif //STRUCTBI_TOOLS_BASEACTION
