@@ -5,17 +5,23 @@
 #include "core/nebula_atom.h"
 #include "handlers/backend_handler.h"
 
-#include "function_data.h"
+#include "tools/function_data.h"
 #include "functions/spaces/spaces.h"
-#include "functions/spaces/spaces_users.h"
-#include "functions/spaces/spaces_logo.h"
+//#include "functions/spaces/spaces_users.h"
+//#include "functions/spaces/spaces_logo.h"
 #include "functions/forms/forms.h"
 #include "functions/forms/forms_data.h"
 #include "functions/forms/forms_columns.h"
 
+namespace StructBI
+{
+    class BackendServer;
+}
+
+using namespace StructBI;
 using namespace NAF;
 
-class BackendServer : public Handlers::BackendHandler
+class StructBI::BackendServer : public Handlers::BackendHandler
 {
     public:
         BackendServer();
@@ -29,7 +35,7 @@ class BackendServer : public Handlers::BackendHandler
         void SetupFunctionData_();
 
     private:
-        FunctionData function_data_;
+        Tools::FunctionData function_data_;
         HTTP::Cookie space_id_cookie_;
         bool add_space_id_cookie_;
 };

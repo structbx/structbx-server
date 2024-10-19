@@ -11,39 +11,39 @@ BackendServer::BackendServer() :
 void BackendServer::AddFunctions_()
 {
     // Spaces
-    auto spaces = Spaces(function_data_);
+    auto spaces = Functions::Spaces(function_data_);
     for(auto it : *spaces.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     
     // Spaces Users
-    auto spaces_users = SpacesUsers(function_data_);
+    /*auto spaces_users = SpacesUsers(function_data_);
     for(auto it : *spaces_users.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     
     // Spaces Logo
     auto spaces_logo = SpacesLogo(function_data_);
     for(auto it : *spaces_logo.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));*/
     
     // Forms
-    auto forms = Forms(function_data_);
+    auto forms = Functions::Forms(function_data_);
     for(auto it : *forms.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 
     // Forms Data
-    auto forms_data = FormsData(function_data_);
+    auto forms_data = Functions::FormsData(function_data_);
     for(auto it : *forms_data.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 
     // Forms Columns
-    auto forms_columns = FormsColumns(function_data_);
+    auto forms_columns = Functions::FormsColumns(function_data_);
     for(auto it : *forms_columns.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 }
 
 void BackendServer::Process_()
 {
-    get_files_parameters()->set_directory_base(Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
+    get_files_parameters()->set_directory_base(NAF::Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
     
     // Set security type
     set_security_type(Extras::SecurityType::kDisableAll);
@@ -99,7 +99,7 @@ void BackendServer::SetupFunctionData_()
     // Save Space ID if it was established
     if(cookie_space_id != cookies.end())
     {
-        auto space_id_decoded = Base64Tool().Decode_(cookie_space_id->second);
+        auto space_id_decoded = Tools::Base64Tool().Decode_(cookie_space_id->second);
         function_data_.set_space_id(space_id_decoded);
     }
     else
@@ -107,7 +107,7 @@ void BackendServer::SetupFunctionData_()
         add_space_id_cookie_ = true;
 
         // Get Space ID Cookie if it was not established
-        auto action = Functions::Action("a1");
+        auto action = NAF::Functions::Action("a1");
         action.set_sql_code(
             "SELECT s.id " \
             "FROM spaces s " \
@@ -124,7 +124,7 @@ void BackendServer::SetupFunctionData_()
                 function_data_.set_space_id(space_id->ToString_());
 
                 // Save Space ID to Cookie
-                auto space_id_encoded = Base64Tool().Encode_(space_id->ToString_());
+                auto space_id_encoded = Tools::Base64Tool().Encode_(space_id->ToString_());
 
                 Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
                 cookie.setPath("/");
