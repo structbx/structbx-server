@@ -7,7 +7,16 @@
 #include <algorithm>
 
 
-class IDChecker
+namespace StructBI
+{
+    namespace Tools
+    {
+        class IDChecker;
+    }
+}
+
+using namespace StructBI;
+class StructBI::Tools::IDChecker
 {
     public:
         IDChecker();

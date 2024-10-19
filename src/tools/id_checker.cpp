@@ -1,7 +1,7 @@
 #include "tools/id_checker.h"
 
 
-IDChecker::IDChecker()
+Tools::IDChecker::IDChecker()
 {
     allowed_characters_ = std::list<char>({
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'
@@ -12,7 +12,7 @@ IDChecker::IDChecker()
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ','});
 }
 
-bool IDChecker::Check_(std::string id)
+bool Tools::IDChecker::Check_(std::string id)
 {
     for (char c : id)
     {
@@ -24,7 +24,7 @@ bool IDChecker::Check_(std::string id)
     return true;
 }
 
-bool IDChecker::CheckNumbers_(std::string id)
+bool Tools::IDChecker::CheckNumbers_(std::string id)
 {
     for (char c : id)
     {
