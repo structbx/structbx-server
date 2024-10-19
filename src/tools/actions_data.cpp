@@ -610,3 +610,67 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA02::Setup_(Functions:
         return true;
     });
 }
+
+void StructBI::Tools::ActionsData::FormsData::AddA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->set_final(false);
+    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", get_space_id(), false);
+
+}
+
+void StructBI::Tools::ActionsData::FormsData::AddA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action_->set_final(false);
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void StructBI::Tools::ActionsData::FormsData::AddA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+
+}

@@ -215,6 +215,9 @@ class StructBI::Tools::ActionsData
                 ,read_columns_a02_(function_data)
                 ,read_specific_a01_(function_data)
                 ,read_specific_a02_(function_data)
+                ,add_01_(function_data)
+                ,add_02_(function_data)
+                ,add_03_(function_data)
             {
                 
             }
@@ -263,6 +266,33 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } read_specific_a02_;
+
+            class AddA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_01_;
+
+            class AddA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_02_;
+
+            class AddA03 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_03_;
         } forms_data_;
 };
 
