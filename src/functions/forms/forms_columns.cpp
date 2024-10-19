@@ -1,7 +1,7 @@
 
 #include "functions/forms/forms_columns.h"
 
-FormsColumns::FormsColumns(FunctionData& function_data) :
+StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_data) :
     FunctionData(function_data)
 {
     Read_();
@@ -9,11 +9,11 @@ FormsColumns::FormsColumns(FunctionData& function_data) :
     Add_();
 }
 
-void FormsColumns::Read_()
+void StructBI::Functions::FormsColumns::Read_()
 {
     // Function GET /api/forms/columns/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     action->set_sql_code(
@@ -40,11 +40,11 @@ void FormsColumns::Read_()
     get_functions()->push_back(function);
 }
 
-void FormsColumns::ReadTypes_()
+void StructBI::Functions::FormsColumns::ReadTypes_()
 {
     // Function GET /api/forms/columns/types/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     action->set_sql_code("SELECT * FROM forms_columns_types ");
@@ -52,19 +52,19 @@ void FormsColumns::ReadTypes_()
     get_functions()->push_back(function);
 }
 
-void FormsColumns::Add_()
+void StructBI::Functions::FormsColumns::Add_()
 {
     // Function POST /api/forms/columns/add
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/forms/columns/add", HTTP::EnumMethods::kHTTP_POST);
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(Functions::Function::ResponseType::kCustom);
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form identifier don't exists
     auto action1 = function->AddAction_("a1");
     action1->set_final(false);
     action1->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    action1->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -99,7 +99,7 @@ void FormsColumns::Add_()
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -114,7 +114,7 @@ void FormsColumns::Add_()
             param->set_error("El identificador no puede ser menor a 3 dígitos");
             return false;
         }
-        bool result = IDChecker().Check_(param->get_value()->ToString_());
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
         if(!result)
         {
             param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
@@ -125,7 +125,7 @@ void FormsColumns::Add_()
     action2->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -187,7 +187,7 @@ void FormsColumns::Add_()
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id](Functions::Function& self)
+    function->SetupCustomProcess_([space_id](NAF::Functions::Function& self)
     {
         // Search first action
         if(self.get_actions().begin() == self.get_actions().end())
