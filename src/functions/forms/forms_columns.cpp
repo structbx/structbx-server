@@ -11,6 +11,7 @@ StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_da
     ReadTypes_();
     Add_();
     Modify_();
+    Delete_();
 }
 
 void StructBI::Functions::FormsColumns::Read_()
@@ -313,6 +314,75 @@ void StructBI::Functions::FormsColumns::Modify_()
         }
 
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
+
+    get_functions()->push_back(function);
+}
+
+void StructBI::Functions::FormsColumns::Delete_()
+{
+    // Function GET /api/forms/columns/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Verify column existence
+    auto action1 = function->AddAction_("a1");
+    actions_.forms_columns_.delete_a01_.Setup_(action1);
+
+    // Action 2: Delete column from table
+    auto action2 = function->AddAction_("a2");
+    actions_.forms_columns_.delete_a02_.Setup_(action2);
+
+    // Action 3: Delete column record
+    auto action3 = function->AddAction_("a3");
+    actions_.forms_columns_.delete_a03_.Setup_(action3);
+
+    // Setup Custom Process
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
+    {
+        // Execute action 1
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+
+        // Get parameters
+        auto identifier = action1->get_results()->front()->ExtractField_("identifier");
+        auto form_identifier = self.GetParameter_("form-identifier");
+        if(identifier->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UOEraAIHjM");
+            return;
+        }
+        if(form_identifier == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UFwgqfZp59");
+            return;
+        }
+
+        // Action 2: Delete columns
+        action2->set_sql_code(
+            "ALTER TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " +
+            "DROP COLUMN " + identifier->ToString_());
+
+        // Execute actions
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+        if(!action3->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
     });
 
     get_functions()->push_back(function);
