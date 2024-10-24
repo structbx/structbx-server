@@ -1025,3 +1025,218 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
     });
     action_->AddParameter_("id_space", get_space_id(), false);
 }
+
+void StructBI::Tools::ActionsData::FormsColumns::ModifyA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_final(false);
+    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::ModifyA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fc.identifier, fc.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.id != ? AND fc.identifier = ? AND f.identifier = ?"
+    );
+
+    action_->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::ModifyA02_1::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fc.identifier " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.id = ?"
+    );
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+    
+    action_->set_sql_code(
+        "UPDATE forms_columns SET identifier = ?, name = ?, length = ?, required = ?, default_value = ?, description = ?, id_column_type = ? " \
+        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
+    );
+
+    action_->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        auto string_param = param->get_value()->ToString_();
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El identificador debe ser una cadena de texto");
+            return false;
+        }
+        if(string_param == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        if(string_param.size() < 3)
+        {
+            param->set_error("El identificador no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre debe ser una cadena de texto");
+            return false;
+        }
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        if(param->get_value()->ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 dígitos");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("length", "", true);
+    action_->AddParameter_("required", "", true)
+    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
+        {
+            return true;
+        }
+        else
+        {
+            param->set_error("El valor de obligatorio debe ser boleano");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("default_value", "", true);
+    action_->AddParameter_("description", "", true);
+    action_->AddParameter_("id_column_type", "", true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El tipo de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de la columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
