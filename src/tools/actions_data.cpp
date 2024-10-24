@@ -1253,3 +1253,73 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
     });
     action_->AddParameter_("id_space", get_space_id(), false);
 }
+
+void StructBI::Tools::ActionsData::FormsColumns::DeleteA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fc.* FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
+    );
+    action_->set_final(false);
+    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("La columna solicitada no existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::DeleteA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+}
+
+void StructBI::Tools::ActionsData::FormsColumns::DeleteA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("DELETE FROM forms_columns WHERE id = ?");
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
