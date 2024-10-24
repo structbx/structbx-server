@@ -76,17 +76,17 @@ void StructBI::Functions::FormsColumns::Add_()
         // Execute actions
         if(!action1->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action1->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
             return;
         }
         if(!action2->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action2->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
             return;
         }
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action3->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
             return;
         }
             
@@ -114,32 +114,32 @@ void StructBI::Functions::FormsColumns::Add_()
         if(id_column_type->get()->ToString_() == "1")
         {
             column_type = "VARCHAR";
-            std::string length_value = "(100)";
+            length_value = "(100)";
         }
         else if(id_column_type->get()->ToString_() == "2")
         {
             column_type = "TEXT";
-            std::string length_value = "";
+            length_value = "";
         }
         else if(id_column_type->get()->ToString_() == "3")
         {
             column_type = "INT";
-            std::string length_value = "(11)";
+            length_value = "(11)";
         }
         else if(id_column_type->get()->ToString_() == "4")
         {
             column_type = "DECIMAL";
-            std::string length_value = "(10, 2)";
+            length_value = "(10, 2)";
         }
         else if(id_column_type->get()->ToString_() == "5")
         {
             column_type = "DATETIME";
-            std::string length_value = "";
+            length_value = "";
         }
         else if(id_column_type->get()->ToString_() == "5")
         {
             column_type = "TIME";
-            std::string length_value = "";
+            length_value = "";
         }
         else
         {
@@ -165,7 +165,7 @@ void StructBI::Functions::FormsColumns::Add_()
         );
         if(!action4->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action4->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action4->get_identifier() + ": " + action4->get_custom_error());
             return;
         }
 
