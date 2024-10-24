@@ -41,7 +41,7 @@ void StructBI::Functions::FormsData::Read_()
         // Execute action
         if(!action1->get()->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": MS46GLPi6D");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": FWXIPdOrmS");
             return;
         }
 
@@ -141,7 +141,7 @@ void StructBI::Functions::FormsData::ReadSpecific_()
         auto action1 = self.GetAction_("a1");
         if(action1 == self.get_actions().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error wZPFx2yYpF");
             return;
         }
 
@@ -157,10 +157,9 @@ void StructBI::Functions::FormsData::ReadSpecific_()
 
         // Get form info
         auto form_identifier = self.GetParameter_("form-identifier");
-
         if(form_identifier == self.get_parameters().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 0ocZQs1hMi");
             return;
         }
 
@@ -200,7 +199,7 @@ void StructBI::Functions::FormsData::ReadSpecific_()
         self.IdentifyParameters_(*action2);
         if(!action2->get()->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error 3FqSnoQ4ru");
             return;
         }
 
@@ -343,7 +342,7 @@ void StructBI::Functions::FormsData::Modify_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.modify_02_.Setup_(action2);
 
-    // Action 3: Save new record
+    // Action 3: Update record
     auto action3 = function->AddAction_("a3");
     actions_.forms_data_.modify_03_.Setup_(action3);
 
