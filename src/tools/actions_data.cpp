@@ -508,7 +508,8 @@ void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action:
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "ORDER BY fc.position ASC"
     );
     action_->set_final(false);
     action_->AddParameter_("identifier", "", true)
@@ -554,7 +555,8 @@ void StructBI::Tools::ActionsData::FormsData::ReadColumnsA02::Setup_(Functions::
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier != 'id'"
+        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier != 'id' " \
+        "ORDER BY fc.position ASC"
     );
     action_->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -579,7 +581,8 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA01::Setup_(Functions:
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "ORDER BY fc.position ASC"
     );
     action_->set_final(false);
     action_->AddParameter_("form-identifier", "", true)
@@ -796,7 +799,8 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
-            "id_space = ? AND f.identifier = ?"
+            "id_space = ? AND f.identifier = ? " \
+        "ORDER BY fc.position ASC"
     );
     action_->AddParameter_("id_space", get_space_id(), false);
 
@@ -822,7 +826,8 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functio
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
-            "fc.id = ? AND id_space = ? AND f.identifier = ?"
+            "fc.id = ? AND id_space = ? AND f.identifier = ? " \
+        "ORDER BY fc.position ASC"
     );
     action_->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -935,8 +940,15 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
     action_ = action;
     
     action_->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, length, required, default_value, description, id_column_type, id_form) " \
-        "SELECT ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
+        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, id_form) " \
+        "SELECT " \
+            "?, ? " \
+            ",MAX(fc.position) + 1 " \
+            ",?, ?, ?, ?, ? " \
+            ",f.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
     );
 
     action_->AddParameter_("identifier", "", true)
@@ -986,6 +998,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
         }
         return true;
     });
+
     action_->AddParameter_("length", "", true);
     action_->AddParameter_("required", "", true)
     ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
