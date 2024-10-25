@@ -1,5 +1,6 @@
 
 #include "tools/actions_data.h"
+#include <functions/action.h>
 
 StructBI::Tools::ActionsData::ActionsData(StructBI::Tools::FunctionData& function_data) : 
     spaces_(function_data)
@@ -51,6 +52,101 @@ void StructBI::Tools::ActionsData::Spaces::ReadSpecificA01::Setup_(Functions::Ac
         action_->AddParameter_("id_naf_user", get_id_user(), false);
         action_->AddParameter_("id_space", get_space_id(), false);
     }
+}
+
+void StructBI::Tools::ActionsData::Spaces::AddA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
+    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Un espacio con este identificador ya existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("identifier", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void StructBI::Tools::ActionsData::Spaces::AddA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "INSERT INTO spaces (identifier, name, description) VALUES (?, ?, ?)"
+    );
+    action_->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador del espacio no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() <= 3)
+        {
+            param->set_error("El identificador debe tener más de 3 caracteres");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre del espacio no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() <= 3)
+        {
+            param->set_error("El nombre del espacio debe tener más de 3 caracteres");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("description", "", true);
+}
+
+void StructBI::Tools::ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "INSERT INTO spaces_users (id_naf_user, id_space) " \
+        "SELECT ?, s.id FROM spaces s WHERE identifier = ?"
+    );
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador del espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 }
 
 void StructBI::Tools::ActionsData::Spaces::ChangeA01::Setup_(Functions::Action::Ptr action)
