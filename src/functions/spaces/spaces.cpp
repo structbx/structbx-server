@@ -120,7 +120,23 @@ void StructBI::Functions::Spaces::Change_()
 
 void StructBI::Functions::Spaces::Add_()
 {
+    // Function GET /api/spaces/add
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/add", HTTP::EnumMethods::kHTTP_POST);
 
+    // Verify space if exists
+    auto action1 = function->AddAction_("a1");
+    actions_.spaces_.add_a01_.Setup_(action1);
+
+    // Add space
+    auto action2 = function->AddAction_("a2");
+    actions_.spaces_.add_a02_.Setup_(action2);
+
+    // Add current user to the new space
+    auto action3 = function->AddAction_("a3");
+    actions_.spaces_.add_a03_.Setup_(action3);
+
+    get_functions()->push_back(function);
 }
 
 void StructBI::Functions::Spaces::Modify_()
