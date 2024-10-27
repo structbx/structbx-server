@@ -159,17 +159,8 @@ void StructBI::Tools::ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr
         "INSERT INTO spaces_users (id_naf_user, id_space) " \
         "SELECT ?, s.id FROM spaces s WHERE identifier = ?"
     );
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador del espacio no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+    action_->AddParameter_("identifier", "", true);
 }
 
 void StructBI::Tools::ActionsData::Spaces::ChangeA01::Setup_(Functions::Action::Ptr action)

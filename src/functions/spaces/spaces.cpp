@@ -126,28 +126,27 @@ void StructBI::Functions::Spaces::Add_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
-    // Verify space if exists
+    // Action1: Verify space if exists
     auto action1 = function->AddAction_("a1");
     actions_.spaces_.add_a01_.Setup_(action1);
 
-    // Add space
+    // Action2: Add space
     auto action2 = function->AddAction_("a2");
     actions_.spaces_.add_a02_.Setup_(action2);
 
-    // Add current user to the new space
-    auto action3 = function->AddAction_("a3");
-    actions_.spaces_.add_a03_.Setup_(action3);
-
-    // Get space id
+    // Action2_1: Get space ID
     auto action2_1 = function->AddAction_("a2_1");
     actions_.spaces_.add_a02_1_.Setup_(action2_1);
 
-    // Create database
+    // Action3: Add current user to the new space
+    auto action3 = function->AddAction_("a3");
+    actions_.spaces_.add_a03_.Setup_(action3);
+
+    // Action4: Create database
     auto action4 = function->AddAction_("a4");
 
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action2_1, action3, action4](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2, action2_1, action3, action4](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
