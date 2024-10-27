@@ -124,6 +124,8 @@ void StructBI::Functions::Spaces::Add_()
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/spaces/add", HTTP::EnumMethods::kHTTP_POST);
 
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
     // Verify space if exists
     auto action1 = function->AddAction_("a1");
     actions_.spaces_.add_a01_.Setup_(action1);
@@ -135,6 +137,65 @@ void StructBI::Functions::Spaces::Add_()
     // Add current user to the new space
     auto action3 = function->AddAction_("a3");
     actions_.spaces_.add_a03_.Setup_(action3);
+
+    // Get space id
+    auto action2_1 = function->AddAction_("a2_1");
+    actions_.spaces_.add_a02_1_.Setup_(action2_1);
+
+    // Create database
+    auto action4 = function->AddAction_("a4");
+
+    // Setup Custom Process
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id, action1, action2, action2_1, action3, action4](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+        if(!action3->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+            return;
+        }
+        if(!action2_1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_1->get_identifier() + ": " + action2_1->get_custom_error());
+            return;
+        }
+
+        // Get space ID
+        auto space_id = action2_1->get_results()->First_();
+        if(space_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error bq0fyWtqeP");
+            return;
+        }
+
+        // Create database
+        action4->set_sql_code("CREATE DATABASE _structbi_space_" + space_id->ToString_());
+        if(!action4->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error TmKDtIjGXT");
+
+            // Delete space from table
+            NAF::Functions::Action action5("a5");
+            action5.set_sql_code("DELETE FROM spaces WHERE id = ?");
+            action5.AddParameter_("id", space_id->ToString_(), false);
+
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+    });
 
     get_functions()->push_back(function);
 }
