@@ -141,13 +141,21 @@ void StructBI::Functions::Spaces::Add_()
 
 void StructBI::Functions::Spaces::Modify_()
 {
-    // Function PUT /api/spaces/general/modify
+    // Function PUT /api/spaces/modify
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/general/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<NAF::Functions::Function>("/api/spaces/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    // Action 1: Modify space
-    auto action = function->AddAction_("a1");
-    actions_.spaces_.modify_a01_.Setup_(action);
+    // Action 1: Verify that current user is in the space
+    auto action1 = function->AddAction_("a1");
+    actions_.spaces_.modify_a01_.Setup_(action1);
+
+    // Action 2: Verify space identifier
+    auto action2 = function->AddAction_("a2");
+    actions_.spaces_.modify_a02_.Setup_(action2);
+
+    // Action 3: Modify space
+    auto action3 = function->AddAction_("a3");
+    actions_.spaces_.modify_a03_.Setup_(action3);
 
     get_functions()->push_back(function);
 }

@@ -50,6 +50,8 @@ class StructBI::Tools::ActionsData
                 ,add_a03_(function_data)
                 ,change_a01_(function_data)
                 ,modify_a01_(function_data)
+                ,modify_a02_(function_data)
+                ,modify_a03_(function_data)
             {
                 
             }
@@ -116,6 +118,24 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
                     
             } modify_a01_;
+
+            class ModifyA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+                    
+            } modify_a02_;
+
+            class ModifyA03 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+                    
+            } modify_a03_;
         } spaces_;
 
         struct Forms
