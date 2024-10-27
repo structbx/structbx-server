@@ -534,7 +534,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA02::Setup_(Functions::Action::P
     action_ = action;
 
     action_->set_final(false);
-    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ?");
+    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ? AND id_space = ?");
     action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
@@ -567,6 +567,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA02::Setup_(Functions::Action::P
         }
         return true;
     });
+    action_->AddParameter_("space_id", get_space_id(), false);
 }
 
 void StructBI::Tools::ActionsData::Forms::ModifyA03::Setup_(Functions::Action::Ptr action)
@@ -626,26 +627,8 @@ void StructBI::Tools::ActionsData::Forms::ModifyA03::Setup_(Functions::Action::P
         }
         return true;
     });
-    action_->AddParameter_("state", "", true)
-    ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El estado no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("privacity", "", true)
-    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("La privacidad no puede estar vacía");
-            return false;
-        }
-        return true;
-    });
+    action_->AddParameter_("state", "", true);
+    action_->AddParameter_("privacity", "", true);
     action_->AddParameter_("description", "", true);
 
     action_->AddParameter_("id", "", true)
