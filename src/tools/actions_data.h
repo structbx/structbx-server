@@ -260,9 +260,8 @@ class StructBI::Tools::ActionsData
         struct FormsData
         {
             FormsData(Tools::FunctionData& function_data) : 
-                read_a01_(function_data)
-                ,read_columns_a01_(function_data)
-                ,read_columns_a02_(function_data)
+                read_a01_0_(function_data)
+                ,read_a01_(function_data)
                 ,read_specific_a01_(function_data)
                 ,read_specific_a02_(function_data)
                 ,add_01_(function_data)
@@ -277,6 +276,15 @@ class StructBI::Tools::ActionsData
                 
             }
 
+            class ReadA01_0 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_a01_0_;
+
             class ReadA01 : public Tools::BaseAction
             {
                 public:
@@ -285,24 +293,6 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } read_a01_;
-
-            class ReadColumnsA01 : public Tools::BaseAction
-            {
-                public:
-                    using Tools::BaseAction::BaseAction;
-
-                    virtual void Setup_(Functions::Action::Ptr action) override;
-
-            } read_columns_a01_;
-
-            class ReadColumnsA02 : public Tools::BaseAction
-            {
-                public:
-                    using Tools::BaseAction::BaseAction;
-
-                    virtual void Setup_(Functions::Action::Ptr action) override;
-
-            } read_columns_a02_;
 
             class ReadSpecificA01 : public Tools::BaseAction
             {
@@ -406,7 +396,6 @@ class StructBI::Tools::ActionsData
                 ,add_a03_(function_data)
                 ,modify_a01_(function_data)
                 ,modify_a02_(function_data)
-                ,modify_a02_1_(function_data)
                 ,modify_a03_(function_data)
                 ,delete_a01_(function_data)
                 ,delete_a02_(function_data)
@@ -486,15 +475,6 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } modify_a02_;
-
-            class ModifyA02_1 : public Tools::BaseAction
-            {
-                public:
-                    using Tools::BaseAction::BaseAction;
-
-                    virtual void Setup_(Functions::Action::Ptr action) override;
-
-            } modify_a02_1_;
 
             class ModifyA03 : public Tools::BaseAction
             {

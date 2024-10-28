@@ -444,26 +444,8 @@ void StructBI::Tools::ActionsData::Forms::AddA02::Setup_(Functions::Action::Ptr 
         }
         return true;
     });
-    action_->AddParameter_("state", "", true)
-    ->SetupCondition_("condition-state", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El estado no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("privacity", "", true)
-    ->SetupCondition_("condition-privacity", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("La privacidad no puede estar vacía");
-            return false;
-        }
-        return true;
-    });
+    action_->AddParameter_("state", "", true);
+    action_->AddParameter_("privacity", "", true);
     action_->AddParameter_("description", "", true);
     action_->AddParameter_("id_space", get_space_id(), false);
 }
@@ -674,21 +656,19 @@ void StructBI::Tools::ActionsData::Forms::DeleteA02::Setup_(Functions::Action::P
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
+void StructBI::Tools::ActionsData::FormsData::ReadA01_0::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? " \
-        "ORDER BY fc.position ASC"
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
     );
     action_->set_final(false);
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -701,44 +681,25 @@ void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action:
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadColumnsA01::Setup_(Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
-    action_->set_final(false);
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void StructBI::Tools::ActionsData::FormsData::ReadColumnsA02::Setup_(Functions::Action::Ptr action)
+void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
+        "SELECT fc.*, fct.identifier AS column_type, f.id AS form_id " \
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier != 'id' " \
+        "WHERE f.identifier = ? AND f.id_space = ? " \
         "ORDER BY fc.position ASC"
     );
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action_->set_final(false);
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
-            param->set_error("El identificador no puede estar vacío");
+            param->set_error("El identificador de formulario no puede estar vacío");
             return false;
         }
         return true;
@@ -794,7 +755,7 @@ void StructBI::Tools::ActionsData::FormsData::AddA01::Setup_(Functions::Action::
 {
     action_ = action;
 
-    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
     action_->set_final(false);
     action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
@@ -817,7 +778,7 @@ void StructBI::Tools::ActionsData::FormsData::AddA01::Setup_(Functions::Action::
         }
         return true;
     });
-    action_->AddParameter_("form-identifier", get_space_id(), false);
+    action_->AddParameter_("id_space", get_space_id(), false);
 
 }
 
@@ -858,7 +819,12 @@ void StructBI::Tools::ActionsData::FormsData::ModifyA01::Setup_(Functions::Actio
 {
     action_ = action;
 
-    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+    );
     action_->set_final(false);
     action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
@@ -921,7 +887,12 @@ void StructBI::Tools::ActionsData::FormsData::DeleteA01::Setup_(Functions::Actio
 {
     action_ = action;
 
-    action_->set_sql_code("SELECT identifier, id_space FROM forms WHERE identifier = ? AND id_space = ?");
+    action_->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+    );
     action_->set_final(false);
     action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
@@ -1073,7 +1044,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Actio
         "SELECT fc.id " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE fc.identifier = ? AND f.identifier = ?"
+        "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
     );
 
     action_->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -1108,6 +1079,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Actio
         }
         return true;
     });
+    action_->AddParameter_("id_space", get_space_id(), false);
 }
 
 void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Action::Ptr action)
@@ -1300,29 +1272,6 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA02::Setup_(Functions::Ac
     });
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ModifyA02_1::Setup_(Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.identifier " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE fc.id = ?"
-    );
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
 void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
@@ -1434,7 +1383,8 @@ void StructBI::Tools::ActionsData::FormsColumns::DeleteA01::Setup_(Functions::Ac
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.* FROM forms_columns fc " \
+        "SELECT fc.id AS column_id, f.id AS form_id " \
+        "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
         "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
     );
