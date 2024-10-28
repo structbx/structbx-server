@@ -1,6 +1,5 @@
 
 #include "functions/forms/forms_columns.h"
-#include "tools/actions_data.h"
 
 StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -58,7 +57,7 @@ void StructBI::Functions::FormsColumns::Add_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the columns don't exists in the form
+    // Action 1: Verify that the form exists
     auto action1 = function->AddAction_("a1");
     actions_.forms_columns_.add_a01_.Setup_(action1);
 
@@ -88,6 +87,22 @@ void StructBI::Functions::FormsColumns::Add_()
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+            return;
+        }
+
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error nh39HIiJkd");
+            return;
+        }
+
+        // Get Column ID
+        int column_id = action3->get_last_insert_id();
+        if(column_id == 0)
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 6eHh9R4Pv5");
             return;
         }
             
@@ -160,8 +175,8 @@ void StructBI::Functions::FormsColumns::Add_()
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " +
-            "ADD " + identifier->get()->ToString_() + " " + column_type + length_value + " " +
+            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
+            "ADD _structbi_column_" + std::to_string(column_id) + " " + column_type + length_value + " " +
             required_value + default_value->get()->ToString_()
         );
         if(!action4->Work_())
@@ -192,17 +207,13 @@ void StructBI::Functions::FormsColumns::Modify_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_columns_.modify_a02_.Setup_(action2);
 
-    // Action 2_1: Get old column identifier
-    auto action2_1 = function->AddAction_("a2_1");
-    actions_.forms_columns_.modify_a02_1_.Setup_(action2_1);
-
     // Action 3: Update the column
     auto action3 = function->AddAction_("a3");
     actions_.forms_columns_.modify_a03_.Setup_(action3);
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action2_1, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -215,12 +226,23 @@ void StructBI::Functions::FormsColumns::Modify_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
             return;
         }
-        if(!action2_1->Work_())
+
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_1->get_identifier() + ": " + action2_1->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error KOBE4bH6qL");
             return;
         }
 
+        // Get Column ID
+        auto column_id = self.GetParameter_("id");
+        if(column_id == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error XVtkYKnme6");
+            return;
+        }
+        
         // Get parameters
         auto end = self.get_parameters().end();
         auto identifier = self.GetParameter_("identifier");
@@ -236,14 +258,6 @@ void StructBI::Functions::FormsColumns::Modify_()
         )
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error H1AZ0gYu7T");
-            return;
-        }
-
-        // Get old identifier
-        auto old_identifier = action2_1->get_results()->First_();
-        if(old_identifier->IsNull_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error ce4yVOtjhC");
             return;
         }
 
@@ -298,9 +312,9 @@ void StructBI::Functions::FormsColumns::Modify_()
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " +
-            "CHANGE COLUMN `" + old_identifier.get()->ToString_() + "` " + identifier->get()->ToString_() + " " + column_type + length_value + " " +
-            required_value + " " + default_value->get()->ToString_()
+            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
+            "CHANGE COLUMN `_structbi_column_" + column_id->get()->ToString_() + "` _structbi_column_" + column_id->get()->ToString_() + 
+            " " + column_type + length_value + " " + required_value + " " + default_value->get()->ToString_()
         );
         if(!action4->Work_())
         {
@@ -350,15 +364,17 @@ void StructBI::Functions::FormsColumns::Delete_()
             return;
         }
 
-        // Get parameters
-        auto identifier = action1->get_results()->front()->ExtractField_("identifier");
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(identifier->IsNull_())
+        // Get Form ID
+        auto form_id = action1->get_results()->front()->ExtractField_("form_id");
+        if(form_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UOEraAIHjM");
             return;
         }
-        if(form_identifier == self.get_parameters().end())
+
+        // Get Column ID
+        auto column_id = action1->get_results()->front()->ExtractField_("column_id");
+        if(column_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UFwgqfZp59");
             return;
@@ -366,8 +382,8 @@ void StructBI::Functions::FormsColumns::Delete_()
 
         // Action 2: Delete columns
         action2->set_sql_code(
-            "ALTER TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " +
-            "DROP COLUMN " + identifier->ToString_());
+            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
+            "DROP COLUMN _structbi_column_" + column_id->ToString_());
 
         // Execute actions
         if(!action2->Work_())
