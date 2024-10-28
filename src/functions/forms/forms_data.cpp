@@ -1,13 +1,11 @@
 
 #include "functions/forms/forms_data.h"
-#include "tools/actions_data.h"
 
 StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
     FunctionData(function_data)
     ,actions_(function_data)
 {
     Read_();
-    ReadColumns_();
     ReadSpecific_();
     Add_();
     Modify_();
@@ -22,73 +20,74 @@ void StructBI::Functions::FormsData::Read_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
+    // Action 1_0: Get form id
+    auto action1_0 = function->AddAction_("a1_0");
+    actions_.forms_data_.read_a01_0_.Setup_(action1_0);
+
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
     actions_.forms_data_.read_a01_.Setup_(action1);
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1_0, action1](NAF::Functions::Function& self)
     {
-        // Get actions
-        auto action1 = self.GetAction_("a1");
-        if(action1 == self.get_actions().end())
+        // Execute actions
+        if(!action1_0->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error QFt5mE0RfV");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1_0->get_identifier() + ": " + action1_0->get_custom_error());
+            return;
+        }
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
             return;
         }
 
-        // Execute action
-        if(!action1->get()->Work_())
+        // Get form ID
+        auto form_id = action1_0->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": FWXIPdOrmS");
-            return;
-        }
-
-        // Get JSON Results
-        auto json_result1 = action1->get()->CreateJSONResult_();
-
-        // Get form info
-        auto form_identifier = self.GetParameter_("identifier");
-
-        if(form_identifier == self.get_parameters().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error EqLiZk1pm7");
             return;
         }
 
         // Get columns
         std::string columns = "";
-        for(auto it : *action1->get()->get_results())
+        for(auto it : *action1->get_results())
         {
-            Query::Field::Ptr identifier = it.get()->ExtractField_("identifier");
+            Query::Field::Ptr id = it.get()->ExtractField_("id");
             Query::Field::Ptr name = it.get()->ExtractField_("name");
-            if(identifier->IsNull_() || name->IsNull_())
+            if(id->IsNull_() || name->IsNull_())
                 continue;
 
-            if(it == *action1->get()->get_results()->begin())
-                columns = identifier->ToString_() + " AS '" + name->ToString_() + "'";
+            if(it == *action1->get_results()->begin())
+                columns = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
             else
-                columns += ", " + identifier->ToString_() + " AS '" + name->ToString_() + "'";
+                columns += ", _structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
         }
 
         // Verify if columns is empty
         if(columns == "")
-            columns = "*";
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No existen columnas en la tabla");
+            return;
+        }
 
         // Action 2: Get Form data
         auto action2 = self.AddAction_("a2");
         action2->set_sql_code(
             "SELECT " + columns + " " \
-            "FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_());
+            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_());
         if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
             return;
         }
 
-        // Action 2 results
-        auto json_result2 = action2->CreateJSONResult_();
+        // Results
+        auto json_result1 = action1->get_json_result();
+        auto json_result2 = action2->get_json_result();
         json_result2->set("status", action2->get_status());
         json_result2->set("message", action2->get_message());
         json_result2->set("columns_meta", json_result1);
@@ -96,23 +95,6 @@ void StructBI::Functions::FormsData::Read_()
         // Send results
         self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
     });
-
-    get_functions()->push_back(function);
-}
-
-void StructBI::Functions::FormsData::ReadColumns_()
-{
-    // Function GET /api/forms/data/columns/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/data/columns/read", HTTP::EnumMethods::kHTTP_GET);
-
-    // Action 1: Get current identifier and id_space
-    auto action1 = function->AddAction_("a1");
-    actions_.forms_data_.read_columns_a01_.Setup_(action1);
-
-    // Action 2: Get form columns
-    auto action2 = function->AddAction_("a2");
-    actions_.forms_data_.read_columns_a02_.Setup_(action2);
 
     get_functions()->push_back(function);
 }
@@ -125,6 +107,10 @@ void StructBI::Functions::FormsData::ReadSpecific_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
+    // Action 1_0: Get form id
+    auto action1_0 = function->AddAction_("a1_0");
+    actions_.forms_data_.read_a01_0_.Setup_(action1_0);
+
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
     actions_.forms_data_.read_specific_a01_.Setup_(action1);
@@ -135,78 +121,77 @@ void StructBI::Functions::FormsData::ReadSpecific_()
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1_0,action1, action2](NAF::Functions::Function& self)
     {
-        // Get action 1
-        auto action1 = self.GetAction_("a1");
-        if(action1 == self.get_actions().end())
+        // Execute actions
+        if(!action1_0->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error wZPFx2yYpF");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1_0->get_identifier() + ": " + action1_0->get_custom_error());
+            return;
+        }
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
             return;
         }
 
-        // Execute action
-        if(!action1->get()->Work_())
+        // Get form ID
+        auto form_id = action1_0->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get()->get_identifier() + ": MS46GLPi6D");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
             return;
         }
 
-        // Get JSON Results
-        auto json_result1 = action1->get()->CreateJSONResult_();
-
-        // Get form info
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier == self.get_parameters().end())
+        // Get Column ID
+        auto column_id = action1_0->get_results()->front()->ExtractField_("column_id");
+        if(column_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 0ocZQs1hMi");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 7UL6KqIryh");
             return;
         }
 
         // Get columns
         std::string columns = "";
-        for(auto it : *action1->get()->get_results())
+        for(auto it : *action1->get_results())
         {
-            Query::Field::Ptr identifier = it.get()->ExtractField_("identifier");
+            Query::Field::Ptr id = it.get()->ExtractField_("id");
             Query::Field::Ptr name = it.get()->ExtractField_("name");
-            if(identifier->IsNull_() || name->IsNull_())
+            if(id->IsNull_() || name->IsNull_())
                 continue;
 
             if(columns == "")
-                columns = identifier->ToString_() + " AS '" + name->ToString_() + "'";
+                columns = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
             else
-                columns += ", " + identifier->ToString_() + " AS '" + name->ToString_() + "'";
+                columns += ", _structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
         }
 
         // Verify if columns is empty
         if(columns == "")
-            columns = "*";
-
-        // Action 2: Get Form data
-        auto action2 = self.GetAction_("a2");
-        if(action2 == self.get_actions().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error xTWsdae5pJ");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No existen columnas en la tabla");
             return;
         }
 
-        action2->get()->set_sql_code(
+        // Action 2: Get Form data
+        action2->set_sql_code(
             "SELECT " + columns + " " \
-            "FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
-            "WHERE id = ?");
+            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
+            "WHERE _structbi_column_" + column_id->ToString_() + " = ?");
 
         // Identify parameters and work
-        self.IdentifyParameters_(*action2);
-        if(!action2->get()->Work_())
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error 3FqSnoQ4ru");
             return;
         }
 
-        // Action 2 results
-        auto json_result2 = action2->get()->CreateJSONResult_();
-        json_result2->set("status", action2->get()->get_status());
-        json_result2->set("message", action2->get()->get_message());
+        // Results
+        auto json_result1 = action1->get_json_result();
+        auto json_result2 = action2->get_json_result();
+        json_result2->set("status", action2->get_status());
+        json_result2->set("message", action2->get_message());
         json_result2->set("columns_meta", json_result1);
 
         // Send results
@@ -252,11 +237,11 @@ void StructBI::Functions::FormsData::Add_()
             return;
         }
 
-        // Get form info
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier == self.get_parameters().end())
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error inbZDVtXXd");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
             return;
         }
 
@@ -266,6 +251,7 @@ void StructBI::Functions::FormsData::Add_()
         for(auto it : *action2->get_results())
         {
             // Get column
+            auto id = it.get()->ExtractField_("id");
             auto identifier = it.get()->ExtractField_("identifier");
             auto name = it.get()->ExtractField_("name");
             auto length = it.get()->ExtractField_("length");
@@ -283,12 +269,12 @@ void StructBI::Functions::FormsData::Add_()
             // Setup columns and values string
             if(columns == "")
             {
-                columns = identifier->ToString_();
+                columns = "_structbi_column_" + id->ToString_();
                 values = "?";
             }
             else
             {
-                columns += ", " + identifier->ToString_();
+                columns += ",_structbi_column_" + id->ToString_();
                 values += ", ?";
             }
 
@@ -308,14 +294,14 @@ void StructBI::Functions::FormsData::Add_()
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "INSERT INTO  form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
+            "INSERT INTO _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
         self.IdentifyParameters_(action3);
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error fECruxvqCZ");
             return;
         }
 
@@ -362,11 +348,19 @@ void StructBI::Functions::FormsData::Modify_()
             return;
         }
 
-        // Get form info
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier == self.get_parameters().end())
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 1VxAfjpkhN");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
+            return;
+        }
+
+        // Get Column ID
+        auto column_id = action1->get_results()->front()->ExtractField_("column_id");
+        if(column_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error FaAMlFeyJC");
             return;
         }
 
@@ -375,6 +369,7 @@ void StructBI::Functions::FormsData::Modify_()
         for(auto it : *action2->get_results())
         {
             // Get column
+            auto id = it.get()->ExtractField_("id");
             auto identifier = it.get()->ExtractField_("identifier");
             auto name = it.get()->ExtractField_("name");
             auto length = it.get()->ExtractField_("length");
@@ -392,11 +387,11 @@ void StructBI::Functions::FormsData::Modify_()
             // Setup columns and values string
             if(columns == "")
             {
-                columns = identifier->ToString_() + " = ?";
+                columns = "_structbi_column_" + id->ToString_() + " = ?";
             }
             else
             {
-                columns += ", " + identifier->ToString_() + " = ?";
+                columns += ",_structbi_column_" + id->ToString_() + " = ?";
             }
 
             // Setup parameters
@@ -429,14 +424,14 @@ void StructBI::Functions::FormsData::Modify_()
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "UPDATE form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " " \
-            "SET " + columns + " WHERE id = ?");
+            "UPDATE _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
+            "SET " + columns + " WHERE _structbi_column_" + column_id->ToString_() + " = ?");
 
         // Execute action 2
         self.IdentifyParameters_(action3);
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UyUKjUef7b");
             return;
         }
 
@@ -500,17 +495,27 @@ void StructBI::Functions::FormsData::Delete_()
             return;
         }
 
-        // Get form info
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier == self.get_parameters().end())
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UFwgqfZp59");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
+            return;
+        }
+
+        // Get Column ID
+        auto column_id = action1->get_results()->front()->ExtractField_("column_id");
+        if(column_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error LbunnRyAm2");
             return;
         }
 
         // Action 2: Save new record
         action2->set_sql_code(
-            "DELETE FROM form_" + id_space + "_" + form_identifier->get()->get_value()->ToString_() + " WHERE id = ?");
+            "DELETE FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
+            " WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+        );
 
         // Execute action 2
         self.IdentifyParameters_(action2);
