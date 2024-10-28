@@ -47,7 +47,6 @@ class StructBI::Tools::ActionsData
                 ,read_specific_a01_(function_data)
                 ,add_a01_(function_data)
                 ,add_a02_(function_data)
-                ,add_a02_1_(function_data)
                 ,add_a03_(function_data)
                 ,change_a01_(function_data)
                 ,modify_a01_(function_data)
@@ -92,15 +91,6 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } add_a02_;
-
-            class AddA02_1 : public Tools::BaseAction
-            {
-                public:
-                    using Tools::BaseAction::BaseAction;
-
-                    virtual void Setup_(Functions::Action::Ptr action) override;
-
-            } add_a02_1_;
 
             class AddA03 : public Tools::BaseAction
             {

@@ -137,20 +137,6 @@ void StructBI::Tools::ActionsData::Spaces::AddA02::Setup_(Functions::Action::Ptr
     action_->AddParameter_("description", "", true);
 }
 
-void StructBI::Tools::ActionsData::Spaces::AddA02_1::Setup_(Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.id " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE s.identifier = ? AND su.id_naf_user = ?"
-    );
-    action_->AddParameter_("identifier", "", true);
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-}
-
 void StructBI::Tools::ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;

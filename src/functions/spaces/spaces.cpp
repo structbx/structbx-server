@@ -134,10 +134,6 @@ void StructBI::Functions::Spaces::Add_()
     auto action2 = function->AddAction_("a2");
     actions_.spaces_.add_a02_.Setup_(action2);
 
-    // Action2_1: Get space ID
-    auto action2_1 = function->AddAction_("a2_1");
-    actions_.spaces_.add_a02_1_.Setup_(action2_1);
-
     // Action3: Add current user to the new space
     auto action3 = function->AddAction_("a3");
     actions_.spaces_.add_a03_.Setup_(action3);
@@ -146,7 +142,7 @@ void StructBI::Functions::Spaces::Add_()
     auto action4 = function->AddAction_("a4");
 
     // Setup Custom Process
-    function->SetupCustomProcess_([action1, action2, action2_1, action3, action4](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2, action3, action4](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -164,22 +160,17 @@ void StructBI::Functions::Spaces::Add_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
             return;
         }
-        if(!action2_1->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_1->get_identifier() + ": " + action2_1->get_custom_error());
-            return;
-        }
 
         // Get space ID
-        auto space_id = action2_1->get_results()->First_();
-        if(space_id->IsNull_())
+        auto space_id = action2->get_last_insert_id();
+        if(space_id == 0)
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error bq0fyWtqeP");
             return;
         }
 
         // Create database
-        action4->set_sql_code("CREATE DATABASE _structbi_space_" + space_id->ToString_());
+        action4->set_sql_code("CREATE DATABASE _structbi_space_" + std::to_string(space_id));
         if(!action4->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error TmKDtIjGXT");
@@ -187,7 +178,7 @@ void StructBI::Functions::Spaces::Add_()
             // Delete space from table
             NAF::Functions::Action action5("a5");
             action5.set_sql_code("DELETE FROM spaces WHERE id = ?");
-            action5.AddParameter_("id", space_id->ToString_(), false);
+            action5.AddParameter_("id", std::to_string(space_id), false);
 
             return;
         }
