@@ -173,7 +173,7 @@ void StructBI::Functions::Spaces::Add_()
         action4->set_sql_code("CREATE DATABASE _structbi_space_" + std::to_string(space_id));
         if(!action4->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error TmKDtIjGXT");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la DB de espacio");
 
             // Delete space from table
             NAF::Functions::Action action5("a5");
