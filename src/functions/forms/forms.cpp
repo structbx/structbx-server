@@ -37,16 +37,16 @@ void StructBI::Functions::Forms::Read_()
         // Iterate over results
         for(auto row : *action1->get_results())
         {
-            // Get form identifier
-            auto identifier = row->ExtractField_("identifier");
-            if(identifier->IsNull_())
+            // Get form id
+            auto id = row->ExtractField_("id");
+            if(id->IsNull_())
                 continue;
 
             // Action 2: COUNT
             auto action2 = NAF::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
-                "FROM form_" + space_id + "_" + identifier->ToString_());
+                "FROM _structbi_space_" + space_id + "._structbi_form_" + id.get()->ToString_());
             if(!action2.Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error JNt2Std2sh");
@@ -101,7 +101,7 @@ void StructBI::Functions::Forms::Add_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the form identifier don't exists
+    // Action 1: Verify that the form identifier don't exists in current space
     auto action1 = function->AddAction_("a1");
     actions_.forms_.add_a01_.Setup_(action1);
 
@@ -112,48 +112,63 @@ void StructBI::Functions::Forms::Add_()
     // Action 3: Add the ID Column to the form
     auto action3 = function->AddAction_("a3");
     actions_.forms_.add_a03_.Setup_(action3);
+
+    // Action 4: Create the table
+    auto action4 = function->AddAction_("a4");
     
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3, action4](NAF::Functions::Function& self)
     {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
+        // Execute actions
+        if(!action1->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UjR4f9nmIO");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+        if(!action3->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
             return;
         }
 
-        // Iterate over actions
-        for(auto action : self.get_actions())
+        // Form ID
+        int form_id = action2->get_last_insert_id();
+        if(form_id == 0)
         {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
-                return;
-            }
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error MVm2IlbSnm");
+            return;
         }
 
-        // Get form identifier
-        auto form_identifier = self.GetParameter_("identifier");
-        if(form_identifier == self.get_parameters().end())
+        // Columns ID
+        int column_id = action3->get_last_insert_id();
+        if(column_id == 0)
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error Qe6SiPDQoM");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lyEC9cs1tj");
             return;
         }
 
         // Action 4: Create the table
-        auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "CREATE TABLE form_" + space_id + "_" + form_identifier->get()->get_value()->ToString_() + " " \
+            "CREATE TABLE _structbi_space_" + space_id + "._structbi_form_" + std::to_string(form_id) + " " \
             "(" \
-                "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
+                "_structbi_column_" + std::to_string(column_id) + " INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
         );
         if(!action4->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action4->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la tabla");
+
+            // Delete form from table
+            NAF::Functions::Action action5("a5");
+            action5.set_sql_code("DELETE FROM forms WHERE id = ?");
+            action5.AddParameter_("id", std::to_string(form_id), false);
+
             return;
         }
 
@@ -169,8 +184,6 @@ void StructBI::Functions::Forms::Modify_()
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
-
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
     actions_.forms_.modify_a01_.Setup_(action1);
@@ -182,56 +195,6 @@ void StructBI::Functions::Forms::Modify_()
     // Action 3: Modify form
     auto action3 = function->AddAction_("a3");
     actions_.forms_.modify_a03_.Setup_(action3);
-
-    // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
-    {
-        // Search first action
-        if(self.get_actions().begin() == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UjR4f9nmIO");
-            return;
-        }
-
-        // Iterate over actions
-        for(auto action : self.get_actions())
-        {
-            // Execute action
-            if(!action->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
-                return;
-            }
-        }
-
-        // Compare old identifier and new identifier
-        auto old_identifier = action1->get_results()->First_();
-        auto new_identifier = action2->GetParameter("identifier");
-
-        if(old_identifier->IsNull_() || new_identifier == action2->get_parameters().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 5sVP0geEXI");
-            return;
-        }
-
-        // Action 4: Modify the table
-        if(old_identifier->ToString_() != new_identifier->get()->ToString_())
-        {
-            auto action4 = self.AddAction_("a4");
-            action4->set_sql_code(
-                "RENAME TABLE IF EXISTS " \
-                "form_" + id_space + "_" + old_identifier->ToString_() + " " \
-                "TO form_" + id_space + "_" + new_identifier->get()->ToString_());
-            if(!action4->Work_())
-            {
-                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error iFZCXs2XEN");
-                return;
-            }
-        }
-
-        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
-    });
 
     get_functions()->push_back(function);
 }
@@ -263,9 +226,9 @@ void StructBI::Functions::Forms::Delete_()
             return;
         }
             
-        // Get form identifier
-        auto identifier = action1->get_results()->First_();
-        if(identifier->IsNull_())
+        // Variables
+        auto id = action1->GetParameter("id");
+        if(id == action1->get_parameters().end())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error J5pktjAN5K");
             return;
@@ -273,7 +236,7 @@ void StructBI::Functions::Forms::Delete_()
 
         // Action 3: Drop table
         auto action3 = self.AddAction_("a3");
-        action3->set_sql_code("DROP TABLE IF EXISTS form_" + space_id + "_" + identifier->ToString_());
+        action3->set_sql_code("DROP TABLE IF EXISTS _structbi_space_" + space_id + "._structbi_form_" + id->get()->ToString_());
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
