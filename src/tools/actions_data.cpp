@@ -690,7 +690,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA01::Setup_(Functions:
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
+        "SELECT fc.*, fct.identifier AS column_type, f.id AS form_id " \
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
@@ -1154,7 +1154,15 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
         }
         return true;
     });
-    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true);
+    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-link_to", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+        }
+        return true;
+    });
     action_->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {

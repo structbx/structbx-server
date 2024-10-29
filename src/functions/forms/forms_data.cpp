@@ -54,17 +54,57 @@ void StructBI::Functions::FormsData::Read_()
 
         // Get columns
         std::string columns = "";
+        bool has_link = false;
+        std::string form_id_link = "";
+        std::string column_id_link = "";
+        std::string column_id = "";
         for(auto it : *action1->get_results())
         {
             Query::Field::Ptr id = it.get()->ExtractField_("id");
             Query::Field::Ptr name = it.get()->ExtractField_("name");
+            Query::Field::Ptr link_to = it.get()->ExtractField_("link_to");
             if(id->IsNull_() || name->IsNull_())
                 continue;
 
+            std::string column = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+
+            // Get link columns
+            if(!link_to->IsNull_())
+            {
+                has_link = true;
+                form_id_link = link_to->ToString_();
+                column_id = id->ToString_();
+
+                auto action1_2 = self.AddAction_("a1_2");
+                action1_2->set_sql_code("SELECT * FROM forms_columns WHERE id_form = ?");
+                action1_2->AddParameter_("id", link_to->Int_(), false);
+                if(!action1_2->Work_())
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error wmAdRBELoO");
+                    return;
+                }
+                if(action1_2->get_results()->size() < 2)
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error OFYV54ToXi");
+                    return;
+                }
+                auto column2 = action1_2->get_results()->begin();
+                auto column2_id = column2->get()->ExtractField_("id");
+                column2++;
+                auto column2_visualization = column2->get()->ExtractField_("id");
+                if(column2_id->IsNull_())
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error NmYoq56SDN");
+                    return;
+                }
+                column_id_link = column2_id->ToString_();
+                column = "_" + link_to->ToString_() + "._structbi_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
+            }
+
             if(it == *action1->get_results()->begin())
-                columns = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+                columns = column;
             else
-                columns += ", _structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+                columns += ", " + column;
         }
 
         // Verify if columns is empty
@@ -76,9 +116,17 @@ void StructBI::Functions::FormsData::Read_()
 
         // Action 2: Get Form data
         auto action2 = self.AddAction_("a2");
-        action2->set_sql_code(
+        std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_());
+            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
+                " AS _" + form_id->ToString_();
+        if(has_link)
+        {
+            sql_code += " LEFT JOIN _structbi_space_" + id_space + "._structbi_form_" + form_id_link +
+            " AS _" + form_id_link + " ON _" + form_id_link + "._structbi_column_" + column_id_link + 
+            " = _" + form_id->ToString_() + "._structbi_column_" + column_id;
+        }
+        action2->set_sql_code(sql_code);
         if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UgOMMObhM2");
