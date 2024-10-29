@@ -96,7 +96,7 @@ void BackendServer::SetupFunctionData_()
     get_http_server_request().value()->getCookies(cookies);
     auto cookie_space_id = cookies.find("1f3efd18688d2b844f4fa1e800712c9b5750c031");
 
-    // Save Space ID if it was established
+    // Set Space ID if exists in Cookies
     if(cookie_space_id != cookies.end())
     {
         auto space_id_decoded = Tools::Base64Tool().Decode_(cookie_space_id->second);
@@ -106,7 +106,7 @@ void BackendServer::SetupFunctionData_()
     {
         add_space_id_cookie_ = true;
 
-        // Get Space ID Cookie if it was not established
+        // Get Space ID Cookie if not exists in Cookies
         auto action = NAF::Functions::Action("a1");
         action.set_sql_code(
             "SELECT s.id " \
@@ -120,7 +120,7 @@ void BackendServer::SetupFunctionData_()
             auto space_id = action.get_results()->First_();
             if(!space_id->IsNull_())
             {
-                // Save Space ID
+                // Set Space ID
                 function_data_.set_space_id(space_id->ToString_());
 
                 // Save Space ID to Cookie
