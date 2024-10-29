@@ -69,9 +69,18 @@ void StructBI::Functions::FormsColumns::Add_()
     auto action3 = function->AddAction_("a3");
     actions_.forms_columns_.add_a03_.Setup_(action3);
 
+    // Action 4: Add the column in the table
+    auto action4 = function->AddAction_("a4");
+
+    // Action 5: Get column id from link to
+    auto action5 = function->AddAction_("a5");
+
+    // Action 6: Create foreign key if there is a link to
+    auto action6 = function->AddAction_("a6");
+
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3, action4, action5, action6](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -114,10 +123,11 @@ void StructBI::Functions::FormsColumns::Add_()
         auto required = self.GetParameter_("required");
         auto default_value = self.GetParameter_("default_value");
         auto id_column_type = self.GetParameter_("id_column_type");
+        auto link_to = self.GetParameter_("link_to");
         auto form_identifier = self.GetParameter_("form-identifier");
         if(
             identifier == end || name == end || length == end || required == end ||
-            default_value == end || id_column_type == end || form_identifier == end
+            default_value == end || id_column_type == end || link_to == end || form_identifier == end
         )
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error xTWsdae5pJ");
@@ -169,20 +179,68 @@ void StructBI::Functions::FormsColumns::Add_()
 
         // Required Transformations
         std::string required_value = "";
+        std::string cascade_key_condition = "ON DELETE SET NULL ON UPDATE CASCADE";
         if(required->get()->ToString_() == "1")
+        {
             required_value = "NOT NULL";
+            cascade_key_condition = "ON DELETE CASCADE ON UPDATE CASCADE";
+        }
+
+        // Variables
+        std::string space_db = "_structbi_space_" + space_id;
+        std::string form_table = "_structbi_form_" + form_id->ToString_();
+        std::string column = "_structbi_column_" + std::to_string(column_id);
 
         // Action 4: Add the column in the table
-        auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
-            "ADD _structbi_column_" + std::to_string(column_id) + " " + column_type + length_value + " " +
+            "ALTER TABLE " + space_db + "." + form_table + " " +
+            "ADD " + column + " " + column_type + length_value + " " +
             required_value + default_value->get()->ToString_()
         );
         if(!action4->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action4->get_identifier() + ": " + action4->get_custom_error());
             return;
+        }
+
+        // Create foreign key if there is a link to
+        if(link_to->get()->ToString_() != "")
+        {
+            // Get column id from link to
+            action5->set_sql_code(
+                "SELECT fc.id " \
+                "FROM forms_columns fc " \
+                "JOIN forms f ON f.id = fc.id_form " \
+                "WHERE f.id = ? AND f.id_space = ?"
+            );
+            action5->AddParameter_("id_form", link_to->get()->ToString_(), false);
+            action5->AddParameter_("id_space", space_id, false);
+            if(!action5->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action5->get_identifier() + ": No se pudo crear la llave foránea");
+                return;
+            }
+
+            auto column_id = action5->get_results()->First_();
+            if(column_id->IsNull_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error: No se pudo crear la llave foránea");
+                return;
+            }
+
+            // Create the foreign key
+            action6->set_sql_code(
+                "ALTER TABLE " + space_db + "." + form_table + " " +
+                "ADD CONSTRAINT _IDX" + column + " " + 
+                "FOREIGN KEY (" + column + ") " +
+                "REFERENCES " + space_db + "._structbi_form_" + link_to->get()->ToString_() + "(_structbi_column_" + column_id->ToString_() + ") " + 
+                cascade_key_condition
+            );
+            if(!action6->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action6->get_identifier() + ": No se pudo crear la llave foránea");
+                return;
+            }
         }
 
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
