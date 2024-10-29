@@ -54,10 +54,8 @@ void StructBI::Functions::FormsData::Read_()
 
         // Get columns
         std::string columns = "";
+        std::string joins = "";
         bool has_link = false;
-        std::string form_id_link = "";
-        std::string column_id_link = "";
-        std::string column_id = "";
         for(auto it : *action1->get_results())
         {
             Query::Field::Ptr id = it.get()->ExtractField_("id");
@@ -72,9 +70,8 @@ void StructBI::Functions::FormsData::Read_()
             if(!link_to->IsNull_())
             {
                 has_link = true;
-                form_id_link = link_to->ToString_();
-                column_id = id->ToString_();
 
+                // Get table columns (link)
                 auto action1_2 = self.AddAction_("a1_2");
                 action1_2->set_sql_code("SELECT * FROM forms_columns WHERE id_form = ?");
                 action1_2->AddParameter_("id", link_to->Int_(), false);
@@ -88,6 +85,8 @@ void StructBI::Functions::FormsData::Read_()
                     self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error OFYV54ToXi");
                     return;
                 }
+
+                // Get ID from first and second column
                 auto column2 = action1_2->get_results()->begin();
                 auto column2_id = column2->get()->ExtractField_("id");
                 column2++;
@@ -97,10 +96,17 @@ void StructBI::Functions::FormsData::Read_()
                     self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error NmYoq56SDN");
                     return;
                 }
-                column_id_link = column2_id->ToString_();
+
+                // Setup column link
                 column = "_" + link_to->ToString_() + "._structbi_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
+
+                // Setup new join
+                joins += " LEFT JOIN _structbi_space_" + id_space + "._structbi_form_" + link_to->ToString_() +
+                " AS _" + link_to->ToString_() + " ON _" + link_to->ToString_() + "._structbi_column_" + column2_id->ToString_() + 
+                " = _" + form_id->ToString_() + "._structbi_column_" + id->ToString_();
             }
 
+            // Set column
             if(it == *action1->get_results()->begin())
                 columns = column;
             else
@@ -119,13 +125,14 @@ void StructBI::Functions::FormsData::Read_()
         std::string sql_code = 
             "SELECT " + columns + " " \
             "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
-                " AS _" + form_id->ToString_();
+                " AS _" + form_id->ToString_()
+        ;
+
+        // Prepare JOIN if there is a link
         if(has_link)
-        {
-            sql_code += " LEFT JOIN _structbi_space_" + id_space + "._structbi_form_" + form_id_link +
-            " AS _" + form_id_link + " ON _" + form_id_link + "._structbi_column_" + column_id_link + 
-            " = _" + form_id->ToString_() + "._structbi_column_" + column_id;
-        }
+            sql_code += joins;
+
+        // Execute
         action2->set_sql_code(sql_code);
         if(!action2->Work_())
         {
