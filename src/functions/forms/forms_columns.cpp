@@ -403,6 +403,9 @@ void StructBI::Functions::FormsColumns::Delete_()
     auto action1 = function->AddAction_("a1");
     actions_.forms_columns_.delete_a01_.Setup_(action1);
 
+    // Action 2_0: Delete foreign key if exists
+    auto action2_0 = function->AddAction_("a2_0");
+
     // Action 2: Delete column from table
     auto action2 = function->AddAction_("a2");
     actions_.forms_columns_.delete_a02_.Setup_(action2);
@@ -413,7 +416,7 @@ void StructBI::Functions::FormsColumns::Delete_()
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2_0, action2, action3](NAF::Functions::Function& self)
     {
         // Execute action 1
         if(!action1->Work_())
@@ -435,6 +438,18 @@ void StructBI::Functions::FormsColumns::Delete_()
         if(column_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UFwgqfZp59");
+            return;
+        }
+
+        // Action 2_0: Delete foreign key if exists
+        action2_0->set_sql_code(
+            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
+            "DROP FOREIGN KEY IF EXISTS _IDX_structbi_column_" + column_id->ToString_());
+
+        // Execute actions
+        if(!action2_0->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_0->get_identifier() + ": " + action2_0->get_custom_error());
             return;
         }
 
