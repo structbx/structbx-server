@@ -35,30 +35,41 @@ void StructBI::Functions::Spaces::ReadSpecific_()
     auto action = function->AddAction_("a1");
     actions_.spaces_.read_specific_a01_.Setup_(action);
 
-    function->SetupCustomProcess_([](NAF::Functions::Function& self)
+    auto space_id = get_space_id();
+    auto id_user = get_id_user();
+    function->SetupCustomProcess_([space_id, id_user, action](NAF::Functions::Function& self)
     {
-        // Action to request the current Space
-        auto action = self.GetAction_("a1");
-        if(action == self.get_actions().end())
+        // Get identifier
+        auto identifier = self.GetParameter_("identifier");
+        if(identifier != self.get_parameters().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 4H0abNY1yW");
-            return;
+            action->get_parameters().clear();
+            action->set_sql_code(
+                "SELECT s.* " \
+                "FROM spaces s " \
+                "JOIN spaces_users su ON su.id_space = s.id " \
+                "WHERE su.id_naf_user = ? AND s.identifier = ?"
+            );
+            action->AddParameter_("id_naf_user", id_user, false);
+            action->AddParameter_("identifier", identifier->get()->ToString_(), true)
+            ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+            {
+                if(param->ToString_() == "")
+                {
+                    param->set_error("El identificador de espacio no puede estar vacío");
+                    return false;
+                }
+                return true;
+            });
         }
 
-        // Execute action
-        if(!action->get()->Work_())
+        if(!action->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action->get()->get_custom_error());
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
             return;
         }
-        auto result = action->get()->get_json_result();
-
-        // Set Space ID Cookie to the client
-        auto field = action->get()->get_results()->First_();
-        if(!field->IsNull_())
-            self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
-        else
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
+        
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, action->get_json_result());
     });
 
     get_functions()->push_back(function);

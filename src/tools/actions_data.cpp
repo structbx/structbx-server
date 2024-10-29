@@ -1,6 +1,7 @@
 
 #include "tools/actions_data.h"
 #include <functions/action.h>
+#include <tools/dvalue.h>
 
 StructBI::Tools::ActionsData::ActionsData(StructBI::Tools::FunctionData& function_data) : 
     spaces_(function_data)
@@ -29,38 +30,14 @@ void StructBI::Tools::ActionsData::Spaces::ReadSpecificA01::Setup_(Functions::Ac
 {
     action_ = action;
 
-    if(get_space_id() == "")
-    {
-        // Request space ID in DB (Not found in cookie)
-        action_->set_sql_code(
-            "SELECT s.* " \
-            "FROM spaces s " \
-            "JOIN spaces_users su ON su.id_space = s.id " \
-            "WHERE su.id_naf_user = ?"
-        );
-        action_->AddParameter_("id_naf_user", get_id_user(), false);
-    }
-    else
-    {
-        // Request space ID in Cookie
-        action_->set_sql_code(
-            "SELECT s.* " \
-            "FROM spaces s " \
-            "JOIN spaces_users su ON su.id_space = s.id " \
-            "WHERE su.id_naf_user = ? AND s.id = ?"
-        );
-        action_->AddParameter_("id_naf_user", get_id_user(), false);
-        action_->AddParameter_("id_space", get_space_id(), true)
-        ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-        {
-            if(param->ToString_() == "")
-            {
-                param->set_error("El id de espacio no puede estar vacío");
-                return false;
-            }
-            return true;
-        });
-    }
+    action_->set_sql_code(
+        "SELECT s.* " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+    action_->AddParameter_("id_space", get_space_id(), false);
 }
 
 void StructBI::Tools::ActionsData::Spaces::AddA01::Setup_(Functions::Action::Ptr action)
@@ -940,7 +917,9 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
@@ -967,7 +946,9 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functio
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
@@ -1087,11 +1068,11 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
     action_ = action;
     
     action_->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, id_form) " \
+        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_form) " \
         "SELECT " \
             "?, ? " \
             ",MAX(fc.position) + 1 " \
-            ",?, ?, ?, ?, ? " \
+            ",?, ?, ?, ?, ?, ? " \
             ",f.id " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
@@ -1173,6 +1154,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
         }
         return true;
     });
+    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true);
     action_->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -1277,7 +1259,9 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
     action_ = action;
     
     action_->set_sql_code(
-        "UPDATE forms_columns SET identifier = ?, name = ?, length = ?, required = ?, default_value = ?, description = ?, id_column_type = ? " \
+        "UPDATE forms_columns SET " \
+            "identifier = ?, name = ?, length = ?, required = ? " \
+            ",default_value = ?, description = ?, id_column_type = ?, link_to = ? " \
         "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
     );
 
@@ -1355,6 +1339,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
         }
         return true;
     });
+    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true);
     action_->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
