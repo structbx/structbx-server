@@ -142,7 +142,7 @@ void StructBI::Functions::FormsColumns::Add_()
             column_type = "VARCHAR";
             length_value = "(100)";
         }
-        else if(id_column_type->get()->ToString_() == "2")
+        else if(id_column_type->get()->ToString_() == "2" || id_column_type->get()->ToString_() == "7" || id_column_type->get()->ToString_() == "8")
         {
             column_type = "TEXT";
             length_value = "";
@@ -159,13 +159,18 @@ void StructBI::Functions::FormsColumns::Add_()
         }
         else if(id_column_type->get()->ToString_() == "5")
         {
-            column_type = "DATETIME";
+            column_type = "DATE";
             length_value = "";
         }
-        else if(id_column_type->get()->ToString_() == "5")
+        else if(id_column_type->get()->ToString_() == "6")
         {
             column_type = "TIME";
             length_value = "";
+        }
+        else if(id_column_type->get()->ToString_() == "9")
+        {
+            column_type = "INT";
+            length_value = "(11)";
         }
         else
         {
@@ -327,7 +332,7 @@ void StructBI::Functions::FormsColumns::Modify_()
             column_type = "VARCHAR";
             length_value = "(100)";
         }
-        else if(id_column_type->get()->ToString_() == "2")
+        else if(id_column_type->get()->ToString_() == "2" || id_column_type->get()->ToString_() == "7" || id_column_type->get()->ToString_() == "8")
         {
             column_type = "TEXT";
             length_value = "";
@@ -347,10 +352,15 @@ void StructBI::Functions::FormsColumns::Modify_()
             column_type = "DATE";
             length_value = "";
         }
-        else if(id_column_type->get()->ToString_() == "5")
+        else if(id_column_type->get()->ToString_() == "6")
         {
             column_type = "TIME";
             length_value = "";
+        }
+        else if(id_column_type->get()->ToString_() == "9")
+        {
+            column_type = "INT";
+            length_value = "(11)";
         }
         else
         {
@@ -456,7 +466,7 @@ void StructBI::Functions::FormsColumns::Delete_()
         // Action 2: Delete columns
         action2->set_sql_code(
             "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
-            "DROP COLUMN _structbi_column_" + column_id->ToString_());
+            "DROP COLUMN IF EXISTS _structbi_column_" + column_id->ToString_());
 
         // Execute actions
         if(!action2->Work_())
