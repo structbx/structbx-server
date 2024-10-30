@@ -919,7 +919,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
     action_->set_sql_code(
         "SELECT " \
             "fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
