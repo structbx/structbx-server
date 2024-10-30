@@ -224,5 +224,21 @@ void StructBI::Functions::Spaces::Modify_()
 
 void StructBI::Functions::Spaces::Delete_()
 {
-    
+    // Function GET /api/spaces/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    // Action 1: Verify that current user is in the space
+    auto action1 = function->AddAction_("a1");
+    actions_.spaces_.delete_a01_.Setup_(action1);
+
+    // Action 2: Mark space like "deleted"
+    auto action2 = function->AddAction_("a2");
+    actions_.spaces_.delete_a02_.Setup_(action2);
+
+    // Action 3: Delete users from space
+    auto action3 = function->AddAction_("a3");
+    actions_.spaces_.delete_a03_.Setup_(action3);
+
+    get_functions()->push_back(function);
 }

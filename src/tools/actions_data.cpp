@@ -284,6 +284,72 @@ void StructBI::Tools::ActionsData::Spaces::ModifyA03::Setup_(Functions::Action::
     });
 }
 
+void StructBI::Tools::ActionsData::Spaces::DeleteA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT s.id " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ?"
+    );
+    action_->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El usuario actual no pertenece al espacio que intenta eliminar");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
+void StructBI::Tools::ActionsData::Spaces::DeleteA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "UPDATE spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "SET s.state = 'DELETED' " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void StructBI::Tools::ActionsData::Spaces::DeleteA03::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("DELETE FROM spaces_users WHERE id_space = ?");
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
 void StructBI::Tools::ActionsData::Forms::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
@@ -663,7 +729,10 @@ void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action:
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type, f.id AS form_id " \
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
@@ -690,7 +759,10 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA01::Setup_(Functions:
     action_ = action;
 
     action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type, f.id AS form_id " \
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN forms f ON f.id = fc.id_form " \
@@ -918,8 +990,9 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
 
     action_->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
             ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \
         "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
@@ -927,6 +1000,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
             "id_space = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
     );
+
     action_->AddParameter_("id_space", get_space_id(), false);
 
     action_->AddParameter_("form-identifier", "", true)
@@ -947,7 +1021,8 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functio
 
     action_->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
             ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
         "FROM forms_columns fc " \
         "JOIN forms f ON f.id = fc.id_form " \

@@ -52,6 +52,9 @@ class StructBI::Tools::ActionsData
                 ,modify_a01_(function_data)
                 ,modify_a02_(function_data)
                 ,modify_a03_(function_data)
+                ,delete_a01_(function_data)
+                ,delete_a02_(function_data)
+                ,delete_a03_(function_data)
             {
                 
             }
@@ -136,6 +139,34 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
                     
             } modify_a03_;
+
+            class DeleteA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+                    
+            } delete_a01_;
+
+            class DeleteA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+                    
+            } delete_a02_;
+
+            class DeleteA03 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+                    
+            } delete_a03_;
+
         } spaces_;
 
         struct Forms
