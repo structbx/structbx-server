@@ -82,6 +82,16 @@ void StructBI::Functions::FormsColumns::Add_()
     auto space_id = get_space_id();
     function->SetupCustomProcess_([space_id, action1, action2, action3, action4, action5, action6](NAF::Functions::Function& self)
     {
+        // If error, delete the column from the table
+        auto delete_column_table = [](int column_id)
+        {
+            // Delete space from table
+            NAF::Functions::Action action("action_delete_column");
+            action.set_sql_code("DELETE FROM forms_columns WHERE id = ?");
+            action.AddParameter_("id", column_id, false);
+            action.Work_();
+        };
+
         // Execute actions
         if(!action1->Work_())
         {
@@ -114,84 +124,16 @@ void StructBI::Functions::FormsColumns::Add_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error 6eHh9R4Pv5");
             return;
         }
-            
-        // Get parameters
-        auto end = self.get_parameters().end();
-        auto identifier = self.GetParameter_("identifier");
-        auto name = self.GetParameter_("name");
-        auto length = self.GetParameter_("length");
-        auto required = self.GetParameter_("required");
-        auto default_value = self.GetParameter_("default_value");
-        auto id_column_type = self.GetParameter_("id_column_type");
-        auto link_to = self.GetParameter_("link_to");
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(
-            identifier == end || name == end || length == end || required == end ||
-            default_value == end || id_column_type == end || link_to == end || form_identifier == end
-        )
+
+        // Setup column variables
+        auto column_setup = ColumnSetup();
+        auto variables = ColumnVariables();
+        if(!column_setup.Setup(self, variables))
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error xTWsdae5pJ");
+            delete_column_table(column_id);
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error e4GBhN1lxk");
             return;
         }
-
-        // Column Type Transformations
-        std::string column_type = "VARCHAR";
-        std::string length_value = "(100)";
-        if(id_column_type->get()->ToString_() == "1")
-        {
-            column_type = "VARCHAR";
-            length_value = "(100)";
-        }
-        else if(id_column_type->get()->ToString_() == "2" || id_column_type->get()->ToString_() == "7" || id_column_type->get()->ToString_() == "8")
-        {
-            column_type = "TEXT";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "3")
-        {
-            column_type = "INT";
-            length_value = "(11)";
-        }
-        else if(id_column_type->get()->ToString_() == "4")
-        {
-            column_type = "DECIMAL";
-            length_value = "(10, 2)";
-        }
-        else if(id_column_type->get()->ToString_() == "5")
-        {
-            column_type = "DATE";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "6")
-        {
-            column_type = "TIME";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "9")
-        {
-            column_type = "INT";
-            length_value = "(11)";
-        }
-        else
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HetZIhSqTe");
-            return;
-        }
-
-        // Length Transformations
-        if(length->get()->ToString_() != "")
-            length_value = "(" + length->get()->ToString_() + ")";
-
-        // Required Transformations
-        std::string required_value = "";
-        std::string cascade_key_condition = "ON DELETE SET NULL ON UPDATE CASCADE";
-        if(required->get()->ToString_() == "1")
-        {
-            required_value = "NOT NULL";
-            cascade_key_condition = "ON DELETE CASCADE ON UPDATE CASCADE";
-        }
-
-        // Variables
         std::string space_db = "_structbi_space_" + space_id;
         std::string form_table = "_structbi_form_" + form_id->ToString_();
         std::string column = "_structbi_column_" + std::to_string(column_id);
@@ -199,17 +141,18 @@ void StructBI::Functions::FormsColumns::Add_()
         // Action 4: Add the column in the table
         action4->set_sql_code(
             "ALTER TABLE " + space_db + "." + form_table + " " +
-            "ADD " + column + " " + column_type + length_value + " " +
-            required_value + default_value->get()->ToString_()
+            "ADD " + column + " " + variables.column_type + variables.length + " " +
+            variables.required + " " + variables.default_value
         );
         if(!action4->Work_())
         {
+            delete_column_table(column_id);
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action4->get_identifier() + ": " + action4->get_custom_error());
             return;
         }
 
         // Create foreign key if there is a link to
-        if(link_to->get()->ToString_() != "")
+        if(variables.link_to != "")
         {
             // Get column id from link to
             action5->set_sql_code(
@@ -218,7 +161,7 @@ void StructBI::Functions::FormsColumns::Add_()
                 "JOIN forms f ON f.id = fc.id_form " \
                 "WHERE f.id = ? AND f.id_space = ?"
             );
-            action5->AddParameter_("id_form", link_to->get()->ToString_(), false);
+            action5->AddParameter_("id_form", variables.link_to, false);
             action5->AddParameter_("id_space", space_id, false);
             if(!action5->Work_())
             {
@@ -226,8 +169,8 @@ void StructBI::Functions::FormsColumns::Add_()
                 return;
             }
 
-            auto column_id = action5->get_results()->First_();
-            if(column_id->IsNull_())
+            auto column_id_link = action5->get_results()->First_();
+            if(column_id_link->IsNull_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error: No se pudo crear la llave foránea");
                 return;
@@ -238,8 +181,9 @@ void StructBI::Functions::FormsColumns::Add_()
                 "ALTER TABLE " + space_db + "." + form_table + " " +
                 "ADD CONSTRAINT _IDX" + column + " " + 
                 "FOREIGN KEY (" + column + ") " +
-                "REFERENCES " + space_db + "._structbi_form_" + link_to->get()->ToString_() + "(_structbi_column_" + column_id->ToString_() + ") " + 
-                cascade_key_condition
+                "REFERENCES " + space_db + "._structbi_form_" + variables.link_to + 
+                    "(_structbi_column_" + column_id_link->ToString_() + ") " + 
+                    variables.cascade_key_condition
             );
             if(!action6->Work_())
             {
@@ -305,84 +249,26 @@ void StructBI::Functions::FormsColumns::Modify_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error XVtkYKnme6");
             return;
         }
-        
-        // Get parameters
-        auto end = self.get_parameters().end();
-        auto identifier = self.GetParameter_("identifier");
-        auto name = self.GetParameter_("name");
-        auto length = self.GetParameter_("length");
-        auto required = self.GetParameter_("required");
-        auto default_value = self.GetParameter_("default_value");
-        auto id_column_type = self.GetParameter_("id_column_type");
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(
-            identifier == end || name == end || length == end || required == end ||
-            default_value == end || id_column_type == end || form_identifier == end
-        )
+
+        // Setup column variables
+        auto column_setup = ColumnSetup();
+        auto variables = ColumnVariables();
+        if(!column_setup.Setup(self, variables))
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error H1AZ0gYu7T");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error WW17KL82QJ");
             return;
         }
-
-        // Column Type Transformations
-        std::string column_type = "VARCHAR";
-        std::string length_value = "(100)";
-        if(id_column_type->get()->ToString_() == "1")
-        {
-            column_type = "VARCHAR";
-            length_value = "(100)";
-        }
-        else if(id_column_type->get()->ToString_() == "2" || id_column_type->get()->ToString_() == "7" || id_column_type->get()->ToString_() == "8")
-        {
-            column_type = "TEXT";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "3")
-        {
-            column_type = "INT";
-            length_value = "(11)";
-        }
-        else if(id_column_type->get()->ToString_() == "4")
-        {
-            column_type = "DECIMAL";
-            length_value = "(10, 2)";
-        }
-        else if(id_column_type->get()->ToString_() == "5")
-        {
-            column_type = "DATE";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "6")
-        {
-            column_type = "TIME";
-            length_value = "";
-        }
-        else if(id_column_type->get()->ToString_() == "9")
-        {
-            column_type = "INT";
-            length_value = "(11)";
-        }
-        else
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error Q5FLHrDF3H");
-            return;
-        }
-
-        // Length Transformations
-        if(length->get()->ToString_() != "")
-            length_value = "(" + length->get()->ToString_() + ")";
-
-        // Required Transformations
-        std::string required_value = "";
-        if(required->get()->ToString_() == "1")
-            required_value = "NOT NULL";
+        std::string space_db = "_structbi_space_" + space_id;
+        std::string form_table = "_structbi_form_" + form_id->ToString_();
+        std::string column = "_structbi_column_" + column_id->get()->ToString_();
 
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
-            "CHANGE COLUMN `_structbi_column_" + column_id->get()->ToString_() + "` _structbi_column_" + column_id->get()->ToString_() + 
-            " " + column_type + length_value + " " + required_value + " " + default_value->get()->ToString_()
+            "ALTER TABLE " + space_db + "." + form_table + " " +
+            "CHANGE COLUMN `" + column + "` " + column + 
+            " " + variables.column_type + variables.length + " " + variables.required +
+            " " + variables.default_value
         );
         if(!action4->Work_())
         {
@@ -485,4 +371,100 @@ void StructBI::Functions::FormsColumns::Delete_()
     });
 
     get_functions()->push_back(function);
+}
+
+bool StructBI::Functions::FormsColumns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)
+{
+    // Get parameters
+    auto end = self.get_parameters().end();
+    auto identifier = self.GetParameter_("identifier");
+    auto name = self.GetParameter_("name");
+    auto length = self.GetParameter_("length");
+    auto required = self.GetParameter_("required");
+    auto default_value = self.GetParameter_("default_value");
+    auto id_column_type = self.GetParameter_("id_column_type");
+    auto link_to = self.GetParameter_("link_to");
+    auto form_identifier = self.GetParameter_("form-identifier");
+    if(
+        identifier == end || name == end || length == end || required == end ||
+        default_value == end || id_column_type == end || link_to == end || form_identifier == end
+    )
+        return false;
+
+    // Column Type setup
+    std::string column_type_id = id_column_type->get()->ToString_();
+    auto column_type_setup = ColumnTypeSetup();
+    if(!column_type_setup.Setup(column_type_id, variables.column_type, variables.length))
+        return false;
+
+    // Length setup
+    if(length->get()->ToString_() != "")
+        variables.length = "(" + length->get()->ToString_() + ")";
+
+    // Required setup
+    if(required->get()->ToString_() == "1")
+    {
+        variables.required = "NOT NULL";
+        variables.cascade_key_condition = "ON DELETE CASCADE ON UPDATE CASCADE";
+    }
+
+    // Default setup
+    if(default_value->get()->ToString_() != "")
+        variables.default_value = "DEFAULT " + default_value->get()->ToString_();
+
+    // Link to
+    if(link_to->get()->ToString_() != "")
+        variables.link_to = link_to->get()->ToString_();
+
+    return true;
+}
+
+bool StructBI::Functions::FormsColumns::ColumnTypeSetup::Setup(std::string column_type_id, std::string& column_type, std::string& length_value)
+{
+    if(column_type_id == "1")
+    {
+        column_type = "VARCHAR";
+        length_value = "(100)";
+        return true;
+    }
+    else if(column_type_id == "2" || column_type_id == "7" || column_type_id == "8")
+    {
+        column_type = "TEXT";
+        length_value = "";
+        return true;
+    }
+    else if(column_type_id == "3")
+    {
+        column_type = "INT";
+        length_value = "(11)";
+        return true;
+    }
+    else if(column_type_id == "4")
+    {
+        column_type = "DECIMAL";
+        length_value = "(10, 2)";
+        return true;
+    }
+    else if(column_type_id == "5")
+    {
+        column_type = "DATE";
+        length_value = "";
+        return true;
+    }
+    else if(column_type_id == "6")
+    {
+        column_type = "TIME";
+        length_value = "";
+        return true;
+    }
+    else if(column_type_id == "9")
+    {
+        column_type = "INT";
+        length_value = "(11)";
+        return true;
+    }
+    else
+    {
+        return false;
+    } 
 }
