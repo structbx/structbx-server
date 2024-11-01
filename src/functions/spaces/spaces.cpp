@@ -19,8 +19,58 @@ void StructBI::Functions::Spaces::Read_()
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
     
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
     auto action = function->AddAction_("a1");
     actions_.spaces_.read_a01_.Setup_(action);
+
+    // Setup custom process
+    auto space_id = get_space_id();
+    function->SetupCustomProcess_([space_id, action](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action->get_identifier() + ": " + action->get_custom_error());
+            return;
+        }
+
+        // Iterate over results
+        for(auto row : *action->get_results())
+        {
+            // Get form id
+            auto id = row->ExtractField_("id");
+            if(id->IsNull_())
+                continue;
+
+            // Action 2: Size
+            auto action2 = NAF::Functions::Action("a2");
+            action2.set_sql_code(
+                "SELECT ROUND(SUM((DATA_LENGTH + INDEX_LENGTH)) / 1024 / 1024, 2) AS 'size' " \
+                "FROM information_schema.TABLES " \
+                "WHERE TABLE_SCHEMA = '_structbi_space_" + id->ToString_() + "'"
+            );
+            if(!action2.Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error KXkg8nuaNB");
+                return;
+            }
+
+            // Get results
+            auto size = action2.get_results()->First_();
+            if(size->IsNull_())
+                row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(0)));
+            else
+                row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(size->Float_())));
+
+        }
+
+        // JSON Results
+        auto json_results = action->CreateJSONResult_();
+
+        // Send results
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_results);
+    });
 
     get_functions()->push_back(function);
 }
