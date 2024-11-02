@@ -9,10 +9,11 @@ db_user : "root"
 db_password : "0UHC72zNvywZ"
 session_max_age : 2592000
 directory_base : "/var/www/structbi-web"
-directory_for_uploaded_files : "/var/www/structbi-web-uploaded"
 directory_for_temp_files : "/tmp"
 certificate: "cert.pem"
 key: "key.pem"
 rootcert: ""
 logger_output_file: "structbi.log"
 debug: true
+
+directory_for_uploaded_files : "/var/www/structbi-web-uploaded"

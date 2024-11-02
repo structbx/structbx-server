@@ -13,6 +13,11 @@
 using namespace StructBI;
 using namespace NAF;
 
+void SetupSettings()
+{
+    NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbi-web-uploaded"));
+}
+
 int main(int argc, char** argv)
 {
     // Setup
@@ -20,6 +25,7 @@ int main(int argc, char** argv)
 
         NAF::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
+        SetupSettings();
         NAF::Query::DatabaseManager::StartMySQL_();
         NAF::Security::PermissionsManager::LoadPermissions_();
         NAF::Tools::SessionsManager::ReadSessions_();
