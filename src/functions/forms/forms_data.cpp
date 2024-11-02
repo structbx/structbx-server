@@ -308,6 +308,7 @@ void StructBI::Functions::FormsData::Add_()
             // Get column
             auto id = it.get()->ExtractField_("id");
             auto identifier = it.get()->ExtractField_("identifier");
+            auto column_type = it.get()->ExtractField_("column_type");
             auto name = it.get()->ExtractField_("name");
             auto length = it.get()->ExtractField_("length");
             auto required = it.get()->ExtractField_("required");
@@ -333,17 +334,23 @@ void StructBI::Functions::FormsData::Add_()
                 values += ", ?";
             }
 
+            // Get file manager
+            auto file_manager = self.get_file_manager();
+            file_manager->set_directory_base(
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+            );
+
             // Setup parameter
             action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
+            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
-                return pv.Verify(param, length, required, default_value);
+                return pv.Verify(file_manager, param, length, required, default_value, column_type);
             });
         }
         if(columns == "")
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Debes crear columnas para poder guardar informaci&oacute;n");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Debes crear columnas para poder guardar informaci&oacute;n");
             return;
         }
 
@@ -356,7 +363,7 @@ void StructBI::Functions::FormsData::Add_()
         self.IdentifyParameters_(action3);
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error fECruxvqCZ");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error fECruxvqCZ: No se pudo guardar el registro. " + action3->get_custom_error());
             return;
         }
 
@@ -426,6 +433,7 @@ void StructBI::Functions::FormsData::Modify_()
             // Get column
             auto id = it.get()->ExtractField_("id");
             auto identifier = it.get()->ExtractField_("identifier");
+            auto column_type = it.get()->ExtractField_("column_type");
             auto name = it.get()->ExtractField_("name");
             auto length = it.get()->ExtractField_("length");
             auto required = it.get()->ExtractField_("required");
@@ -449,12 +457,18 @@ void StructBI::Functions::FormsData::Modify_()
                 columns += ",_structbi_column_" + id->ToString_() + " = ?";
             }
 
+            // Get file manager
+            auto file_manager = self.get_file_manager();
+            file_manager->set_directory_base(
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+            );
+
             // Setup parameters
             action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value](Query::Parameter::Ptr param)
+            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type](Query::Parameter::Ptr param)
             {
                 ParameterVerification pv;
-                return pv.Verify(param, length, required, default_value);
+                return pv.Verify(file_manager, param, length, required, default_value, column_type);
             });
         }
 
@@ -473,7 +487,7 @@ void StructBI::Functions::FormsData::Modify_()
         // Verify that columns is not empty
         if(columns == "")
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Debes crear columnas para poder guardar informaci&oacute;n");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Debes crear columnas para poder guardar informaci&oacute;n");
             return;
         }
 
@@ -486,7 +500,7 @@ void StructBI::Functions::FormsData::Modify_()
         self.IdentifyParameters_(action3);
         if(!action3->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UyUKjUef7b");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error UyUKjUef7b: No se pudo guardar el registro.");
             return;
         }
 
@@ -497,9 +511,15 @@ void StructBI::Functions::FormsData::Modify_()
     get_functions()->push_back(function);
 }
 
-bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value)
+bool StructBI::Functions::FormsData::ParameterVerification::Verify(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value, Query::Field::Ptr column_type)
 {
-    if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
+    if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
+    {
+        std::string path = "";
+        FileProcessing().Save(file_manager, param, path);
+        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(path)));
+    }
+    else if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
     {
         if(required->Int_() == 1)
         {
@@ -515,6 +535,24 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
         {
             if(default_value->ToString_() == "")
                 return true;
+            else
+                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
+        }
+    }
+    else if (param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            if(default_value->ToString_() == "")
+            {
+                if(required->Int_() == 1)
+                {
+                    param->set_error("Este parámetro es obligatorio");
+                    return false;
+                }
+                else
+                    param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+            }
             else
                 param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
         }
@@ -585,4 +623,34 @@ void StructBI::Functions::FormsData::Delete_()
     });
 
     get_functions()->push_back(function);
+}
+
+bool StructBI::Functions::FormsData::FileProcessing::Save(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, std::string& path)
+{
+    // Setup file manager
+    file_manager->AddBasicSupportedFiles_();
+
+    // Upload new file
+    file_manager->set_operation_type(Files::OperationType::kUpload);
+    auto& front_file = file_manager->get_files().front();
+    
+    if(!file_manager->ChangePathAndFilename_(front_file, file_manager->get_directory_base()))
+    {
+        param->set_error("Error al subir el archivo.");
+        return false;
+    }
+    if(!file_manager->IsSupported_())
+    {
+        param->set_error("Archivo no soportado.");
+        return false;
+    }
+    if(!file_manager->VerifyMaxFileSize_())
+    {
+        param->set_error("El archivo debe ser de menos de 5MB.");
+        return false;
+    }
+    file_manager->UploadFile_();
+    
+    path = front_file.get_requested_path()->getFileName();
+    return true; 
 }

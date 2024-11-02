@@ -24,7 +24,11 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
     protected:
         struct ParameterVerification
         {
-            bool Verify(Query::Parameter::Ptr param, Query::Field::Ptr length, Query::Field::Ptr required, Query::Field::Ptr default_value);
+            bool Verify(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, Query::Field::Ptr length, Query::Field::Ptr required, Query::Field::Ptr default_value, Query::Field::Ptr column_type);
+        };
+        struct FileProcessing
+        {
+            bool Save(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, std::string& path);
         };
 
         void Read_();
