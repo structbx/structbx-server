@@ -7,6 +7,7 @@ StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
 {
     Read_();
     ReadSpecific_();
+    ReadFile_();
     Add_();
     Modify_();
     Delete_();
@@ -251,6 +252,40 @@ void StructBI::Functions::FormsData::ReadSpecific_()
 
         // Send results
         self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
+    });
+
+    get_functions()->push_back(function);
+}
+
+void StructBI::Functions::FormsData::ReadFile_()
+{
+    // Function GET /api/forms/data/file/read
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/file/read", HTTP::EnumMethods::kHTTP_GET);
+
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    {
+        // Setup file manager
+        self.get_file_manager()->AddBasicSupportedFiles_();
+        self.get_file_manager()->set_directory_base(
+            NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+        );
+
+        // Get filepath
+        auto filepath = self.GetParameter_("filepath");
+        if(filepath == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El nombre del archivo no puede estar vacío");
+            return;
+        }
+
+        // Download process
+        auto string_path = filepath->get()->ToString_();
+        self.DownloadProcess_(string_path);
     });
 
     get_functions()->push_back(function);

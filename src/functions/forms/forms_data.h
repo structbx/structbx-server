@@ -33,6 +33,7 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
 
         void Read_();
         void ReadSpecific_();
+        void ReadFile_();
         void Add_();
         void Modify_();
         void Delete_();
