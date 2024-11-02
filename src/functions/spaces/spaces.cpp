@@ -244,8 +244,38 @@ void StructBI::Functions::Spaces::Add_()
             return;
         }
 
-        // Send results
-        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+        // Create the directory to store files
+        try
+        {
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            directory += "/" + std::to_string(space_id);
+            Poco::File file(directory);
+            if(file.exists())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+                return;
+            }
+            if(!file.createDirectory())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+                return;
+            }
+
+            // Send results
+            self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+        }
+        catch(Poco::FileException& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+            return;
+        }
+        catch(std::exception& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.what());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+            return;
+        }
     });
 
     get_functions()->push_back(function);
