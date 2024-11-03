@@ -1,5 +1,6 @@
 
 #include "functions/forms/forms_data.h"
+#include <tools/dvalue.h>
 
 StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -379,8 +380,13 @@ void StructBI::Functions::FormsData::Add_()
             action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
             ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type](Query::Parameter::Ptr param)
             {
-                ParameterVerification pv;
-                return pv.Verify(file_manager, param, length, required, default_value, column_type);
+                FileProcessing fp;
+                fp.file_manager = file_manager;
+                fp.param = param;
+                fp.modify = false;
+                fp.filepath = "";
+                ParameterVerification pv(length, required, default_value, column_type, fp);
+                return pv.Verify(param);
             });
         }
         if(columns == "")
@@ -425,13 +431,16 @@ void StructBI::Functions::FormsData::Modify_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.modify_02_.Setup_(action2);
 
+    // Action 2_1: Get old filepath
+    auto action2_1 = function->AddAction_("a2_1");
+
     // Action 3: Update record
     auto action3 = function->AddAction_("a3");
     actions_.forms_data_.modify_03_.Setup_(action3);
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action2_1, action3](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -498,12 +507,47 @@ void StructBI::Functions::FormsData::Modify_()
                 NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
             );
 
-            // Setup parameters
-            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type](Query::Parameter::Ptr param)
+            // Setup action to get old filepath
+            std::string filepath_string = "";
+            if(column_type->ToString_() == "image" || column_type->ToString_() == "file")
             {
-                ParameterVerification pv;
-                return pv.Verify(file_manager, param, length, required, default_value, column_type);
+                action2_1->set_sql_code(
+                    "SELECT _structbi_column_" + id->ToString_() + " "
+                    "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
+                    "WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+                );
+                action2_1->AddParameter_("id", "", true)
+                ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+                {
+                    if(param->get_value()->ToString_() == "")
+                    {
+                        param->set_error("El id no puede estar vacío");
+                    }
+
+                    return true;
+                });
+                self.IdentifyParameters_(action2_1);
+                if(!action2_1->Work_())
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_1->get_identifier() + ": yKqkgKKfdg");
+                    return;
+                }
+                auto filepath = action2_1->get_results()->First_();
+                if(!filepath->IsNull_())
+                    filepath_string = filepath->ToString_();
+            }
+
+            // Setup parameter
+            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type, filepath_string](Query::Parameter::Ptr param)
+            {
+                FileProcessing fp;
+                fp.file_manager = file_manager;
+                fp.param = param;
+                fp.modify = true;
+                fp.filepath = filepath_string;
+                ParameterVerification pv(length, required, default_value, column_type, fp);
+                return pv.Verify(param);
             });
         }
 
@@ -546,15 +590,9 @@ void StructBI::Functions::FormsData::Modify_()
     get_functions()->push_back(function);
 }
 
-bool StructBI::Functions::FormsData::ParameterVerification::Verify(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, Query::Field::Ptr, Query::Field::Ptr required, Query::Field::Ptr default_value, Query::Field::Ptr column_type)
+bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param)
 {
-    if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
-    {
-        std::string path = "";
-        FileProcessing().Save(file_manager, param, path);
-        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(path)));
-    }
-    else if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
+    if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
     {
         if(required->Int_() == 1)
         {
@@ -590,6 +628,25 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(NAF::Files::F
             }
             else
                 param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
+        }
+        else
+        {
+            if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
+            {
+                if(file_processing.modify)
+                {
+                    file_processing.Delete();
+                    if(!file_processing.Save())
+                        return false;
+                }
+                else
+                {
+                    if(!file_processing.Save())
+                        return false;
+                }
+
+                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(file_processing.filepath)));
+            }
         }
     }
 
@@ -660,8 +717,10 @@ void StructBI::Functions::FormsData::Delete_()
     get_functions()->push_back(function);
 }
 
-bool StructBI::Functions::FormsData::FileProcessing::Save(NAF::Files::FileManager::Ptr file_manager, Query::Parameter::Ptr param, std::string& path)
+bool StructBI::Functions::FormsData::FileProcessing::Save()
 {
+    filepath = "";
+
     // Setup file manager
     file_manager->AddBasicSupportedFiles_();
 
@@ -686,6 +745,24 @@ bool StructBI::Functions::FormsData::FileProcessing::Save(NAF::Files::FileManage
     }
     file_manager->UploadFile_();
     
-    path = front_file.get_requested_path()->getFileName();
+    filepath = front_file.get_requested_path()->getFileName();
     return true; 
+}
+
+bool StructBI::Functions::FormsData::FileProcessing::Delete()
+{
+    // Verify logo exists and remove it
+    Files::FileManager file_manager;
+    file_manager.set_directory_base(this->file_manager->get_directory_base());
+    file_manager.set_operation_type(Files::OperationType::kDelete);
+    file_manager.get_files().push_back(file_manager.CreateTempFile_("/" + filepath));
+
+    if(file_manager.CheckFiles_())
+    {
+        file_manager.RemoveFile_();
+    }
+    else
+        return false;
+    
+    return true;
 }
