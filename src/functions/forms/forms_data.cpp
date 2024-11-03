@@ -590,6 +590,70 @@ void StructBI::Functions::FormsData::Modify_()
     get_functions()->push_back(function);
 }
 
+void StructBI::Functions::FormsData::Delete_()
+{
+    // Function GET /api/forms/data/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
+
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Verify form existence
+    auto action1 = function->AddAction_("a1");
+    actions_.forms_data_.delete_a01_.Setup_(action1);
+
+    // Action 2: Save new record
+    auto action2 = function->AddAction_("a2");
+    actions_.forms_data_.delete_a02_.Setup_(action2);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space, action1, action2](NAF::Functions::Function& self)
+    {
+        // Execute action 1
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": twQ1cxcgZs");
+            return;
+        }
+
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
+            return;
+        }
+
+        // Get Column ID
+        auto column_id = action1->get_results()->front()->ExtractField_("column_id");
+        if(column_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error LbunnRyAm2");
+            return;
+        }
+
+        // Action 2: Save new record
+        action2->set_sql_code(
+            "DELETE FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
+            " WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+        );
+
+        // Execute action 2
+        self.IdentifyParameters_(action2);
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+    });
+
+    get_functions()->push_back(function);
+}
+
 bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param)
 {
     if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
@@ -661,70 +725,6 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
     }
 
     return true;
-}
-
-void StructBI::Functions::FormsData::Delete_()
-{
-    // Function GET /api/forms/data/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
-
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
-
-    // Action 1: Verify form existence
-    auto action1 = function->AddAction_("a1");
-    actions_.forms_data_.delete_a01_.Setup_(action1);
-
-    // Action 2: Save new record
-    auto action2 = function->AddAction_("a2");
-    actions_.forms_data_.delete_a02_.Setup_(action2);
-
-    // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2](NAF::Functions::Function& self)
-    {
-        // Execute action 1
-        if(!action1->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": twQ1cxcgZs");
-            return;
-        }
-
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
-            return;
-        }
-
-        // Get Column ID
-        auto column_id = action1->get_results()->front()->ExtractField_("column_id");
-        if(column_id->IsNull_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error LbunnRyAm2");
-            return;
-        }
-
-        // Action 2: Save new record
-        action2->set_sql_code(
-            "DELETE FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
-            " WHERE _structbi_column_" + column_id->ToString_() + " = ?"
-        );
-
-        // Execute action 2
-        self.IdentifyParameters_(action2);
-        if(!action2->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
-            return;
-        }
-
-        // Send results
-        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
-    });
-
-    get_functions()->push_back(function);
 }
 
 bool StructBI::Functions::FormsData::FileProcessing::Save()
