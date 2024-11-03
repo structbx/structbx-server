@@ -602,18 +602,27 @@ void StructBI::Functions::FormsData::Delete_()
     auto action1 = function->AddAction_("a1");
     actions_.forms_data_.delete_a01_.Setup_(action1);
 
-    // Action 2: Save new record
+    // Action 2_0: Get form columns
+    auto action2_0 = function->AddAction_("a2_0");
+    actions_.forms_data_.add_02_.Setup_(action2_0);
+
+    // Action 2: Delete record from table
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.delete_a02_.Setup_(action2);
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2_0, action2](NAF::Functions::Function& self)
     {
-        // Execute action 1
+        // Execute actions
         if(!action1->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": twQ1cxcgZs");
+            return;
+        }
+        if(!action2_0->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_0->get_identifier() + ": PYaZ1nddvm");
             return;
         }
 
@@ -633,7 +642,69 @@ void StructBI::Functions::FormsData::Delete_()
             return;
         }
 
-        // Action 2: Save new record
+        // Delete record files
+        for(auto it : *action2_0->get_results())
+        {
+            // Get column
+            auto id = it.get()->ExtractField_("id");
+            auto identifier = it.get()->ExtractField_("identifier");
+            auto column_type = it.get()->ExtractField_("column_type");
+
+            // Verify identifier is not null
+            if(identifier->IsNull_())
+                continue;
+
+            // Verify if is image or file
+            if(column_type->IsNull_())
+                continue;
+            bool r = false;
+            if(column_type->ToString_() == "image" || column_type->ToString_() == "file")
+                r = true;
+            if(!r)
+                continue;
+
+            // Get file manager
+            auto file_manager = self.get_file_manager();
+            file_manager->set_directory_base(
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+            );
+
+            // Request filepath
+            auto action2_2 = self.AddAction_("a2_2");
+            action2_2->set_sql_code(
+                "SELECT _structbi_column_" + id->ToString_() + " "
+                "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
+                "WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+            );
+            action2_2->AddParameter_("id", "", true)
+            ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+            {
+                if(param->get_value()->ToString_() == "")
+                {
+                    param->set_error("El id no puede estar vacío");
+                }
+
+                return true;
+            });
+            self.IdentifyParameters_(action2_2);
+            if(!action2_2->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_2->get_identifier() + ": PIvGrSKDYx");
+                return;
+            }
+            auto filepath = action2_2->get_results()->First_();
+
+            // Process file
+            FileProcessing fp;
+            fp.file_manager = file_manager;
+            if(!filepath->IsNull_() && filepath->ToString_() != "")
+            {
+                fp.filepath = filepath->ToString_();
+                fp.Delete();
+            }
+        }
+
+        // Action 2: Delete record from table
         action2->set_sql_code(
             "DELETE FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
             " WHERE _structbi_column_" + column_id->ToString_() + " = ?"
