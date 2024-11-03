@@ -594,10 +594,13 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
 {
     if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
     {
+        // If value is empty
         if(required->Int_() == 1)
         {
+            // If value is required
             if(default_value->ToString_() == "")
             {
+                // default value is empty
                 param->set_error("Este parámetro es obligatorio");
                 return false;
             }
@@ -606,6 +609,7 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
         }
         else
         {
+            // value is not required
             if(default_value->ToString_() == "")
                 return true;
             else
@@ -614,12 +618,16 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
     }
     else if (param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
     {
+        // value is a string
         if(param->get_value()->ToString_() == "")
         {
+            // if value is empty
             if(default_value->ToString_() == "")
             {
+                // if default value is empty
                 if(required->Int_() == 1)
                 {
+                    // if value is required
                     param->set_error("Este parámetro es obligatorio");
                     return false;
                 }
@@ -631,8 +639,10 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
         }
         else
         {
+            // if value is not an empty string
             if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
             {
+                // if column type is file or image
                 if(file_processing.modify)
                 {
                     file_processing.Delete();
