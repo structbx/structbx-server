@@ -172,6 +172,39 @@ void StructBI::Functions::Forms::Add_()
             return;
         }
 
+        // Create the directory to store files
+        try
+        {
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            directory += "/" + space_id + "/" + std::to_string(form_id);
+            Poco::File file(directory);
+            if(file.exists())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+                return;
+            }
+            if(!file.createDirectory())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
+                return;
+            }
+
+            // Send results
+            self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+        }
+        catch(Poco::FileException& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
+            return;
+        }
+        catch(std::exception& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.what());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
+            return;
+        }
+
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
     });
 
@@ -251,6 +284,35 @@ void StructBI::Functions::Forms::Delete_()
             return;
         }
 
+        // Delete form directory
+        try
+        {
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            directory += "/" + space_id + "/" + id->get()->ToString_();
+            Poco::File file(directory);
+            if(file.exists())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+                return;
+            }
+            file.remove(true);
+
+            // Send results
+            self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
+        }
+        catch(Poco::FileException& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
+            return;
+        }
+        catch(std::exception& e)
+        {
+            NAF::Tools::OutputLogger::Debug_(e.what());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
+            return;
+        }
+        
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
     });
 
