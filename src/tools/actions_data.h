@@ -293,6 +293,7 @@ class StructBI::Tools::ActionsData
             FormsData(Tools::FunctionData& function_data) : 
                 read_a01_0_(function_data)
                 ,read_a01_(function_data)
+                ,read_file_a01_(function_data)
                 ,read_specific_a01_(function_data)
                 ,read_specific_a02_(function_data)
                 ,add_01_(function_data)
@@ -324,6 +325,15 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } read_a01_;
+
+            class ReadFileA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } read_file_a01_;
 
             class ReadSpecificA01 : public Tools::BaseAction
             {
