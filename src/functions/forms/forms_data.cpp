@@ -267,23 +267,42 @@ void StructBI::Functions::FormsData::ReadFile_()
 
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
+    // Action 1: Get form id
+    auto action1 = function->AddAction_("a1");
+    actions_.forms_data_.read_file_a01_.Setup_(action1);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1](NAF::Functions::Function& self)
     {
-        // Setup file manager
-        self.get_file_manager()->AddBasicSupportedFiles_();
-        self.get_file_manager()->set_directory_base(
-            NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
-        );
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.HTMLResponse_(HTTP::Status::kHTTP_NOT_FOUND, "Archivo no encontrado en el formulario actual");
+            return;
+        }
 
         // Get filepath
         auto filepath = self.GetParameter_("filepath");
         if(filepath == self.get_parameters().end())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El nombre del archivo no puede estar vacío");
+            self.HTMLResponse_(HTTP::Status::kHTTP_NOT_FOUND, "Archivo no encontrado en el formulario actual");
             return;
         }
+
+        // Get form_id
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
+        {
+            self.HTMLResponse_(HTTP::Status::kHTTP_NOT_FOUND, "Archivo no encontrado en el formulario actual");
+            return;
+        }
+
+        // Setup file manager
+        self.get_file_manager()->AddBasicSupportedFiles_();
+        self.get_file_manager()->set_directory_base(
+            NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+        );
 
         // Download process
         auto string_path = filepath->get()->ToString_();
@@ -543,7 +562,7 @@ void StructBI::Functions::FormsData::Delete_()
             // Get file manager
             auto file_manager = self.get_file_manager();
             file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
             );
 
             // Request filepath
@@ -683,7 +702,7 @@ void StructBI::Functions::FormsData::ParameterConfiguration::Setup(NAF::Function
             auto file_manager = self.get_file_manager();
             auto new_file_manager = std::make_shared<NAF::Files::FileManager>();
             file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
             );
             new_file_manager->set_directory_base(file_manager->get_directory_base());
 
