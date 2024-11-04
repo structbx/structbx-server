@@ -28,9 +28,9 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
             bool Delete();
 
             NAF::Files::FileManager::Ptr file_manager;
-            Query::Parameter::Ptr param;
-            bool modify = false;
             std::string filepath = "";
+            std::string name = "";
+            std::string error = "";
         };
         struct ParameterVerification
         {
@@ -39,14 +39,13 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
                 ,Query::Field::Ptr required
                 ,Query::Field::Ptr default_value
                 ,Query::Field::Ptr column_type
-                ,FileProcessing file_processing
             ) :
                 length(length)
                 ,required(required)
                 ,default_value(default_value)
                 ,column_type(column_type)
             {
-                this->file_processing = file_processing;
+                
             }
             bool Verify(Query::Parameter::Ptr param);
 
@@ -54,7 +53,6 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
             Query::Field::Ptr required;
             Query::Field::Ptr default_value;
             Query::Field::Ptr column_type;
-            FileProcessing file_processing;
         };
 
         void Read_();

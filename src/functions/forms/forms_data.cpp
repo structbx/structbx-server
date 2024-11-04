@@ -1,5 +1,6 @@
 
 #include "functions/forms/forms_data.h"
+#include <files/file_manager.h>
 #include <tools/dvalue.h>
 
 StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
@@ -358,6 +359,25 @@ void StructBI::Functions::FormsData::Add_()
             if(identifier->ToString_() == "id")
                 continue;
 
+            // Get file manager
+            auto file_manager = self.get_file_manager();
+            auto new_file_manager = std::make_shared<NAF::Files::FileManager>();
+            file_manager->set_directory_base(
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+            );
+            new_file_manager->set_directory_base(file_manager->get_directory_base());
+
+            // Setup current file to new file manager
+            auto found = std::find_if(file_manager->get_files().begin(), file_manager->get_files().end(), [identifier](NAF::Files::File& file)
+            {
+                return file.get_name() == identifier->ToString_();
+            });
+
+            // Verify if the file is empty and is not required
+            if(found == file_manager->get_files().end() && required->ToString_() == "0")
+                continue;
+            new_file_manager->get_files().push_back(*found);
+
             // Setup columns and values string
             if(columns == "")
             {
@@ -370,24 +390,36 @@ void StructBI::Functions::FormsData::Add_()
                 values += ", ?";
             }
 
-            // Get file manager
-            auto file_manager = self.get_file_manager();
-            file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
-            );
-
-            // Setup parameter
-            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type](Query::Parameter::Ptr param)
+            // File processing
+            if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
             {
                 FileProcessing fp;
-                fp.file_manager = file_manager;
-                fp.param = param;
-                fp.modify = false;
                 fp.filepath = "";
-                ParameterVerification pv(length, required, default_value, column_type, fp);
-                return pv.Verify(param);
-            });
+                fp.file_manager = new_file_manager;
+                if(!fp.Save())
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error en par&aacute;metro (" + identifier->ToString_() + "): " + fp.error);
+                    return;
+                }
+
+                // Setup static parameter
+                action3->AddParameter_(identifier->ToString_(), fp.filepath, false)
+                ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value, column_type](Query::Parameter::Ptr param)
+                {
+                    ParameterVerification pv(length, required, default_value, column_type);
+                    return pv.Verify(param);
+                });
+            }
+            else
+            {
+                // Setup parameter
+                action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+                ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value, column_type](Query::Parameter::Ptr param)
+                {
+                    ParameterVerification pv(length, required, default_value, column_type);
+                    return pv.Verify(param);
+                });
+            }
         }
         if(columns == "")
         {
@@ -431,16 +463,13 @@ void StructBI::Functions::FormsData::Modify_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.modify_02_.Setup_(action2);
 
-    // Action 2_1: Get old filepath
-    auto action2_1 = function->AddAction_("a2_1");
-
     // Action 3: Update record
     auto action3 = function->AddAction_("a3");
     actions_.forms_data_.modify_03_.Setup_(action3);
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action2_1, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -470,7 +499,7 @@ void StructBI::Functions::FormsData::Modify_()
             return;
         }
 
-        // Get columns from action 2
+        // Step 1: Get record columns
         std::string columns = "";
         for(auto it : *action2->get_results())
         {
@@ -491,26 +520,41 @@ void StructBI::Functions::FormsData::Modify_()
             if(identifier->ToString_() == "id")
                 continue;
 
-            // Setup columns and values string
-            if(columns == "")
-            {
-                columns = "_structbi_column_" + id->ToString_() + " = ?";
-            }
-            else
-            {
-                columns += ",_structbi_column_" + id->ToString_() + " = ?";
-            }
-
-            // Get file manager
-            auto file_manager = self.get_file_manager();
-            file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
-            );
-
-            // Setup action to get old filepath
+            // Step 2: Search column type image or file
             std::string filepath_string = "";
             if(column_type->ToString_() == "image" || column_type->ToString_() == "file")
             {
+                // Get file manager
+                auto file_manager = self.get_file_manager();
+                auto new_file_manager = std::make_shared<NAF::Files::FileManager>();
+                file_manager->set_directory_base(
+                    NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space)
+                );
+                new_file_manager->set_directory_base(file_manager->get_directory_base());
+
+                // Setup current file to new file manager
+                auto found = std::find_if(file_manager->get_files().begin(), file_manager->get_files().end(), [identifier](NAF::Files::File& file)
+                {
+                    return file.get_name() == identifier->ToString_();
+                });
+
+                // Step 4: If there is not file, do not touch the column (or filename is empty)
+                if(found == file_manager->get_files().end() || found->get_filename() == "")
+                    continue;
+                new_file_manager->get_files().push_back(*found);
+
+                // Setup columns and values string
+                if(columns == "")
+                {
+                    columns = "_structbi_column_" + id->ToString_() + " = ?";
+                }
+                else
+                {
+                    columns += ",_structbi_column_" + id->ToString_() + " = ?";
+                }
+
+                // Step 5: Verify old file saved
+                auto action2_1 = NAF::Functions::Action::Ptr(new NAF::Functions::Action("a2_1"));
                 action2_1->set_sql_code(
                     "SELECT _structbi_column_" + id->ToString_() + " "
                     "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
@@ -534,21 +578,64 @@ void StructBI::Functions::FormsData::Modify_()
                 }
                 auto filepath = action2_1->get_results()->First_();
                 if(!filepath->IsNull_())
-                    filepath_string = filepath->ToString_();
-            }
-
-            // Setup parameter
-            action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-            ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [file_manager, length, required, default_value, column_type, filepath_string](Query::Parameter::Ptr param)
-            {
+                {
+                    if(found == file_manager->get_files().end())
+                        continue;
+                    else
+                        filepath_string = filepath->ToString_();
+                }
+                
+                // Process file
                 FileProcessing fp;
-                fp.file_manager = file_manager;
-                fp.param = param;
-                fp.modify = true;
                 fp.filepath = filepath_string;
-                ParameterVerification pv(length, required, default_value, column_type, fp);
-                return pv.Verify(param);
-            });
+                fp.file_manager = new_file_manager;
+
+                // Step 6: if there is old file, delete it
+                if(fp.filepath != "")
+                {
+                    if(!fp.Delete())
+                    {
+                        self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error en par&aacute;metro (" + identifier->ToString_() + "): " + fp.error);
+                        return;
+                    }
+                }
+
+                // Step 7: Save the new file
+                if(!fp.Save())
+                {
+                    self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error en par&aacute;metro (" + identifier->ToString_() + "): " + fp.error);
+                    return;
+                }
+
+                // Setup static parameter
+                action3->AddParameter_(identifier->ToString_(), fp.filepath, false)
+                ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value, column_type](Query::Parameter::Ptr param)
+                {
+                    ParameterVerification pv(length, required, default_value, column_type);
+                    return pv.Verify(param);
+                });
+            }
+            else
+            {
+
+                // Setup columns and values string
+                if(columns == "")
+                {
+                    columns = "_structbi_column_" + id->ToString_() + " = ?";
+                }
+                else
+                {
+                    columns += ",_structbi_column_" + id->ToString_() + " = ?";
+                }
+
+                // Setup parameter
+                action3->AddParameter_(identifier->ToString_(), NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+                ->SetupCondition_(identifier->ToString_(), Query::ConditionType::kError, [length, required, default_value, column_type](Query::Parameter::Ptr param)
+                {
+                    ParameterVerification pv(length, required, default_value, column_type);
+                    return pv.Verify(param);
+                });
+            }
         }
 
         // Add id parameter
@@ -772,27 +859,6 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
             else
                 param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(default_value->ToString_())));
         }
-        else
-        {
-            // if value is not an empty string
-            if(column_type->ToString_() == "file" || column_type->ToString_() == "image")
-            {
-                // if column type is file or image
-                if(file_processing.modify)
-                {
-                    file_processing.Delete();
-                    if(!file_processing.Save())
-                        return false;
-                }
-                else
-                {
-                    if(!file_processing.Save())
-                        return false;
-                }
-
-                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(file_processing.filepath)));
-            }
-        }
     }
 
     return true;
@@ -811,17 +877,17 @@ bool StructBI::Functions::FormsData::FileProcessing::Save()
     
     if(!file_manager->ChangePathAndFilename_(front_file, file_manager->get_directory_base()))
     {
-        param->set_error("Error al subir el archivo.");
+        error = "Error al subir el archivo.";
         return false;
     }
     if(!file_manager->IsSupported_())
     {
-        param->set_error("Archivo no soportado.");
+        error = "Archivo no soportado.";
         return false;
     }
     if(!file_manager->VerifyMaxFileSize_())
     {
-        param->set_error("El archivo debe ser de menos de 5MB.");
+        error = "El archivo debe ser de menos de 5MB.";
         return false;
     }
     file_manager->UploadFile_();
