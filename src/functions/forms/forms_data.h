@@ -4,6 +4,10 @@
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
+#include <functions/action.h>
+#include <functions/function.h>
+#include <query/field.h>
+#include <query/results.h>
 
 namespace StructBI
 {
@@ -22,6 +26,23 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
         FormsData(FunctionData& function_data);
 
     protected:
+        struct ParameterConfiguration
+        {
+            enum class Type {kAdd, kModify};
+
+            ParameterConfiguration(Type type, std::string& columns, std::string& values, std::string id_space) :
+                type(type)
+                ,columns(columns)
+                ,values(values)
+                ,id_space(id_space)
+            {}
+            void Setup(NAF::Functions::Function& self, NAF::Query::Results::Ptr results, NAF::Query::Field::Ptr form_id, NAF::Query::Field::Ptr column_id, NAF::Functions::Action::Ptr action3);
+
+            Type type;
+            std::string& columns;
+            std::string& values;
+            std::string id_space;
+        };
         struct FileProcessing
         {
             bool Save();
