@@ -1368,7 +1368,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
     action_->set_sql_code(
         "UPDATE forms_columns SET " \
             "identifier = ?, name = ?, length = ?, required = ? " \
-            ",default_value = ?, description = ?, id_column_type = ?, link_to = ? " \
+            ",default_value = ?, description = ?, id_column_type = ?, link_to = ?, position = ? " \
         "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
     );
 
@@ -1446,7 +1446,25 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
         }
         return true;
     });
-    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true);
+    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+        }
+        return true;
+    });
+    action_->AddParameter_("position", "", true)
+    ->SetupCondition_("condition-position", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("La posici&oacute;n no puede estar vacía");
+            return false;
+        }
+        return true;
+    });
     action_->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
