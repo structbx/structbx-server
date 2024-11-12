@@ -1,24 +1,37 @@
 
 #include "functions/spaces/spaces_users.h"
 
-SpacesUsers::SpacesUsers(FunctionData& function_data) :
-    FunctionData(function_data)
+StructBI::Functions::SpacesUsers::SpacesUsers(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+    ,actions_(function_data)
 {
     Read_();
 }
 
-void SpacesUsers::Read_()
+void StructBI::Functions::SpacesUsers::Read_()
 {
     // Function GET /api/spaces/users/read
-    Functions::Function::Ptr function = 
-        std::make_shared<Functions::Function>("/api/spaces/users/read", HTTP::EnumMethods::kHTTP_GET);
-
-    auto action = function->AddAction_("a1");
-    action->set_sql_code(
-        "SELECT nu.username, nu.status, nu.created_at, ng.id AS id_group, ng.`group` AS 'group' " \
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/users/read", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT nu.*, ng.group AS 'group' " \
         "FROM _naf_users nu " \
-        "JOIN _naf_groups ng ON ng.id = nu.id_group"
+        "JOIN _naf_groups ng ON ng.id = nu.id_group " \
+        "JOIN spaces_users sp ON sp.id_naf_user = nu.id " \
+        "WHERE sp.id_space = ?"
     );
+    action1->AddParameter_("id_space", get_space_id(), true)
+    ->SetupCondition_("condition-id_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 
     get_functions()->push_back(function);
 }

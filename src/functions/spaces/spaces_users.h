@@ -3,15 +3,30 @@
 #define STRUCTBI_FUNCTIONS_SPACESUSERS
 
 
-#include "function_data.h"
+#include "tools/function_data.h"
+#include "tools/actions_data.h"
 
-class SpacesUsers : public FunctionData
+namespace StructBI
+{
+    namespace Functions
+    {
+        class SpacesUsers;
+    }
+}
+
+using namespace StructBI;
+using namespace NAF;
+class StructBI::Functions::SpacesUsers : public Tools::FunctionData
 {
     public:
-        SpacesUsers(FunctionData& function_data);
-    
+        SpacesUsers(Tools::FunctionData& function_data);
+        
     protected:
         void Read_();
+
+    private:
+        Tools::ActionsData actions_;
+
 };
 
 #endif //STRUCTBI_FUNCTIONS_SPACESUSERS
