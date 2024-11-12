@@ -7,7 +7,7 @@
 
 #include "tools/function_data.h"
 #include "functions/spaces/spaces.h"
-//#include "functions/spaces/spaces_users.h"
+#include "functions/spaces/spaces_users.h"
 //#include "functions/spaces/spaces_logo.h"
 #include "functions/forms/forms.h"
 #include "functions/forms/forms_data.h"

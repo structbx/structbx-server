@@ -16,12 +16,12 @@ void BackendServer::AddFunctions_()
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     
     // Spaces Users
-    /*auto spaces_users = SpacesUsers(function_data_);
+    auto spaces_users = Functions::SpacesUsers(function_data_);
     for(auto it : *spaces_users.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
     
     // Spaces Logo
-    auto spaces_logo = SpacesLogo(function_data_);
+    /*auto spaces_logo = SpacesLogo(function_data_);
     for(auto it : *spaces_logo.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));*/
     
