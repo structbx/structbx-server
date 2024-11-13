@@ -77,10 +77,11 @@ set(
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/organizations/main.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/organizations/users.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/spaces/spaces.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/forms.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_data.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_columns.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/spaces/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/spaces/users.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/forms/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/forms/data.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/forms/columns.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/actions_data.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/base64_tool.cpp
