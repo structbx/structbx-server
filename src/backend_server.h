@@ -7,12 +7,8 @@
 
 #include "tools/function_data.h"
 #include "functions/organizations/main.h"
-#include "functions/organizations/users.h"
-#include "functions/spaces/spaces.h"
-#include "functions/spaces/spaces_users.h"
-#include "functions/forms/forms.h"
-#include "functions/forms/forms_data.h"
-#include "functions/forms/forms_columns.h"
+#include "functions/spaces/main.h"
+#include "functions/forms/main.h"
 
 namespace StructBI
 {

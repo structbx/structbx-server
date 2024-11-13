@@ -1,6 +1,5 @@
 
 #include "backend_server.h"
-#include "functions/organizations/main.h"
 
 using namespace StructBI::Functions;
 
@@ -15,10 +14,8 @@ void BackendServer::AddFunctions_()
 {
     // Functions
     auto organizations = Organizations::Main(function_data_);
-    auto spaces = Spaces(function_data_);
-    auto forms = Forms(function_data_);
-    auto forms_data = FormsData(function_data_);
-    auto forms_columns = FormsColumns(function_data_);
+    auto spaces = Spaces::Main(function_data_);
+    auto forms = Forms::Main(function_data_);
 
     // Add all functions
     for(auto it : *function_data_.get_functions())
