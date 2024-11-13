@@ -17,3 +17,4 @@ logger_output_file: "structbi.log"
 debug: true
 
 directory_for_uploaded_files : "/var/www/structbi-web-uploaded"
+space_id_cookie_name: "1f3efd18688d2b844f4fa1e800712c9b5750c031"
