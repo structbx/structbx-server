@@ -1,18 +1,19 @@
 
-#include "functions/organizations.h"
-#include <query/parameter.h>
+#include "functions/organizations/main.h"
+#include "functions/organizations/users.h"
 
-using namespace StructBI::Functions;
+using namespace StructBI::Functions::Organizations;
 
-Organizations::Organizations(Tools::FunctionData& function_data) :
+Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
+    ,users_(function_data)
 {
     Read_();
     Modify_();
 }
 
-void Organizations::Read_()
+void Main::Read_()
 {
     // Function GET /api/organizations/read
     NAF::Functions::Function::Ptr function = 
@@ -30,7 +31,7 @@ void Organizations::Read_()
     get_functions()->push_back(function);
 }
 
-void Organizations::Modify_()
+void Main::Modify_()
 {
     // Function GET /api/organizations/modify
     NAF::Functions::Function::Ptr function = 
