@@ -4,7 +4,7 @@
 using namespace StructBI::Functions;
 
 BackendServer::BackendServer() :
-    space_id_cookie_("1f3efd18688d2b844f4fa1e800712c9b5750c031", "")
+    space_id_cookie_(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), "")
     ,add_space_id_cookie_(false)
 {
 
@@ -75,7 +75,7 @@ void BackendServer::SetupFunctionData_()
     // Get Cookie Space ID
     Poco::Net::NameValueCollection cookies;
     get_http_server_request().value()->getCookies(cookies);
-    auto cookie_space_id = cookies.find("1f3efd18688d2b844f4fa1e800712c9b5750c031");
+    auto cookie_space_id = cookies.find(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"));
 
     // Set Space ID if exists in Cookies
     if(cookie_space_id != cookies.end())
@@ -107,7 +107,7 @@ void BackendServer::SetupFunctionData_()
                 // Save Space ID to Cookie
                 auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(space_id->ToString_());
 
-                Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
+                Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
                 cookie.setPath("/");
                 cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
                 cookie.setSecure(true);

@@ -163,7 +163,7 @@ void Main::Change_()
         {
             // Set Cookie Space ID
             auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(field->ToString_());
-            Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
+            Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
             cookie.setPath("/");
             cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
             cookie.setSecure(true);

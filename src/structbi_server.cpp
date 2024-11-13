@@ -18,6 +18,7 @@ using namespace NAF;
 void SetupSettings()
 {
     NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbi-web-uploaded"));
+    NAF::Tools::SettingsManager::AddSetting_("space_id_cookie_name", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("1f3efd18688d2"));
 }
 
 int main(int argc, char** argv)
@@ -25,9 +26,12 @@ int main(int argc, char** argv)
     // Setup
         Core::NebulaAtom app(true);
 
+    // Setup settings
+        SetupSettings();
         NAF::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
-        SetupSettings();
+
+    // Setup
         NAF::Query::DatabaseManager::StartMySQL_();
         NAF::Security::PermissionsManager::LoadPermissions_();
         NAF::Tools::SessionsManager::ReadSessions_();
