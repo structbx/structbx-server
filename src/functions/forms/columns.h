@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_FORMSCOLUMNS
-#define STRUCTBI_FUNCTIONS_FORMSCOLUMNS
+#ifndef STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H
+#define STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
@@ -9,14 +9,17 @@ namespace StructBI
 {
     namespace Functions
     {
-        class FormsColumns;
+        namespace Forms
+        {
+            class Columns;
+        }
     }
 }
 
 using namespace StructBI;
 using namespace NAF;
 
-class StructBI::Functions::FormsColumns : public Tools::FunctionData
+class StructBI::Functions::Forms::Columns : public Tools::FunctionData
 {
     public:
         struct ColumnVariables
@@ -43,7 +46,7 @@ class StructBI::Functions::FormsColumns : public Tools::FunctionData
             bool Setup(std::string column_type_id, std::string& column_type, std::string& length_value);
         };
 
-        FormsColumns(Tools::FunctionData& function_data);
+        Columns(Tools::FunctionData& function_data);
 
     protected:
         void Read_();
@@ -57,4 +60,4 @@ class StructBI::Functions::FormsColumns : public Tools::FunctionData
         Tools::ActionsData actions_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_FORMSCOLUMNS
+#endif //STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H

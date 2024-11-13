@@ -1,7 +1,9 @@
 
-#include "functions/forms/forms_columns.h"
+#include "functions/forms/columns.h"
 
-StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_data) :
+using namespace StructBI::Functions::Forms;
+
+Columns::Columns(Tools::FunctionData& function_data) :
     FunctionData(function_data)
     ,actions_(function_data)
 {
@@ -13,7 +15,7 @@ StructBI::Functions::FormsColumns::FormsColumns(Tools::FunctionData& function_da
     Delete_();
 }
 
-void StructBI::Functions::FormsColumns::Read_()
+void Columns::Read_()
 {
     // Function GET /api/forms/columns/read
     NAF::Functions::Function::Ptr function = 
@@ -25,7 +27,7 @@ void StructBI::Functions::FormsColumns::Read_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsColumns::ReadSpecific_()
+void Columns::ReadSpecific_()
 {
     // Function GET /api/forms/columns/read/id
     NAF::Functions::Function::Ptr function = 
@@ -37,7 +39,7 @@ void StructBI::Functions::FormsColumns::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsColumns::ReadTypes_()
+void Columns::ReadTypes_()
 {
     // Function GET /api/forms/columns/types/read
     NAF::Functions::Function::Ptr function = 
@@ -49,7 +51,7 @@ void StructBI::Functions::FormsColumns::ReadTypes_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsColumns::Add_()
+void Columns::Add_()
 {
     // Function POST /api/forms/columns/add
     NAF::Functions::Function::Ptr function = 
@@ -198,7 +200,7 @@ void StructBI::Functions::FormsColumns::Add_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsColumns::Modify_()
+void Columns::Modify_()
 {
     // Function POST /api/forms/columns/modify
     NAF::Functions::Function::Ptr function = 
@@ -287,7 +289,7 @@ void StructBI::Functions::FormsColumns::Modify_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsColumns::Delete_()
+void Columns::Delete_()
 {
     // Function GET /api/forms/columns/delete
     NAF::Functions::Function::Ptr function = 
@@ -373,7 +375,7 @@ void StructBI::Functions::FormsColumns::Delete_()
     get_functions()->push_back(function);
 }
 
-bool StructBI::Functions::FormsColumns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)
+bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)
 {
     // Get parameters
     auto end = self.get_parameters().end();
@@ -419,7 +421,7 @@ bool StructBI::Functions::FormsColumns::ColumnSetup::Setup(NAF::Functions::Funct
     return true;
 }
 
-bool StructBI::Functions::FormsColumns::ColumnTypeSetup::Setup(std::string column_type_id, std::string& column_type, std::string& length_value)
+bool Columns::ColumnTypeSetup::Setup(std::string column_type_id, std::string& column_type, std::string& length_value)
 {
     if(column_type_id == "1")
     {
