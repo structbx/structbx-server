@@ -84,7 +84,6 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/forms/columns.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/actions_data.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
-    ${PROJECT_SOURCE_DIR}/src/tools/base64_tool.cpp
 )
 
 # Executable
