@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_ORGANIZATIONS_H
-#define STRUCTBI_FUNCTIONS_ORGANIZATIONS_H
+#ifndef STRUCTBI_FUNCTIONS_ORGANIZATIONS_MAIN_H
+#define STRUCTBI_FUNCTIONS_ORGANIZATIONS_MAIN_H
 
 
 #include "tools/function_data.h"
@@ -37,4 +37,4 @@ class StructBI::Functions::Organizations::Main : public Tools::FunctionData
 
 };
 
-#endif //STRUCTBI_FUNCTIONS_ORGANIZATIONS_H
+#endif //STRUCTBI_FUNCTIONS_ORGANIZATIONS_MAIN_H
