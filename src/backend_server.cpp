@@ -1,5 +1,8 @@
 
 #include "backend_server.h"
+#include "functions/organizations/main.h"
+
+using namespace StructBI::Functions;
 
 BackendServer::BackendServer() :
     space_id_cookie_("1f3efd18688d2b844f4fa1e800712c9b5750c031", "")
@@ -10,29 +13,15 @@ BackendServer::BackendServer() :
 
 void BackendServer::AddFunctions_()
 {
-    // Organizations
-    auto organizations = Functions::Organizations(function_data_);
-    for(auto it : *organizations.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    
-    // Spaces
-    auto spaces = Functions::Spaces(function_data_);
-    for(auto it : *spaces.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-    
-    // Forms
-    auto forms = Functions::Forms(function_data_);
-    for(auto it : *forms.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
+    // Functions
+    auto organizations = Organizations::Main(function_data_);
+    auto spaces = Spaces(function_data_);
+    auto forms = Forms(function_data_);
+    auto forms_data = FormsData(function_data_);
+    auto forms_columns = FormsColumns(function_data_);
 
-    // Forms Data
-    auto forms_data = Functions::FormsData(function_data_);
-    for(auto it : *forms_data.get_functions())
-        get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
-
-    // Forms Columns
-    auto forms_columns = Functions::FormsColumns(function_data_);
-    for(auto it : *forms_columns.get_functions())
+    // Add all functions
+    for(auto it : *function_data_.get_functions())
         get_functions_manager().get_functions().insert(std::make_pair(it->get_endpoint(), it));
 }
 
