@@ -80,7 +80,7 @@ void BackendServer::SetupFunctionData_()
     // Set Space ID if exists in Cookies
     if(cookie_space_id != cookies.end())
     {
-        auto space_id_decoded = Tools::Base64Tool().Decode_(cookie_space_id->second);
+        auto space_id_decoded = NAF::Tools::Base64Tool().Decode_(cookie_space_id->second);
         function_data_.set_space_id(space_id_decoded);
     }
     else
@@ -105,7 +105,7 @@ void BackendServer::SetupFunctionData_()
                 function_data_.set_space_id(space_id->ToString_());
 
                 // Save Space ID to Cookie
-                auto space_id_encoded = Tools::Base64Tool().Encode_(space_id->ToString_());
+                auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(space_id->ToString_());
 
                 Net::HTTPCookie cookie("1f3efd18688d2b844f4fa1e800712c9b5750c031", space_id_encoded);
                 cookie.setPath("/");

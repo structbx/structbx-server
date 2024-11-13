@@ -9,6 +9,8 @@
 #include "handlers/backend_handler.h"
 #include "functions/function.h"
 #include "tools/dvalue.h"
+#include "tools/hmac_tool.h"
+#include "tools/base64_tool.h"
 
 #include "tools/id_checker.h"
 

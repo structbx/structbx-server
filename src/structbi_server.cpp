@@ -6,6 +6,8 @@
 #include "tools/route.h"
 #include <query/parameter.h>
 #include <tools/dvalue.h>
+#include <tools/output_logger.h>
+#include <tools/hmac_tool.h>
 
 #include "web_server.h"
 #include "backend_server.h"
@@ -56,7 +58,20 @@ int main(int argc, char** argv)
                     NAF::Tools::Route logout_route("/api/system/logout");
 
                     if(requested_route == login_route || requested_route == logout_route)
+                    {
                         handler = new NAF::Handlers::LoginHandler();
+                        auto password = handler->get_users_manager().get_action()->GetParameter("password");
+                        if(password != handler->get_users_manager().get_action()->get_parameters().end())
+                        {
+                            password->get()->SetupCondition_("condition-password", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
+                            {
+                                std::string password = param->ToString_();
+                                std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
+                                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+                                return true;
+                            });
+                        }
+                    }
                     else
                         handler = new StructBI::BackendServer;
 
