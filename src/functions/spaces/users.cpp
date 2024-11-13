@@ -1,14 +1,16 @@
 
-#include "functions/spaces/spaces_users.h"
+#include "functions/spaces/users.h"
 
-StructBI::Functions::SpacesUsers::SpacesUsers(Tools::FunctionData& function_data) :
+using namespace StructBI::Functions::Spaces;
+
+Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
 {
     Read_();
 }
 
-void StructBI::Functions::SpacesUsers::Read_()
+void Users::Read_()
 {
     // Function GET /api/spaces/users/read
     NAF::Functions::Function::Ptr function = 
