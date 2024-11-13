@@ -1,9 +1,13 @@
 
-#include "functions/forms/forms.h"
+#include "functions/forms/main.h"
 
-StructBI::Functions::Forms::Forms(Tools::FunctionData& function_data) :
+using namespace StructBI::Functions::Forms;
+
+Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
+    ,data_(function_data)
+    ,columns_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -12,7 +16,7 @@ StructBI::Functions::Forms::Forms(Tools::FunctionData& function_data) :
     Delete_();
 }
 
-void StructBI::Functions::Forms::Read_()
+void Main::Read_()
 {
     // Function GET /api/forms/read
     NAF::Functions::Function::Ptr function = 
@@ -72,7 +76,7 @@ void StructBI::Functions::Forms::Read_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Forms::ReadSpecific_()
+void Main::ReadSpecific_()
 {
     // Function GET /api/forms/read/id
     NAF::Functions::Function::Ptr function = 
@@ -93,7 +97,7 @@ void StructBI::Functions::Forms::ReadSpecific_()
     get_functions()->push_back(function2);
 }
 
-void StructBI::Functions::Forms::Add_()
+void Main::Add_()
 {
     // Function POST /api/forms/add
     NAF::Functions::Function::Ptr function = 
@@ -211,7 +215,7 @@ void StructBI::Functions::Forms::Add_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Forms::Modify_()
+void Main::Modify_()
 {
     // Function PUT /api/forms/modify
     NAF::Functions::Function::Ptr function = 
@@ -232,7 +236,7 @@ void StructBI::Functions::Forms::Modify_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Forms::Delete_()
+void Main::Delete_()
 {
     // Function DEL /api/forms/delete
     NAF::Functions::Function::Ptr function = 
