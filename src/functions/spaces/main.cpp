@@ -1,9 +1,12 @@
 
-#include "functions/spaces/spaces.h"
+#include "functions/spaces/main.h"
 
-StructBI::Functions::Spaces::Spaces(Tools::FunctionData& function_data) :
+using namespace StructBI::Functions::Spaces;
+
+Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
+    ,users_(function_data)
 {
     Read_();
     ReadSpecific_();
@@ -13,7 +16,7 @@ StructBI::Functions::Spaces::Spaces(Tools::FunctionData& function_data) :
     Delete_();
 }
 
-void StructBI::Functions::Spaces::Read_()
+void Main::Read_()
 {
     // Function GET /api/spaces/read
     NAF::Functions::Function::Ptr function = 
@@ -75,7 +78,7 @@ void StructBI::Functions::Spaces::Read_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Spaces::ReadSpecific_()
+void Main::ReadSpecific_()
 {
     // Function GET /api/spaces/read/id
     NAF::Functions::Function::Ptr function = 
@@ -125,7 +128,7 @@ void StructBI::Functions::Spaces::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Spaces::Change_()
+void Main::Change_()
 {
     // Function GET /api/spaces/change
     NAF::Functions::Function::Ptr function = 
@@ -179,7 +182,7 @@ void StructBI::Functions::Spaces::Change_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Spaces::Add_()
+void Main::Add_()
 {
     // Function GET /api/spaces/add
     NAF::Functions::Function::Ptr function = 
@@ -281,7 +284,7 @@ void StructBI::Functions::Spaces::Add_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Spaces::Modify_()
+void Main::Modify_()
 {
     // Function PUT /api/spaces/modify
     NAF::Functions::Function::Ptr function = 
@@ -302,7 +305,7 @@ void StructBI::Functions::Spaces::Modify_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::Spaces::Delete_()
+void Main::Delete_()
 {
     // Function GET /api/spaces/delete
     NAF::Functions::Function::Ptr function = 
