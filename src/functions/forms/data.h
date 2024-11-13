@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_FORMSDATA
-#define STRUCTBI_FUNCTIONS_FORMSDATA
+#ifndef STRUCTBI_FUNCTIONS_FORMS_DATA_H
+#define STRUCTBI_FUNCTIONS_FORMS_DATA_H
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
@@ -13,17 +13,20 @@ namespace StructBI
 {
     namespace Functions
     {
-        class FormsData;
+        namespace Forms
+        {
+            class Data;
+        }
     }
 }
 
 using namespace StructBI;
 using namespace NAF;
 
-class StructBI::Functions::FormsData : public Tools::FunctionData
+class StructBI::Functions::Forms::Data : public Tools::FunctionData
 {
     public:
-        FormsData(FunctionData& function_data);
+        Data(FunctionData& function_data);
 
     protected:
         struct ParameterConfiguration
@@ -87,4 +90,4 @@ class StructBI::Functions::FormsData : public Tools::FunctionData
         Tools::ActionsData actions_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_FORMSDATA
+#endif //STRUCTBI_FUNCTIONS_FORMS_DATA_H

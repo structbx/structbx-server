@@ -1,9 +1,10 @@
 
-#include "functions/forms/forms_data.h"
-#include <files/file_manager.h>
-#include <tools/dvalue.h>
+#include "functions/forms/data.h"
 
-StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
+using namespace StructBI::Functions;
+using namespace StructBI::Functions::Forms;
+
+Forms::Data::Data(Tools::FunctionData& function_data) :
     FunctionData(function_data)
     ,actions_(function_data)
 {
@@ -15,7 +16,7 @@ StructBI::Functions::FormsData::FormsData(Tools::FunctionData& function_data) :
     Delete_();
 }
 
-void StructBI::Functions::FormsData::Read_()
+void Forms::Data::Read_()
 {
     // Function GET /api/forms/data/read
     NAF::Functions::Function::Ptr function = 
@@ -157,7 +158,7 @@ void StructBI::Functions::FormsData::Read_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsData::ReadSpecific_()
+void Forms::Data::ReadSpecific_()
 {
     // Function GET /api/forms/data/read/id
     NAF::Functions::Function::Ptr function = 
@@ -259,7 +260,7 @@ void StructBI::Functions::FormsData::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsData::ReadFile_()
+void Forms::Data::ReadFile_()
 {
     // Function GET /api/forms/data/file/read
     NAF::Functions::Function::Ptr function = 
@@ -312,7 +313,7 @@ void StructBI::Functions::FormsData::ReadFile_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsData::Add_()
+void Forms::Data::Add_()
 {
     // Function GET /api/forms/data/add
     NAF::Functions::Function::Ptr function = 
@@ -389,7 +390,7 @@ void StructBI::Functions::FormsData::Add_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsData::Modify_()
+void Forms::Data::Modify_()
 {
     // Function GET /api/forms/data/modify
     NAF::Functions::Function::Ptr function = 
@@ -486,7 +487,7 @@ void StructBI::Functions::FormsData::Modify_()
     get_functions()->push_back(function);
 }
 
-void StructBI::Functions::FormsData::Delete_()
+void Forms::Data::Delete_()
 {
     // Function GET /api/forms/data/delete
     NAF::Functions::Function::Ptr function = 
@@ -621,7 +622,7 @@ void StructBI::Functions::FormsData::Delete_()
     get_functions()->push_back(function);
 }
 
-bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parameter::Ptr param)
+bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
 {
     if(param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty))
     {
@@ -673,7 +674,7 @@ bool StructBI::Functions::FormsData::ParameterVerification::Verify(Query::Parame
     return true;
 }
 
-void StructBI::Functions::FormsData::ParameterConfiguration::Setup(NAF::Functions::Function& self, NAF::Query::Results::Ptr results, NAF::Query::Field::Ptr form_id, NAF::Query::Field::Ptr column_id, NAF::Functions::Action::Ptr action3)
+void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, NAF::Query::Results::Ptr results, NAF::Query::Field::Ptr form_id, NAF::Query::Field::Ptr column_id, NAF::Functions::Action::Ptr action3)
 {
     // Setp 1: Iterate over columns
     for(auto it : *results)
@@ -850,7 +851,7 @@ void StructBI::Functions::FormsData::ParameterConfiguration::Setup(NAF::Function
     }
 }
 
-bool StructBI::Functions::FormsData::FileProcessing::Save()
+bool Forms::Data::FileProcessing::Save()
 {
     filepath = "";
 
@@ -882,7 +883,7 @@ bool StructBI::Functions::FormsData::FileProcessing::Save()
     return true; 
 }
 
-bool StructBI::Functions::FormsData::FileProcessing::Delete()
+bool Forms::Data::FileProcessing::Delete()
 {
     // Verify logo exists and remove it
     Files::FileManager file_manager;
