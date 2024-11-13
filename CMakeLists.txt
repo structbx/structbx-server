@@ -75,9 +75,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/structbi_server.cpp
     ${PROJECT_SOURCE_DIR}/src/web_server.cpp
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/organizations.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/spaces/spaces.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/spaces/spaces_users.cpp
-    #${PROJECT_SOURCE_DIR}/src/functions/spaces/spaces_logo.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_data.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/forms_columns.cpp
