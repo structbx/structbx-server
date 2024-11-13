@@ -24,6 +24,7 @@ class StructBI::Functions::Organizations : public Tools::FunctionData
         
     protected:
         void Read_();
+        void Modify_();
 
     private:
         Tools::ActionsData actions_;
