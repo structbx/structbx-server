@@ -23,9 +23,11 @@ class StructBI::Tools::IDChecker
 
         bool Check_(std::string id);
         bool CheckNumbers_(std::string id);
+        bool CheckEmail_(std::string id);
 
         std::list<char> allowed_characters_;
         std::list<char> allowed_characters_numbers_;
+        std::list<char> allowed_characters_email_;
 
         std::string id_;
 };
