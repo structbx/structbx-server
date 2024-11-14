@@ -1,5 +1,7 @@
 
 #include "functions/spaces/main.h"
+#include <string>
+#include <tools/output_logger.h>
 
 using namespace StructBI::Functions::Spaces;
 
@@ -59,12 +61,45 @@ void Main::Read_()
                 return;
             }
 
+            // Size of space directory
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            directory += "/" + id->ToString_();
+            float directory_size = 0;
+            DirectoryIterator it(directory);
+            DirectoryIterator end;
+            while (it != end)
+            {
+                if(it->isDirectory())
+                {
+                    directory_size += it->getSize();
+                    DirectoryIterator it2(it.path());
+                    while (it2 != end)
+                    {
+                        directory_size += it2->getSize();
+                        ++it2;
+                    }
+                }
+                else
+                {
+                    directory_size += it->getSize();
+                }
+
+                ++it;
+            }
+            directory_size = directory_size / 1024.f / 1024.f;
+
             // Get results
             auto size = action2.get_results()->First_();
             if(size->IsNull_())
+            {
                 row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(0)));
+                row->AddField_("directory_size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(directory_size)));
+            }
             else
+            {
                 row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(size->Float_())));
+                row->AddField_("directory_size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(directory_size)));
+            }
 
         }
 

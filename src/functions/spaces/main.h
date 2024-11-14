@@ -2,6 +2,7 @@
 #ifndef STRUCTBI_FUNCTIONS_SPACES_MAIN_H
 #define STRUCTBI_FUNCTIONS_SPACES_MAIN_H
 
+#include "Poco/DirectoryIterator.h"
 
 #include "tools/function_data.h"
 #include "tools/base64_tool.h"
