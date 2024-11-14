@@ -20,10 +20,10 @@ void Users::Read_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.*, ng.group AS 'group' " \
-        "FROM _naf_users nu " \
-        "JOIN _naf_groups ng ON ng.id = nu.id_group " \
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id " \
+        "SELECT nu.*, ng.group AS 'group' "
+        "FROM _naf_users nu "
+        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
         "WHERE ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ?)"
     );
     action1->AddParameter_("id_user", get_id_user(), false);
@@ -39,10 +39,10 @@ void Users::ReadCurrent_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.*, ng.group AS 'group' " \
-        "FROM _naf_users nu " \
-        "JOIN _naf_groups ng ON ng.id = nu.id_group " \
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id " \
+        "SELECT nu.*, ng.group AS 'group' "
+        "FROM _naf_users nu "
+        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
         "WHERE ou.id_naf_user = ?"
     );
     action1->AddParameter_("id_user", get_id_user(), false);
