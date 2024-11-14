@@ -40,6 +40,34 @@ class StructBI::Tools::ActionsData
         } element_name_;
         */
 
+        struct OrganizationsUsers
+        {
+            OrganizationsUsers(Tools::FunctionData& function_data) : 
+                modify_a01_(function_data)
+                ,modify_a02_(function_data)
+            {
+                
+            }
+
+            class ModifyA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } modify_a01_;
+
+            class ModifyA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } modify_a02_;
+        } organizations_users_;
+
         struct Spaces
         {
             Spaces(Tools::FunctionData& function_data) : 

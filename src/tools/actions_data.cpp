@@ -1,10 +1,11 @@
 
 #include "tools/actions_data.h"
-#include <functions/action.h>
-#include <tools/dvalue.h>
 
-StructBI::Tools::ActionsData::ActionsData(StructBI::Tools::FunctionData& function_data) : 
-    spaces_(function_data)
+using namespace StructBI::Tools;
+
+ActionsData::ActionsData(FunctionData& function_data) : 
+    organizations_users_(function_data)
+    ,spaces_(function_data)
     ,forms_(function_data)
     ,forms_data_(function_data)
     ,forms_columns_(function_data)
@@ -12,7 +13,76 @@ StructBI::Tools::ActionsData::ActionsData(StructBI::Tools::FunctionData& functio
     
 }
 
-void StructBI::Tools::ActionsData::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::OrganizationsUsers::ModifyA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_final(false);
+    action_->set_sql_code("SELECT id FROM _naf_users WHERE username = ? AND id != ?");
+    action_->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Este nombre de usuario ya est&aacute; registrado");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("username", "", true)
+    ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El nombre de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id", get_id_user(), false);
+}
+
+void ActionsData::OrganizationsUsers::ModifyA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "UPDATE _naf_users "
+        "SET username = ? "
+        "WHERE id = ?"
+    );
+
+    action_->AddParameter_("username", "", true)
+    ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre de usuario debe ser una cadena de texto");
+            return false;
+        }
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre de usuario no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() < 3)
+        {
+            param->set_error("El nombre de usuario no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().CheckEmail_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El nombre de usuario solo puede tener a-z, A-Z, 0-9, \"_\", \".\", \"@\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
+void ActionsData::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
