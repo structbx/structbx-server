@@ -96,7 +96,7 @@ void ActionsData::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
 
 }
 
-void StructBI::Tools::ActionsData::Spaces::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -110,7 +110,7 @@ void StructBI::Tools::ActionsData::Spaces::ReadSpecificA01::Setup_(Functions::Ac
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Spaces::AddA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::AddA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -138,7 +138,7 @@ void StructBI::Tools::ActionsData::Spaces::AddA01::Setup_(Functions::Action::Ptr
     });
 }
 
-void StructBI::Tools::ActionsData::Spaces::AddA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::AddA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -184,7 +184,7 @@ void StructBI::Tools::ActionsData::Spaces::AddA02::Setup_(Functions::Action::Ptr
     action_->AddParameter_("description", "", true);
 }
 
-void StructBI::Tools::ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -196,7 +196,7 @@ void StructBI::Tools::ActionsData::Spaces::AddA03::Setup_(Functions::Action::Ptr
     action_->AddParameter_("identifier", "", true);
 }
 
-void StructBI::Tools::ActionsData::Spaces::ChangeA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::ChangeA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -219,7 +219,7 @@ void StructBI::Tools::ActionsData::Spaces::ChangeA01::Setup_(Functions::Action::
     });
 }
 
-void StructBI::Tools::ActionsData::Spaces::ModifyA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -243,7 +243,7 @@ void StructBI::Tools::ActionsData::Spaces::ModifyA01::Setup_(Functions::Action::
     action_->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
-void StructBI::Tools::ActionsData::Spaces::ModifyA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::ModifyA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -283,7 +283,7 @@ void StructBI::Tools::ActionsData::Spaces::ModifyA02::Setup_(Functions::Action::
     });
 }
 
-void StructBI::Tools::ActionsData::Spaces::ModifyA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -354,7 +354,7 @@ void StructBI::Tools::ActionsData::Spaces::ModifyA03::Setup_(Functions::Action::
     });
 }
 
-void StructBI::Tools::ActionsData::Spaces::DeleteA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::DeleteA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -378,7 +378,7 @@ void StructBI::Tools::ActionsData::Spaces::DeleteA01::Setup_(Functions::Action::
     action_->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
-void StructBI::Tools::ActionsData::Spaces::DeleteA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::DeleteA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -402,7 +402,7 @@ void StructBI::Tools::ActionsData::Spaces::DeleteA02::Setup_(Functions::Action::
     });
 }
 
-void StructBI::Tools::ActionsData::Spaces::DeleteA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::Spaces::DeleteA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -420,7 +420,7 @@ void StructBI::Tools::ActionsData::Spaces::DeleteA03::Setup_(Functions::Action::
     });
 }
 
-void StructBI::Tools::ActionsData::Forms::ReadA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -434,7 +434,7 @@ void StructBI::Tools::ActionsData::Forms::ReadA01::Setup_(Functions::Action::Ptr
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -453,7 +453,7 @@ void StructBI::Tools::ActionsData::Forms::ReadSpecificA01::Setup_(Functions::Act
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -473,7 +473,7 @@ void StructBI::Tools::ActionsData::Forms::ReadSpecificA02::Setup_(Functions::Act
 
 }
 
-void StructBI::Tools::ActionsData::Forms::AddA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::AddA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -504,7 +504,7 @@ void StructBI::Tools::ActionsData::Forms::AddA01::Setup_(Functions::Action::Ptr 
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::AddA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::AddA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -563,7 +563,7 @@ void StructBI::Tools::ActionsData::Forms::AddA02::Setup_(Functions::Action::Ptr 
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::AddA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -586,7 +586,7 @@ void StructBI::Tools::ActionsData::Forms::AddA03::Setup_(Functions::Action::Ptr 
     action_->AddParameter_("space_id", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::ModifyA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -615,7 +615,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA01::Setup_(Functions::Action::P
     });
 }
 
-void StructBI::Tools::ActionsData::Forms::ModifyA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ModifyA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -656,7 +656,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA02::Setup_(Functions::Action::P
     action_->AddParameter_("space_id", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::Forms::ModifyA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -731,7 +731,7 @@ void StructBI::Tools::ActionsData::Forms::ModifyA03::Setup_(Functions::Action::P
 
 }
 
-void StructBI::Tools::ActionsData::Forms::DeleteA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::DeleteA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -760,7 +760,7 @@ void StructBI::Tools::ActionsData::Forms::DeleteA01::Setup_(Functions::Action::P
     });
 }
 
-void StructBI::Tools::ActionsData::Forms::DeleteA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::Forms::DeleteA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -769,7 +769,7 @@ void StructBI::Tools::ActionsData::Forms::DeleteA02::Setup_(Functions::Action::P
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadA01_0::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ReadA01_0::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -794,7 +794,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadA01_0::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -824,7 +824,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadA01::Setup_(Functions::Action:
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadFileA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ReadFileA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -848,7 +848,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadFileA01::Setup_(Functions::Act
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -878,7 +878,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA01::Setup_(Functions:
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ReadSpecificA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -894,7 +894,7 @@ void StructBI::Tools::ActionsData::FormsData::ReadSpecificA02::Setup_(Functions:
     });
 }
 
-void StructBI::Tools::ActionsData::FormsData::AddA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::AddA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -925,7 +925,7 @@ void StructBI::Tools::ActionsData::FormsData::AddA01::Setup_(Functions::Action::
 
 }
 
-void StructBI::Tools::ActionsData::FormsData::AddA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::AddA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -951,14 +951,14 @@ void StructBI::Tools::ActionsData::FormsData::AddA02::Setup_(Functions::Action::
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::AddA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
 
 }
 
-void StructBI::Tools::ActionsData::FormsData::ModifyA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -994,7 +994,7 @@ void StructBI::Tools::ActionsData::FormsData::ModifyA01::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ModifyA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ModifyA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1020,13 +1020,13 @@ void StructBI::Tools::ActionsData::FormsData::ModifyA02::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::ModifyA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
 }
 
-void StructBI::Tools::ActionsData::FormsData::DeleteA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::DeleteA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1062,7 +1062,7 @@ void StructBI::Tools::ActionsData::FormsData::DeleteA01::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsData::DeleteA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsData::DeleteA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1078,7 +1078,7 @@ void StructBI::Tools::ActionsData::FormsData::DeleteA02::Setup_(Functions::Actio
     });
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1109,7 +1109,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadA01::Setup_(Functions::Acti
     });
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1148,14 +1148,14 @@ void StructBI::Tools::ActionsData::FormsColumns::ReadSpecificA01::Setup_(Functio
     });
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ReadTypesA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ReadTypesA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
     action_->set_sql_code("SELECT * FROM forms_columns_types ");
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::AddA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::AddA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1186,7 +1186,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA01::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::AddA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1232,7 +1232,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA02::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::AddA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
     
@@ -1345,7 +1345,7 @@ void StructBI::Tools::ActionsData::FormsColumns::AddA03::Setup_(Functions::Actio
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ModifyA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1376,7 +1376,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA01::Setup_(Functions::Ac
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ModifyA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ModifyA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1431,7 +1431,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA02::Setup_(Functions::Ac
     });
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
     
@@ -1558,7 +1558,7 @@ void StructBI::Tools::ActionsData::FormsColumns::ModifyA03::Setup_(Functions::Ac
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::DeleteA01::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::DeleteA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
@@ -1605,13 +1605,13 @@ void StructBI::Tools::ActionsData::FormsColumns::DeleteA01::Setup_(Functions::Ac
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::DeleteA02::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::DeleteA02::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
 }
 
-void StructBI::Tools::ActionsData::FormsColumns::DeleteA03::Setup_(Functions::Action::Ptr action)
+void ActionsData::FormsColumns::DeleteA03::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
 
