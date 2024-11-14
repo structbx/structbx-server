@@ -9,6 +9,7 @@ Users::Users(Tools::FunctionData& function_data) :
 {
     Read_();
     ReadCurrent_();
+    ModifyCurrentUsername_();
 }
 
 void Users::Read_()
@@ -48,3 +49,21 @@ void Users::ReadCurrent_()
 
     get_functions()->push_back(function);
 }
+
+void Users::ModifyCurrentUsername_()
+{
+    // Function GET /api/organizations/users/current/username/modify
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/current/username/modify", HTTP::EnumMethods::kHTTP_PUT);
+    
+    // Action1: Verify if username don't exists
+    auto action1 = function->AddAction_("a1");
+    actions_.organizations_users_.modify_a01_.Setup_(action1);
+
+    // Action2: Modify username
+    auto action2 = function->AddAction_("a2");
+    actions_.organizations_users_.modify_a02_.Setup_(action2);
+
+    get_functions()->push_back(function);
+}
+
