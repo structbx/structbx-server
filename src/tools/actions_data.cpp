@@ -82,6 +82,73 @@ void ActionsData::OrganizationsUsers::ModifyA02::Setup_(Functions::Action::Ptr a
     action_->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
+void ActionsData::OrganizationsUsers::ModifyPasswordA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_final(false);
+    action_->set_sql_code("SELECT id FROM _naf_users WHERE password = ? AND id = ?");
+    action_->SetupCondition_("verify-username-password", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("La contrase&ntilde;a actual es incorrecta");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("current_password", "", true)
+    ->SetupCondition_("condition-current_password", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("La contrase&ntilde;a actual no puede estar vacía");
+            return false;
+        }
+
+        std::string password = param->ToString_();
+        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
+        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+
+        return true;
+    });
+    action_->AddParameter_("id", get_id_user(), false);
+}
+
+void ActionsData::OrganizationsUsers::ModifyPasswordA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "UPDATE _naf_users "
+        "SET password = ? "
+        "WHERE id = ?"
+    );
+
+    action_->AddParameter_("new_password", "", true)
+    ->SetupCondition_("condition-password", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("La contraseña no puede estar vacía");
+            return false;
+        }
+        if(param->ToString_().size() < 8)
+        {
+            param->set_error("La contraseña no puede ser menor a 8 dígitos");
+            return false;
+        }
+
+        std::string password = param->ToString_();
+        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
+        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        return true;
+    });
+    action_->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
 void ActionsData::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
