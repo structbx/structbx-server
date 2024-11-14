@@ -10,6 +10,7 @@ Users::Users(Tools::FunctionData& function_data) :
     Read_();
     ReadCurrent_();
     ModifyCurrentUsername_();
+    ModifyCurrentPassword_();
 }
 
 void Users::Read_()
@@ -67,3 +68,55 @@ void Users::ModifyCurrentUsername_()
     get_functions()->push_back(function);
 }
 
+void Users::ModifyCurrentPassword_()
+{
+    // Function GET /api/organizations/users/current/password/modify
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/current/password/modify", HTTP::EnumMethods::kHTTP_PUT);
+    
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Action1: Verify current password
+    auto action1 = function->AddAction_("a1");
+    actions_.organizations_users_.modify_password_a01_.Setup_(action1);
+
+    // Action2: Save new password
+    auto action2 = function->AddAction_("a2");
+    actions_.organizations_users_.modify_password_a02_.Setup_(action2);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space, action1, action2](NAF::Functions::Function& self)
+    {
+        auto new_password = self.GetParameter_("new_password");
+        auto new_password2 = self.GetParameter_("new_password2");
+        if(new_password == self.get_parameters().end() || new_password2 == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Hubo un error al modificar la contraseña");
+            return;
+        }
+        // Verify passwords is same
+        if(new_password->get()->ToString_() != new_password2->get()->ToString_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Las contraseñas no coinciden");
+            return;
+        }
+
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
+    });
+
+    get_functions()->push_back(function);
+}

@@ -29,6 +29,7 @@ class StructBI::Functions::Organizations::Users : public Tools::FunctionData
         void Read_();
         void ReadCurrent_();
         void ModifyCurrentUsername_();
+        void ModifyCurrentPassword_();
 
     private:
         Tools::ActionsData actions_;
