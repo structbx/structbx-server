@@ -77,6 +77,7 @@ set(
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/organizations/main.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/organizations/users.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/organizations/groups.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/spaces/main.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/spaces/users.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/main.cpp
