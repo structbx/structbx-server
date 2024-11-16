@@ -8,6 +8,7 @@ Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
     ,users_(function_data)
+    ,groups_(function_data)
 {
     Read_();
     Modify_();

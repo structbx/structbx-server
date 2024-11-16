@@ -7,6 +7,7 @@
 #include "tools/actions_data.h"
 
 #include "functions/organizations/users.h"
+#include "functions/organizations/groups.h"
 
 namespace StructBI
 {
@@ -34,6 +35,7 @@ class StructBI::Functions::Organizations::Main : public Tools::FunctionData
     private:
         Tools::ActionsData actions_;
         Users users_;
+        Groups groups_;
 
 };
 
