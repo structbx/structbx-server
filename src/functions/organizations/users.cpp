@@ -15,6 +15,7 @@ Users::Users(Tools::FunctionData& function_data) :
     ModifyCurrentPassword_();
     Add_();
     Modify_();
+    Delete_();
 }
 
 void Users::Read_()
@@ -274,6 +275,35 @@ void Users::Modify_()
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
     });
+
+    get_functions()->push_back(function);
+}
+
+void Users::Delete_()
+{
+    // Function GET /api/organizations/users/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/delete", HTTP::EnumMethods::kHTTP_DEL);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "DELETE nu FROM _naf_users nu "
+        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
+        "WHERE "
+            "nu.id = ? "
+            "AND ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ? LIMIT 1)"
+    );
+    action1->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_user", get_id_user(), false);
 
     get_functions()->push_back(function);
 }

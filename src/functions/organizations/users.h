@@ -33,6 +33,7 @@ class StructBI::Functions::Organizations::Users : public Tools::FunctionData
         void ModifyCurrentPassword_();
         void Add_();
         void Modify_();
+        void Delete_();
 
     private:
         Tools::ActionsData actions_;
