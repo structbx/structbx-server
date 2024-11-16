@@ -149,6 +149,101 @@ void ActionsData::OrganizationsUsers::ModifyPasswordA02::Setup_(Functions::Actio
     action_->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
+void ActionsData::OrganizationsUsers::AddA01::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code("SELECT id FROM _naf_users WHERE username = ?");
+    action_->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Este nombre de usuario ya est&aacute; registrado");
+            return false;
+        }
+
+        return true;
+    });
+
+    action_->AddParameter_("username", "", true)
+    ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El nombre de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void ActionsData::OrganizationsUsers::AddA02::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "INSERT INTO _naf_users (username, password, status, id_group) "
+        "VALUES (?, ?, ?, ?) "
+    );
+
+    action_->AddParameter_("username", "", true)
+    ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre de usuario debe ser una cadena de texto");
+            return false;
+        }
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre de usuario no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() < 3)
+        {
+            param->set_error("El nombre de usuario no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().CheckEmail_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El nombre de usuario solo puede tener a-z, A-Z, 0-9, \"_\", \".\", \"@\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("password", "", true)
+    ->SetupCondition_("condition-password", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("La contraseña no puede estar vacía");
+            return false;
+        }
+        if(param->ToString_().size() < 8)
+        {
+            param->set_error("La contraseña no puede ser menor a 8 dígitos");
+            return false;
+        }
+
+        std::string password = param->ToString_();
+        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
+        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        return true;
+    });
+    action_->AddParameter_("status", "activo", false);
+    action_->AddParameter_("id_group", "", true)
+    ->SetupCondition_("condition-id_group", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de grupo no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
 void ActionsData::Spaces::ReadA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
