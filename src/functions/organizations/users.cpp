@@ -11,6 +11,7 @@ Users::Users(Tools::FunctionData& function_data) :
     ReadCurrent_();
     ModifyCurrentUsername_();
     ModifyCurrentPassword_();
+    Add_();
 }
 
 void Users::Read_()
@@ -118,5 +119,67 @@ void Users::ModifyCurrentPassword_()
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
     });
 
+    get_functions()->push_back(function);
+}
+
+void Users::Add_()
+{
+    // Function GET /api/organizations/users/add
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/add", HTTP::EnumMethods::kHTTP_POST);
+    
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Action1: Verify if username don't exists
+    auto action1 = function->AddAction_("a1");
+    actions_.organizations_users_.add_a01_.Setup_(action1);
+
+    // Action2: Add username
+    auto action2 = function->AddAction_("a2");
+    actions_.organizations_users_.add_a02_.Setup_(action2);
+
+    // Setup custom process
+    auto current_user = get_id_user();
+    function->SetupCustomProcess_([current_user, action1, action2](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+
+        // New User ID
+        auto user_id = action2->get_last_insert_id();
+        if(user_id < 1)
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Hubo un error al guardar el usuario");
+            return;
+        }
+
+        // Action3: Add username to the current organization
+        auto action3 = self.AddAction_("a3");
+        action3->set_sql_code(
+            "INSERT INTO organizations_users (id_organization, id_naf_user) "
+            "SELECT ou.id_organization, ? "
+            "FROM organizations_users ou "
+            "WHERE ou.id_naf_user = ? "
+        );
+        action3->AddParameter_("id_user", std::to_string(user_id), false);
+        action3->AddParameter_("id_naf_user", current_user, false);
+        if(!action3->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": No se pudo guardar el nuevo usuario");
+            return;
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
+    });
     get_functions()->push_back(function);
 }
