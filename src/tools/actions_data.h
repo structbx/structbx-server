@@ -49,6 +49,9 @@ class StructBI::Tools::ActionsData
                 ,modify_password_a02_(function_data)
                 ,add_a01_(function_data)
                 ,add_a02_(function_data)
+                ,modify_user_a01_0_(function_data)
+                ,modify_user_a01_(function_data)
+                ,modify_user_a02_(function_data)
             {
                 
             }
@@ -106,6 +109,33 @@ class StructBI::Tools::ActionsData
                     virtual void Setup_(Functions::Action::Ptr action) override;
 
             } add_a02_;
+
+            class ModifyUserA01_0 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } modify_user_a01_0_;
+
+            class ModifyUserA01 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } modify_user_a01_;
+            
+            class ModifyUserA02 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } modify_user_a02_;
         } organizations_users_;
 
         struct Spaces

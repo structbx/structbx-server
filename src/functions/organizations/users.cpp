@@ -14,6 +14,7 @@ Users::Users(Tools::FunctionData& function_data) :
     ModifyCurrentUsername_();
     ModifyCurrentPassword_();
     Add_();
+    Modify_();
 }
 
 void Users::Read_()
@@ -211,5 +212,68 @@ void Users::Add_()
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
     });
+    get_functions()->push_back(function);
+}
+
+void Users::Modify_()
+{
+    // Function GET /api/organizations/users/modify
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/modify", HTTP::EnumMethods::kHTTP_PUT);
+    
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    // Action1: Verify if username don't exists
+    auto action1 = function->AddAction_("a1");
+    actions_.organizations_users_.modify_user_a01_0_.Setup_(action1);
+
+    // Action2: Modify user (with password)
+    auto action2 = function->AddAction_("a2");
+    actions_.organizations_users_.modify_user_a01_.Setup_(action2);
+
+    // Action2: Modify user (without password)
+    auto action3 = function->AddAction_("a3");
+    actions_.organizations_users_.modify_user_a02_.Setup_(action3);
+
+    // Setup custom process
+    function->SetupCustomProcess_([action1, action2, action3](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+
+        // Password parameter
+        auto password = self.GetParameter_("password");
+        if(password == self.get_parameters().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error uukK3aINI5");
+            return;
+        }
+
+        // Verify if password is not empty
+        if(password->get()->ToString_() != "")
+        {
+            if(!action2->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+                return;
+            }
+        }
+        else
+        {
+            if(!action3->Work_())
+            {
+                self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+                return;
+            }
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
+    });
+
     get_functions()->push_back(function);
 }
