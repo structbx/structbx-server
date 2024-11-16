@@ -1,5 +1,6 @@
 
 #include "functions/organizations/users.h"
+#include <query/parameter.h>
 
 using namespace StructBI::Functions::Organizations;
 
@@ -9,6 +10,7 @@ Users::Users(Tools::FunctionData& function_data) :
 {
     Read_();
     ReadCurrent_();
+    ReadSpecific_();
     ModifyCurrentUsername_();
     ModifyCurrentPassword_();
     Add_();
@@ -48,6 +50,34 @@ void Users::ReadCurrent_()
         "WHERE ou.id_naf_user = ?"
     );
     action1->AddParameter_("id_user", get_id_user(), false);
+
+    get_functions()->push_back(function);
+}
+
+void Users::ReadSpecific_()
+{
+    // Function GET /api/organizations/users/read/id
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/organizations/users/read/id", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT nu.*, ng.group AS 'group' "
+        "FROM _naf_users nu "
+        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
+        "WHERE ou.id_naf_user = ?"
+    );
+    action1->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id_user", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 
     get_functions()->push_back(function);
 }
