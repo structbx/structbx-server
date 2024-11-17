@@ -9,8 +9,8 @@ Users::Users(Tools::FunctionData& function_data) :
 {
     Read_();
     ReadUserOutSpace_();
-    /*Add_();
-    Delete_();*/
+    Add_();
+    /*Delete_();*/
 }
 
 void Users::Read_()
@@ -21,7 +21,7 @@ void Users::Read_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.username, sp.created_at " \
+        "SELECT nu.id, nu.username, sp.created_at " \
         "FROM _naf_users nu " \
         "JOIN spaces_users sp ON sp.id_naf_user = nu.id " \
         "WHERE sp.id_space = ?"
@@ -48,7 +48,7 @@ void Users::ReadUserOutSpace_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.username "
+        "SELECT nu.id, nu.username "
         "FROM _naf_users nu "
         "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
         "LEFT JOIN spaces_users su ON "
@@ -70,6 +70,43 @@ void Users::ReadUserOutSpace_()
     });
     action1->AddParameter_("id_user", get_id_user(), false);
     action1->AddParameter_("id_user2", get_id_user(), false);
+
+    get_functions()->push_back(function);
+}
+
+void Users::Add_()
+{
+    // Function GET /api/spaces/users/add
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/users/add", HTTP::EnumMethods::kHTTP_POST);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "INSERT INTO spaces_users (id_space, id_naf_user) "
+        "SELECT "
+            "(SELECT id FROM spaces WHERE identifier = ?) "
+            ",(SELECT id_naf_user FROM organizations_users WHERE id_naf_user = ?) "
+    );
+    action1->AddParameter_("identifier_space", "", true)
+    ->SetupCondition_("condition-identifier_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_user", "", true)
+    ->SetupCondition_("condition-id_user", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 
     get_functions()->push_back(function);
 }

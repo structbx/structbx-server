@@ -26,7 +26,7 @@ void Users::Read_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
+        "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
         "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
@@ -45,7 +45,7 @@ void Users::ReadCurrent_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
+        "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
         "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
@@ -64,7 +64,7 @@ void Users::ReadSpecific_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
+        "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
         "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
