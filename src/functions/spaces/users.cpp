@@ -8,6 +8,8 @@ Users::Users(Tools::FunctionData& function_data) :
     ,actions_(function_data)
 {
     Read_();
+    /*Add_();
+    Delete_();*/
 }
 
 void Users::Read_()
@@ -18,9 +20,8 @@ void Users::Read_()
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "SELECT nu.*, ng.group AS 'group' " \
+        "SELECT nu.username, sp.created_at " \
         "FROM _naf_users nu " \
-        "JOIN _naf_groups ng ON ng.id = nu.id_group " \
         "JOIN spaces_users sp ON sp.id_naf_user = nu.id " \
         "WHERE sp.id_space = ?"
     );

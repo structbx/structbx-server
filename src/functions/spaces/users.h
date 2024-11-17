@@ -27,6 +27,8 @@ class StructBI::Functions::Spaces::Users : public Tools::FunctionData
         
     protected:
         void Read_();
+        /*void Add_();
+        void Delete_();*/
 
     private:
         Tools::ActionsData actions_;
