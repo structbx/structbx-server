@@ -27,6 +27,7 @@ class StructBI::Functions::Spaces::Users : public Tools::FunctionData
         
     protected:
         void Read_();
+        void ReadUserOutSpace_();
         /*void Add_();
         void Delete_();*/
 
