@@ -1,5 +1,6 @@
 
 #include "functions/forms/data.h"
+#include <query/parameter.h>
 
 using namespace StructBI::Functions;
 using namespace StructBI::Functions::Forms;
@@ -8,12 +9,43 @@ Forms::Data::Data(Tools::FunctionData& function_data) :
     FunctionData(function_data)
     ,actions_(function_data)
 {
+    ReadChangeInt_();
     Read_();
     ReadSpecific_();
     ReadFile_();
     Add_();
     Modify_();
+    ModifyChangeInt_();
     Delete_();
+}
+
+void Forms::Data::ReadChangeInt_()
+{
+    // Function GET /api/forms/data/read/changeInt
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/read/changeInt", HTTP::EnumMethods::kHTTP_GET);
+
+    // Action 1: Get Change int
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT f.change_int "
+        "FROM forms f "
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_space", get_space_id(), false);
+
+    get_functions()->push_back(function);
 }
 
 void Forms::Data::Read_()
@@ -483,6 +515,35 @@ void Forms::Data::Modify_()
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
     });
+
+    get_functions()->push_back(function);
+}
+
+void Forms::Data::ModifyChangeInt_()
+{
+    // Function GET /api/forms/data/modify/changeInt
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/modify/changeInt", HTTP::EnumMethods::kHTTP_PUT);
+
+    // Action 1: Get Change int
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "UPDATE forms "
+        "SET change_int = change_int + 1 "
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 }

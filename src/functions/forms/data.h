@@ -79,11 +79,13 @@ class StructBI::Functions::Forms::Data : public Tools::FunctionData
             Query::Field::Ptr column_type;
         };
 
+        void ReadChangeInt_();
         void Read_();
         void ReadSpecific_();
         void ReadFile_();
         void Add_();
         void Modify_();
+        void ModifyChangeInt_();
         void Delete_();
 
     private:
