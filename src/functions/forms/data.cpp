@@ -15,7 +15,6 @@ Forms::Data::Data(Tools::FunctionData& function_data) :
     ReadFile_();
     Add_();
     Modify_();
-    ModifyChangeInt_();
     Delete_();
 }
 
@@ -415,6 +414,14 @@ void Forms::Data::Add_()
             return;
         }
 
+        // ChangeInt
+        auto form_identifier = self.GetParameter_("form-identifier");
+        if(form_identifier != self.get_parameters().end())
+        {
+            auto changeInt = ChangeInt();
+            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+        }
+
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
     });
@@ -512,38 +519,17 @@ void Forms::Data::Modify_()
             return;
         }
 
+        // ChangeInt
+        auto form_identifier = self.GetParameter_("form-identifier");
+        if(form_identifier != self.get_parameters().end())
+        {
+            auto changeInt = ChangeInt();
+            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+        }
+
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok.");
     });
-
-    get_functions()->push_back(function);
-}
-
-void Forms::Data::ModifyChangeInt_()
-{
-    // Function GET /api/forms/data/modify/changeInt
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/data/modify/changeInt", HTTP::EnumMethods::kHTTP_PUT);
-
-    // Action 1: Get Change int
-    auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
-        "UPDATE forms "
-        "SET change_int = change_int + 1 "
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-
-    action1->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action1->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 }
@@ -674,6 +660,14 @@ void Forms::Data::Delete_()
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error VF1ACrujc7");
             return;
+        }
+
+        // ChangeInt
+        auto form_identifier = self.GetParameter_("form-identifier");
+        if(form_identifier != self.get_parameters().end())
+        {
+            auto changeInt = ChangeInt();
+            changeInt.Change(form_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -960,4 +954,21 @@ bool Forms::Data::FileProcessing::Delete()
         return false;
     
     return true;
+}
+
+void Forms::Data::ChangeInt::Change(std::string form_identifier, std::string space_id)
+{
+    // Action 1: Get Change int
+    auto action1 = NAF::Functions::Action("a1");
+    action1.set_sql_code(
+        "UPDATE forms "
+        "SET change_int = change_int + 1 "
+        "WHERE identifier = ? AND id_space = ?"
+    );
+
+    action1.AddParameter_("form-identifier", form_identifier, false);
+    action1.AddParameter_("id_space", space_id, false);
+
+    // Execute action
+    action1.Work_();
 }

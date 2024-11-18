@@ -78,6 +78,10 @@ class StructBI::Functions::Forms::Data : public Tools::FunctionData
             Query::Field::Ptr default_value;
             Query::Field::Ptr column_type;
         };
+        struct ChangeInt
+        {
+            void Change(std::string form_identifier, std::string space_id);
+        };
 
         void ReadChangeInt_();
         void Read_();
@@ -85,7 +89,6 @@ class StructBI::Functions::Forms::Data : public Tools::FunctionData
         void ReadFile_();
         void Add_();
         void Modify_();
-        void ModifyChangeInt_();
         void Delete_();
 
     private:
