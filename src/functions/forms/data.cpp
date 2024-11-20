@@ -175,12 +175,29 @@ void Forms::Data::Read_()
             return;
         }
 
+        // Action 3: Total records
+        int total_records = 0;
+        auto action3 = self.AddAction_("a3");
+        action3->set_sql_code(
+            "SELECT COUNT(1) " \
+            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_()
+        );
+        if(action3->Work_())
+        {
+            auto total = action3->get_results()->First_();
+            if(!total->IsNull_())
+            {
+                total_records = total->Int_();
+            }
+        }
+
         // Results
         auto json_result1 = action1->get_json_result();
         auto json_result2 = action2->get_json_result();
         json_result2->set("status", action2->get_status());
         json_result2->set("message", action2->get_message());
         json_result2->set("columns_meta", json_result1);
+        json_result2->set("total_records", total_records);
 
         // Send results
         self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
