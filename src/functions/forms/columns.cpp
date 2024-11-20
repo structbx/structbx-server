@@ -1,5 +1,7 @@
 
 #include "functions/forms/columns.h"
+#include <query/parameter.h>
+#include <tools/dvalue.h>
 
 using namespace StructBI::Functions::Forms;
 
@@ -377,19 +379,33 @@ void Columns::Delete_()
 
 bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)
 {
-    // Get parameters
+    // link_to parameter setup
     auto end = self.get_parameters().end();
+    auto link_to = self.GetParameter_("link_to");
+    if(link_to == end)
+    {
+        // Add null value link_to
+        self.get_parameters().push_back(
+            Query::Parameter::Ptr(
+                new Query::Parameter("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), false)
+            )
+        );
+        link_to = self.GetParameter_("link_to");
+        if(link_to == end)
+            return false;
+    }
+
+    // Get parameters
     auto identifier = self.GetParameter_("identifier");
     auto name = self.GetParameter_("name");
     auto length = self.GetParameter_("length");
     auto required = self.GetParameter_("required");
     auto default_value = self.GetParameter_("default_value");
     auto id_column_type = self.GetParameter_("id_column_type");
-    auto link_to = self.GetParameter_("link_to");
     auto form_identifier = self.GetParameter_("form-identifier");
     if(
         identifier == end || name == end || length == end || required == end ||
-        default_value == end || id_column_type == end || link_to == end || form_identifier == end
+        default_value == end || id_column_type == end || form_identifier == end
     )
         return false;
 
@@ -415,7 +431,7 @@ bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables
         variables.default_value = "DEFAULT " + default_value->get()->ToString_();
 
     // Link to
-    if(link_to->get()->ToString_() != "")
+    if(!link_to->get()->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty) && link_to->get()->ToString_() != "")
         variables.link_to = link_to->get()->ToString_();
 
     return true;
