@@ -1,6 +1,8 @@
 
 #include "functions/forms/data.h"
 #include <query/parameter.h>
+#include <string>
+#include <tools/output_logger.h>
 
 using namespace StructBI::Functions;
 using namespace StructBI::Functions::Forms;
@@ -155,12 +157,24 @@ void Forms::Data::Read_()
             return;
         }
 
+        // Get page
+        auto page = self.GetParameter_("page");
+        int offset = 0;
+        if(page != self.get_parameters().end())
+        {
+            try{offset = (std::stoi(page->get()->ToString_()) - 1) * 20;}
+            catch(std::exception&)
+            {
+                NAF::Tools::OutputLogger::Error_("Page parameter is not an integer");
+            }
+        }
+
         // Action 2: Get Form data
         auto action2 = self.AddAction_("a2");
         std::string sql_code = 
             "SELECT " + columns + " " \
             "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
-                " AS _" + form_id->ToString_()
+                " AS _" + form_id->ToString_() + " LIMIT " + std::to_string(offset) + ", 20"
         ;
 
         // Prepare JOIN if there is a link
@@ -175,29 +189,12 @@ void Forms::Data::Read_()
             return;
         }
 
-        // Action 3: Total records
-        int total_records = 0;
-        auto action3 = self.AddAction_("a3");
-        action3->set_sql_code(
-            "SELECT COUNT(1) " \
-            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_()
-        );
-        if(action3->Work_())
-        {
-            auto total = action3->get_results()->First_();
-            if(!total->IsNull_())
-            {
-                total_records = total->Int_();
-            }
-        }
-
         // Results
         auto json_result1 = action1->get_json_result();
         auto json_result2 = action2->get_json_result();
         json_result2->set("status", action2->get_status());
         json_result2->set("message", action2->get_message());
         json_result2->set("columns_meta", json_result1);
-        json_result2->set("total_records", total_records);
 
         // Send results
         self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
