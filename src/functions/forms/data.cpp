@@ -157,16 +157,33 @@ void Forms::Data::Read_()
             return;
         }
 
-        // Get page
+        // Get page or limit
         auto page = self.GetParameter_("page");
+        auto limit = self.GetParameter_("limit");
         int offset = 0;
+        std::string condition = " LIMIT ";
         if(page != self.get_parameters().end())
         {
-            try{offset = (std::stoi(page->get()->ToString_()) - 1) * 20;}
-            catch(std::exception&)
+            try
             {
-                NAF::Tools::OutputLogger::Error_("Page parameter is not an integer");
+                // LIMIT M, N
+                offset = (std::stoi(page->get()->ToString_()) - 1) * 20;
+                condition += std::to_string(offset) + ", 20";
             }
+            catch(std::exception&){NAF::Tools::OutputLogger::Error_("Page parameter is not an integer");}
+        }
+        else if(limit != self.get_parameters().end())
+        {
+            try
+            {
+                // LIMIT N
+                condition += limit->get()->ToString_();
+            }
+            catch(std::exception&){NAF::Tools::OutputLogger::Error_("Limit parameter error");}
+        }
+        else
+        {
+            condition = "";
         }
 
         // Action 2: Get Form data
@@ -174,12 +191,15 @@ void Forms::Data::Read_()
         std::string sql_code = 
             "SELECT " + columns + " " \
             "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
-                " AS _" + form_id->ToString_() + " LIMIT " + std::to_string(offset) + ", 20"
+                " AS _" + form_id->ToString_()
         ;
 
         // Prepare JOIN if there is a link
         if(has_link)
             sql_code += joins;
+
+        // Limit condition
+        sql_code += condition;
 
         // Execute
         action2->set_sql_code(sql_code);
