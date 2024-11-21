@@ -2,6 +2,7 @@
 #include "functions/forms/data.h"
 #include <query/parameter.h>
 #include <string>
+#include <tools/base64_tool.h>
 #include <tools/output_logger.h>
 
 using namespace StructBI::Functions;
@@ -157,18 +158,42 @@ void Forms::Data::Read_()
             return;
         }
 
+        // Get conditions
+        auto conditions = self.GetParameter_("conditions");
+        std::string condition_query = "";
+        if(conditions != self.get_parameters().end())
+        {
+            if(conditions->get()->ToString_() != "")
+            {
+                std::string conditions_decoded =  NAF::Tools::Base64Tool().Decode_(conditions->get()->ToString_());
+                condition_query = " WHERE " + conditions_decoded;
+            }
+        }
+
+        // Get order
+        auto order = self.GetParameter_("order");
+        std::string order_query = "";
+        if(order != self.get_parameters().end())
+        {
+            if(order->get()->ToString_() != "")
+            {
+                std::string order_decoded =  NAF::Tools::Base64Tool().Decode_(order->get()->ToString_());
+                order_query = " ORDER BY " + order_decoded;
+            }
+        }
+
         // Get page or limit
         auto page = self.GetParameter_("page");
         auto limit = self.GetParameter_("limit");
         int offset = 0;
-        std::string condition = " LIMIT ";
+        std::string limit_query = " LIMIT ";
         if(page != self.get_parameters().end())
         {
             try
             {
                 // LIMIT M, N
                 offset = (std::stoi(page->get()->ToString_()) - 1) * 20;
-                condition += std::to_string(offset) + ", 20";
+                limit_query += std::to_string(offset) + ", 20";
             }
             catch(std::exception&){NAF::Tools::OutputLogger::Error_("Page parameter is not an integer");}
         }
@@ -177,13 +202,13 @@ void Forms::Data::Read_()
             try
             {
                 // LIMIT N
-                condition += limit->get()->ToString_();
+                limit_query += limit->get()->ToString_();
             }
             catch(std::exception&){NAF::Tools::OutputLogger::Error_("Limit parameter error");}
         }
         else
         {
-            condition = "";
+            limit_query = "";
         }
 
         // Action 2: Get Form data
@@ -198,8 +223,14 @@ void Forms::Data::Read_()
         if(has_link)
             sql_code += joins;
 
-        // Limit condition
-        sql_code += condition;
+        // Conditions
+        sql_code += condition_query;
+
+        // Order
+        sql_code += order_query;
+
+        // Limit
+        sql_code += limit_query;
 
         // Execute
         action2->set_sql_code(sql_code);
