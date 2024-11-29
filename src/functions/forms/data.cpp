@@ -207,6 +207,9 @@ void Forms::Data::Read_()
             limit_query = "";
         }
 
+        // Export param
+        auto export_param = self.GetParameter_("export");
+
         // Action 2: Get Form data
         auto action2 = self.AddAction_("a2");
         std::string sql_code = 
@@ -226,7 +229,10 @@ void Forms::Data::Read_()
         sql_code += order_query;
 
         // Limit
-        sql_code += limit_query;
+        if(export_param == self.get_parameters().end())
+        {
+            sql_code += limit_query;
+        }
 
         // Execute
         action2->set_sql_code(sql_code);
@@ -251,7 +257,6 @@ void Forms::Data::Read_()
         };
 
         // Get export
-        auto export_param = self.GetParameter_("export");
         if(export_param != self.get_parameters().end() && export_param->get()->ToString_() == "true")
         {
             // Setup file
