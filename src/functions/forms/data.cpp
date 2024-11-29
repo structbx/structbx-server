@@ -1,9 +1,5 @@
 
 #include "functions/forms/data.h"
-#include <query/parameter.h>
-#include <string>
-#include <tools/base64_tool.h>
-#include <tools/output_logger.h>
 
 using namespace StructBI::Functions;
 using namespace StructBI::Functions::Forms;
@@ -240,15 +236,80 @@ void Forms::Data::Read_()
             return;
         }
 
-        // Results
-        auto json_result1 = action1->get_json_result();
-        auto json_result2 = action2->get_json_result();
-        json_result2->set("status", action2->get_status());
-        json_result2->set("message", action2->get_message());
-        json_result2->set("columns_meta", json_result1);
+        // Send results lambda function
+        auto send = [action1, action2](NAF::Functions::Function& self)
+        {
+            // Results
+            auto json_result1 = action1->get_json_result();
+            auto json_result2 = action2->get_json_result();
+            json_result2->set("status", action2->get_status());
+            json_result2->set("message", action2->get_message());
+            json_result2->set("columns_meta", json_result1);
 
-        // Send results
-        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
+            // Send JSON results
+            self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result2);
+        };
+
+        // Get export
+        auto export_param = self.GetParameter_("export");
+        if(export_param != self.get_parameters().end() && export_param->get()->ToString_() == "true")
+        {
+            // Setup file
+            auto fm = Files::FileManager();
+            fm.set_operation_type(Files::OperationType::kUpload);
+            fm.AddSupportedFile_("csv", Files::FileProperties{"text/csv", false, {""}});
+            Files::File file_naf("tmp_export", "tmp_export.csv", "", 0);
+
+            // Change filename
+            if(!fm.ChangePathAndFilename_(file_naf, "/tmp"))
+            {
+                send(self);
+                return;
+            }
+
+            // File setup
+            std::ofstream tmp_file;
+            tmp_file.open (file_naf.get_requested_file()->path());
+
+            // Write file
+            bool first = true;
+            for(auto row : *action2->get_results())
+            {
+                // Save columns
+                if(first)
+                {
+                    for(auto field : *row)
+                    {
+                        tmp_file << field->get_column_name() + "\t";
+                    }
+                    tmp_file << "\n";
+                    first = false;
+                }
+                else
+                {
+                    // Save data
+                    for(auto field : *row)
+                    {
+                        if(field->IsNull_())
+                            tmp_file << "\t";
+                        else
+                            tmp_file << field->ToString_() + "\t";
+                    }
+                    tmp_file << "\n";
+                }
+
+            }
+            tmp_file.close();
+
+            // Send JSON results
+            auto fm2 = Files::FileManager(Files::OperationType::kDownload);
+            fm2.AddSupportedFile_("csv", Files::FileProperties{"text/csv", false, {""}});
+            self.FileResponse_(HTTP::Status::kHTTP_OK, file_naf.get_requested_file()->path(), fm2);
+        }
+        else
+        {
+            send(self);
+        }
     });
 
     get_functions()->push_back(function);

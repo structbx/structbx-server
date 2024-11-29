@@ -2,6 +2,8 @@
 #ifndef STRUCTBI_FUNCTIONS_FORMS_DATA_H
 #define STRUCTBI_FUNCTIONS_FORMS_DATA_H
 
+#include <fstream>
+
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
 #include <functions/action.h>
