@@ -2,7 +2,7 @@
 # General
 
 cmake_minimum_required(VERSION 3.16)
-project("structbi-server" LANGUAGES CXX)
+project("structbx-server" LANGUAGES CXX)
 
 # Language standard
 set(CMAKE_CXX_STANDARD 17)
@@ -72,7 +72,7 @@ set(HEADER
 # Sources
 set(
     SOURCES
-    ${PROJECT_SOURCE_DIR}/src/structbi_server.cpp
+    ${PROJECT_SOURCE_DIR}/src/server.cpp
     ${PROJECT_SOURCE_DIR}/src/web_server.cpp
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/organizations/main.cpp
@@ -88,9 +88,9 @@ set(
 )
 
 # Executable
-add_executable(structbi-server ${SOURCES}) 
-target_link_libraries(structbi-server PUBLIC ${LIB_DEPENDECIES})
-target_include_directories(structbi-server PUBLIC ${HEADER})
+add_executable(structbx-server ${SOURCES}) 
+target_link_libraries(structbx-server PUBLIC ${LIB_DEPENDECIES})
+target_include_directories(structbx-server PUBLIC ${HEADER})
 
 # Copy properties file
 file(COPY ${CMAKE_SOURCE_DIR}/properties.yaml
