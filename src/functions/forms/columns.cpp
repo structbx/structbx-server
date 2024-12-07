@@ -3,7 +3,7 @@
 #include <query/parameter.h>
 #include <tools/dvalue.h>
 
-using namespace StructBI::Functions::Forms;
+using namespace StructBX::Functions::Forms;
 
 Columns::Columns(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -138,9 +138,9 @@ void Columns::Add_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error e4GBhN1lxk");
             return;
         }
-        std::string space_db = "_structbi_space_" + space_id;
-        std::string form_table = "_structbi_form_" + form_id->ToString_();
-        std::string column = "_structbi_column_" + std::to_string(column_id);
+        std::string space_db = "_structbx_space_" + space_id;
+        std::string form_table = "_structbx_form_" + form_id->ToString_();
+        std::string column = "_structbx_column_" + std::to_string(column_id);
 
         // Action 4: Add the column in the table
         action4->set_sql_code(
@@ -185,8 +185,8 @@ void Columns::Add_()
                 "ALTER TABLE " + space_db + "." + form_table + " " +
                 "ADD CONSTRAINT _IDX" + column + " " + 
                 "FOREIGN KEY (" + column + ") " +
-                "REFERENCES " + space_db + "._structbi_form_" + variables.link_to + 
-                    "(_structbi_column_" + column_id_link->ToString_() + ") " + 
+                "REFERENCES " + space_db + "._structbx_form_" + variables.link_to + 
+                    "(_structbx_column_" + column_id_link->ToString_() + ") " + 
                     variables.cascade_key_condition
             );
             if(!action6->Work_())
@@ -262,9 +262,9 @@ void Columns::Modify_()
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error WW17KL82QJ");
             return;
         }
-        std::string space_db = "_structbi_space_" + space_id;
-        std::string form_table = "_structbi_form_" + form_id->ToString_();
-        std::string column = "_structbi_column_" + column_id->get()->ToString_();
+        std::string space_db = "_structbx_space_" + space_id;
+        std::string form_table = "_structbx_form_" + form_id->ToString_();
+        std::string column = "_structbx_column_" + column_id->get()->ToString_();
 
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
@@ -343,8 +343,8 @@ void Columns::Delete_()
 
         // Action 2_0: Delete foreign key if exists
         action2_0->set_sql_code(
-            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
-            "DROP FOREIGN KEY IF EXISTS _IDX_structbi_column_" + column_id->ToString_());
+            "ALTER TABLE _structbx_space_" + space_id + "._structbx_form_" + form_id->ToString_() + " " +
+            "DROP FOREIGN KEY IF EXISTS _IDX_structbx_column_" + column_id->ToString_());
 
         // Execute actions
         if(!action2_0->Work_())
@@ -355,8 +355,8 @@ void Columns::Delete_()
 
         // Action 2: Delete columns
         action2->set_sql_code(
-            "ALTER TABLE _structbi_space_" + space_id + "._structbi_form_" + form_id->ToString_() + " " +
-            "DROP COLUMN IF EXISTS _structbi_column_" + column_id->ToString_());
+            "ALTER TABLE _structbx_space_" + space_id + "._structbx_form_" + form_id->ToString_() + " " +
+            "DROP COLUMN IF EXISTS _structbx_column_" + column_id->ToString_());
 
         // Execute actions
         if(!action2->Work_())

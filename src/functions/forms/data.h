@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_FORMS_DATA_H
-#define STRUCTBI_FUNCTIONS_FORMS_DATA_H
+#ifndef STRUCTBX_FUNCTIONS_FORMS_DATA_H
+#define STRUCTBX_FUNCTIONS_FORMS_DATA_H
 
 #include <fstream>
 
@@ -11,7 +11,7 @@
 #include <query/field.h>
 #include <query/results.h>
 
-namespace StructBI
+namespace StructBX
 {
     namespace Functions
     {
@@ -22,10 +22,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Functions::Forms::Data : public Tools::FunctionData
+class StructBX::Functions::Forms::Data : public Tools::FunctionData
 {
     public:
         Data(FunctionData& function_data);
@@ -97,4 +97,4 @@ class StructBI::Functions::Forms::Data : public Tools::FunctionData
         Tools::ActionsData actions_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_FORMS_DATA_H
+#endif //STRUCTBX_FUNCTIONS_FORMS_DATA_H

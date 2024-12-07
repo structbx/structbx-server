@@ -1,7 +1,7 @@
 
 #include "functions/forms/main.h"
 
-using namespace StructBI::Functions::Forms;
+using namespace StructBX::Functions::Forms;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
@@ -50,7 +50,7 @@ void Main::Read_()
             auto action2 = NAF::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
-                "FROM _structbi_space_" + space_id + "._structbi_form_" + id.get()->ToString_());
+                "FROM _structbx_space_" + space_id + "._structbx_form_" + id.get()->ToString_());
             if(!action2.Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error JNt2Std2sh");
@@ -159,9 +159,9 @@ void Main::Add_()
 
         // Action 4: Create the table
         action4->set_sql_code(
-            "CREATE TABLE _structbi_space_" + space_id + "._structbi_form_" + std::to_string(form_id) + " " \
+            "CREATE TABLE _structbx_space_" + space_id + "._structbx_form_" + std::to_string(form_id) + " " \
             "(" \
-                "_structbi_column_" + std::to_string(column_id) + " INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
+                "_structbx_column_" + std::to_string(column_id) + " INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
         );
         if(!action4->Work_())
@@ -179,7 +179,7 @@ void Main::Add_()
         // Create the directory to store files
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + space_id + "/" + std::to_string(form_id);
             Poco::File file(directory);
             if(file.exists())
@@ -273,7 +273,7 @@ void Main::Delete_()
 
         // Action 3: Drop table
         auto action3 = self.AddAction_("a3");
-        action3->set_sql_code("DROP TABLE IF EXISTS _structbi_space_" + space_id + "._structbi_form_" + id->get()->ToString_());
+        action3->set_sql_code("DROP TABLE IF EXISTS _structbx_space_" + space_id + "._structbx_form_" + id->get()->ToString_());
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
@@ -291,7 +291,7 @@ void Main::Delete_()
         // Delete form directory
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + space_id + "/" + id->get()->ToString_();
             Poco::File file(directory);
             if(file.exists())

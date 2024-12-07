@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_FORMS_MAIN_H
-#define STRUCTBI_FUNCTIONS_FORMS_MAIN_H
+#ifndef STRUCTBX_FUNCTIONS_FORMS_MAIN_H
+#define STRUCTBX_FUNCTIONS_FORMS_MAIN_H
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
@@ -8,7 +8,7 @@
 #include "functions/forms/data.h"
 #include "functions/forms/columns.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Functions
     {
@@ -19,10 +19,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Functions::Forms::Main : public Tools::FunctionData
+class StructBX::Functions::Forms::Main : public Tools::FunctionData
 {
     public:
         Main(Tools::FunctionData& function_data);
@@ -40,4 +40,4 @@ class StructBI::Functions::Forms::Main : public Tools::FunctionData
         Columns columns_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_FORMS_MAIN_H
+#endif //STRUCTBX_FUNCTIONS_FORMS_MAIN_H

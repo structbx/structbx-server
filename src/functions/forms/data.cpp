@@ -1,8 +1,8 @@
 
 #include "functions/forms/data.h"
 
-using namespace StructBI::Functions;
-using namespace StructBI::Functions::Forms;
+using namespace StructBX::Functions;
+using namespace StructBX::Functions::Forms;
 
 Forms::Data::Data(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -98,7 +98,7 @@ void Forms::Data::Read_()
             if(id->IsNull_() || name->IsNull_())
                 continue;
 
-            std::string column = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+            std::string column = "_structbx_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
 
             // Get link columns
             if(!link_to->IsNull_())
@@ -132,12 +132,12 @@ void Forms::Data::Read_()
                 }
 
                 // Setup column link
-                column = "_" + link_to->ToString_() + "._structbi_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
+                column = "_" + link_to->ToString_() + "._structbx_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
 
                 // Setup new join
-                joins += " LEFT JOIN _structbi_space_" + id_space + "._structbi_form_" + link_to->ToString_() +
-                " AS _" + link_to->ToString_() + " ON _" + link_to->ToString_() + "._structbi_column_" + column2_id->ToString_() + 
-                " = _" + form_id->ToString_() + "._structbi_column_" + id->ToString_();
+                joins += " LEFT JOIN _structbx_space_" + id_space + "._structbx_form_" + link_to->ToString_() +
+                " AS _" + link_to->ToString_() + " ON _" + link_to->ToString_() + "._structbx_column_" + column2_id->ToString_() + 
+                " = _" + form_id->ToString_() + "._structbx_column_" + id->ToString_();
             }
 
             // Set column
@@ -214,7 +214,7 @@ void Forms::Data::Read_()
         auto action2 = self.AddAction_("a2");
         std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
+            "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + 
                 " AS _" + form_id->ToString_()
         ;
 
@@ -382,9 +382,9 @@ void Forms::Data::ReadSpecific_()
                 continue;
 
             if(columns == "")
-                columns = "_structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+                columns = "_structbx_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
             else
-                columns += ", _structbi_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
+                columns += ", _structbx_column_" + id->ToString_() + " AS '" + name->ToString_() + "'";
         }
 
         // Verify if columns is empty
@@ -397,8 +397,8 @@ void Forms::Data::ReadSpecific_()
         // Action 2: Get Form data
         action2->set_sql_code(
             "SELECT " + columns + " " \
-            "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
-            "WHERE _structbi_column_" + column_id->ToString_() + " = ?");
+            "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+            "WHERE _structbx_column_" + column_id->ToString_() + " = ?");
 
         // Identify parameters and work
         self.IdentifyParameters_(action2);
@@ -464,7 +464,7 @@ void Forms::Data::ReadFile_()
         // Setup file manager
         self.get_file_manager()->AddBasicSupportedFiles_();
         self.get_file_manager()->set_directory_base(
-            NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+            NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
         );
 
         // Download process
@@ -534,7 +534,7 @@ void Forms::Data::Add_()
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "INSERT INTO _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
+            "INSERT INTO _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
@@ -639,8 +639,8 @@ void Forms::Data::Modify_()
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "UPDATE _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
-            "SET " + columns + " WHERE _structbi_column_" + column_id->ToString_() + " = ?");
+            "UPDATE _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+            "SET " + columns + " WHERE _structbx_column_" + column_id->ToString_() + " = ?");
 
         // Execute action 3
         self.IdentifyParameters_(action3);
@@ -741,15 +741,15 @@ void Forms::Data::Delete_()
             // Get file manager
             auto file_manager = self.get_file_manager();
             file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
             );
 
             // Request filepath
             auto action2_2 = self.AddAction_("a2_2");
             action2_2->set_sql_code(
-                "SELECT _structbi_column_" + id->ToString_() + " "
-                "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
-                "WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+                "SELECT _structbx_column_" + id->ToString_() + " "
+                "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
             );
             action2_2->AddParameter_("id", "", true)
             ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -781,8 +781,8 @@ void Forms::Data::Delete_()
 
         // Action 2: Delete record from table
         action2->set_sql_code(
-            "DELETE FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + 
-            " WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+            "DELETE FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + 
+            " WHERE _structbx_column_" + column_id->ToString_() + " = ?"
         );
 
         // Execute action 2
@@ -889,7 +889,7 @@ void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, 
             auto file_manager = self.get_file_manager();
             auto new_file_manager = std::make_shared<NAF::Files::FileManager>();
             file_manager->set_directory_base(
-                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+                NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
             );
             new_file_manager->set_directory_base(file_manager->get_directory_base());
 
@@ -915,12 +915,12 @@ void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, 
                 // Setup columns and values string
                 if(columns == "")
                 {
-                    columns = "_structbi_column_" + id->ToString_();
+                    columns = "_structbx_column_" + id->ToString_();
                     values = "?";
                 }
                 else
                 {
-                    columns += ",_structbi_column_" + id->ToString_();
+                    columns += ",_structbx_column_" + id->ToString_();
                     values += ", ?";
                 }
             }
@@ -928,19 +928,19 @@ void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, 
             {
                 if(columns == "")
                 {
-                    columns = "_structbi_column_" + id->ToString_() + " = ?";
+                    columns = "_structbx_column_" + id->ToString_() + " = ?";
                 }
                 else
                 {
-                    columns += ",_structbi_column_" + id->ToString_() + " = ?";
+                    columns += ",_structbx_column_" + id->ToString_() + " = ?";
                 }
 
                 // Step 5: Verify old file saved
                 auto action2_1 = NAF::Functions::Action::Ptr(new NAF::Functions::Action("a2_1"));
                 action2_1->set_sql_code(
-                    "SELECT _structbi_column_" + id->ToString_() + " "
-                    "FROM _structbi_space_" + id_space + "._structbi_form_" + form_id->ToString_() + " " \
-                    "WHERE _structbi_column_" + column_id->ToString_() + " = ?"
+                    "SELECT _structbx_column_" + id->ToString_() + " "
+                    "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                    "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
                 );
                 action2_1->AddParameter_("id", "", true)
                 ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -1004,12 +1004,12 @@ void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, 
                 // Setup columns and values string
                 if(columns == "")
                 {
-                    columns = "_structbi_column_" + id->ToString_();
+                    columns = "_structbx_column_" + id->ToString_();
                     values = "?";
                 }
                 else
                 {
-                    columns += ",_structbi_column_" + id->ToString_();
+                    columns += ",_structbx_column_" + id->ToString_();
                     values += ", ?";
                 }
             }
@@ -1018,11 +1018,11 @@ void Forms::Data::ParameterConfiguration::Setup(NAF::Functions::Function& self, 
                 // Setup columns and values string
                 if(columns == "")
                 {
-                    columns = "_structbi_column_" + id->ToString_() + " = ?";
+                    columns = "_structbx_column_" + id->ToString_() + " = ?";
                 }
                 else
                 {
-                    columns += ",_structbi_column_" + id->ToString_() + " = ?";
+                    columns += ",_structbx_column_" + id->ToString_() + " = ?";
                 }
             }
             

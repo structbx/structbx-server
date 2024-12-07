@@ -1,11 +1,11 @@
 
-#ifndef STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H
-#define STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H
+#ifndef STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
+#define STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Functions
     {
@@ -16,10 +16,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Functions::Forms::Columns : public Tools::FunctionData
+class StructBX::Functions::Forms::Columns : public Tools::FunctionData
 {
     public:
         struct ColumnVariables
@@ -60,4 +60,4 @@ class StructBI::Functions::Forms::Columns : public Tools::FunctionData
         Tools::ActionsData actions_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_FORMS_COLUMNS_H
+#endif //STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
