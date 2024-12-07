@@ -1,7 +1,7 @@
 
 #include "backend_server.h"
 
-using namespace StructBI::Functions;
+using namespace StructBX::Functions;
 
 BackendServer::BackendServer() :
     space_id_cookie_(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), "")

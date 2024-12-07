@@ -12,12 +12,12 @@
 #include "web_server.h"
 #include "backend_server.h"
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
 void SetupSettings()
 {
-    NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbi-web-uploaded"));
+    NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbx-web-uploaded"));
     NAF::Tools::SettingsManager::AddSetting_("space_id_cookie_name", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("1f3efd18688d2"));
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
                 // Manage Frontend
                 case NAF::Tools::RouteType::kEntrypoint:
                 {
-                    handler = new StructBI::Webserver;
+                    handler = new StructBX::Webserver;
                     break;
                 }
 
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
                         }
                     }
                     else
-                        handler = new StructBI::BackendServer;
+                        handler = new StructBX::BackendServer;
 
                     break;
                 }

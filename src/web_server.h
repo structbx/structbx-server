@@ -1,22 +1,22 @@
 
 
-#ifndef STRUCTBI_WEBSERVER
-#define STRUCTBI_WEBSERVER
+#ifndef STRUCTBX_WEBSERVER
+#define STRUCTBX_WEBSERVER
 
 #include "core/nebula_atom.h"
 #include "handlers/root_handler.h"
 
 using namespace NAF;
 
-namespace StructBI
+namespace StructBX
 {
     class Webserver;
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Webserver : public Handlers::RootHandler
+class StructBX::Webserver : public Handlers::RootHandler
 {
     public:
         Webserver();
@@ -28,4 +28,4 @@ class StructBI::Webserver : public Handlers::RootHandler
         Files::FileManager file_manager_;
 };
 
-#endif //STRUCTBI_WEBSERVER
+#endif //STRUCTBX_WEBSERVER

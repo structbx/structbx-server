@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_BACKENDSERVER
-#define STRUCTBI_BACKENDSERVER
+#ifndef STRUCTBX_BACKENDSERVER
+#define STRUCTBX_BACKENDSERVER
 
 #include "core/nebula_atom.h"
 #include "handlers/backend_handler.h"
@@ -10,15 +10,15 @@
 #include "functions/spaces/main.h"
 #include "functions/forms/main.h"
 
-namespace StructBI
+namespace StructBX
 {
     class BackendServer;
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::BackendServer : public Handlers::BackendHandler
+class StructBX::BackendServer : public Handlers::BackendHandler
 {
     public:
         BackendServer();
@@ -37,4 +37,4 @@ class StructBI::BackendServer : public Handlers::BackendHandler
         bool add_space_id_cookie_;
 };
 
-#endif //STRUCTBI_BACKENDSERVER
+#endif //STRUCTBX_BACKENDSERVER
