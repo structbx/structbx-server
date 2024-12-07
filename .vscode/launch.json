@@ -7,8 +7,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "structbi-server (Debug)",
-            "program": "${workspaceFolder}/build/Debug/structbi-server",
+            "name": "structbx-server (Debug)",
+            "program": "${workspaceFolder}/build/Debug/structbx-server",
             "args": [],
             "cwd": "${workspaceFolder}/build/Debug"
         }
