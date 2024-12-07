@@ -1,7 +1,7 @@
 
 
-#ifndef STRUCTBI_TOOLS_FUNCTIONDATA
-#define STRUCTBI_TOOLS_FUNCTIONDATA
+#ifndef STRUCTBX_TOOLS_FUNCTIONDATA
+#define STRUCTBX_TOOLS_FUNCTIONDATA
 
 #include <list>
 
@@ -14,7 +14,7 @@
 
 #include "tools/id_checker.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Tools
     {
@@ -22,10 +22,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Tools::FunctionData
+class StructBX::Tools::FunctionData
 {
     public:
         using FunctionsList = std::shared_ptr<std::list<NAF::Functions::Function::Ptr>>;
@@ -62,4 +62,4 @@ class StructBI::Tools::FunctionData
         FunctionsList functions_;
 };
 
-#endif //STRUCTBI_TOOLS_FUNCTIONDATA
+#endif //STRUCTBX_TOOLS_FUNCTIONDATA

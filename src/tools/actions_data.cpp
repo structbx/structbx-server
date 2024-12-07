@@ -1,7 +1,7 @@
 
 #include "tools/actions_data.h"
 
-using namespace StructBI::Tools;
+using namespace StructBX::Tools;
 
 ActionsData::ActionsData(FunctionData& function_data) : 
     organizations_users_(function_data)

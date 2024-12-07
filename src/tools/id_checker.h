@@ -1,13 +1,13 @@
 
-#ifndef STRUCTBI_TOOLS_IDCHECKER
-#define STRUCTBI_TOOLS_IDCHECKER
+#ifndef STRUCTBX_TOOLS_IDCHECKER
+#define STRUCTBX_TOOLS_IDCHECKER
 
 #include <list>
 #include <string>
 #include <algorithm>
 
 
-namespace StructBI
+namespace StructBX
 {
     namespace Tools
     {
@@ -15,8 +15,8 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
-class StructBI::Tools::IDChecker
+using namespace StructBX;
+class StructBX::Tools::IDChecker
 {
     public:
         IDChecker();
@@ -32,4 +32,4 @@ class StructBI::Tools::IDChecker
         std::string id_;
 };
 
-#endif //STRUCTBI_TOOLS_IDCHECKER
+#endif //STRUCTBX_TOOLS_IDCHECKER

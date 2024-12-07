@@ -1,11 +1,11 @@
 
-#ifndef STRUCTBI_TOOLS_ACTIONSDATA
-#define STRUCTBI_TOOLS_ACTIONSDATA
+#ifndef STRUCTBX_TOOLS_ACTIONSDATA
+#define STRUCTBX_TOOLS_ACTIONSDATA
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Tools
     {
@@ -13,9 +13,9 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 
-class StructBI::Tools::ActionsData
+class StructBX::Tools::ActionsData
 {
     public:
         ActionsData(Tools::FunctionData& function_data);
@@ -654,4 +654,4 @@ class StructBI::Tools::ActionsData
         } forms_columns_;
 };
 
-#endif //STRUCTBI_TOOLS_ACTIONSDATA
+#endif //STRUCTBX_TOOLS_ACTIONSDATA
