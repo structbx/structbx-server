@@ -2,7 +2,7 @@
 #include "functions/organizations/main.h"
 #include "functions/organizations/users.h"
 
-using namespace StructBI::Functions::Organizations;
+using namespace StructBX::Functions::Organizations;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)

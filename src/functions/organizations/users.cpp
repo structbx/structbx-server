@@ -2,7 +2,7 @@
 #include "functions/organizations/users.h"
 #include <query/parameter.h>
 
-using namespace StructBI::Functions::Organizations;
+using namespace StructBX::Functions::Organizations;
 
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)

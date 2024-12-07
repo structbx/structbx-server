@@ -1,7 +1,7 @@
 
 #include "functions/organizations/groups.h"
 
-using namespace StructBI::Functions::Organizations;
+using namespace StructBX::Functions::Organizations;
 
 Groups::Groups(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
