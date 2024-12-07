@@ -1,12 +1,12 @@
 
-#ifndef STRUCTBI_FUNCTIONS_SPACES_USERS_H
-#define STRUCTBI_FUNCTIONS_SPACES_USERS_H
+#ifndef STRUCTBX_FUNCTIONS_SPACES_USERS_H
+#define STRUCTBX_FUNCTIONS_SPACES_USERS_H
 
 
 #include "tools/function_data.h"
 #include "tools/actions_data.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Functions
     {
@@ -17,10 +17,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Functions::Spaces::Users : public Tools::FunctionData
+class StructBX::Functions::Spaces::Users : public Tools::FunctionData
 {
     public:
         Users(Tools::FunctionData& function_data);
@@ -36,4 +36,4 @@ class StructBI::Functions::Spaces::Users : public Tools::FunctionData
 
 };
 
-#endif //STRUCTBI_FUNCTIONS_SPACES_USERS_H
+#endif //STRUCTBX_FUNCTIONS_SPACES_USERS_H

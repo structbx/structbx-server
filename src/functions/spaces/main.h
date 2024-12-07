@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBI_FUNCTIONS_SPACES_MAIN_H
-#define STRUCTBI_FUNCTIONS_SPACES_MAIN_H
+#ifndef STRUCTBX_FUNCTIONS_SPACES_MAIN_H
+#define STRUCTBX_FUNCTIONS_SPACES_MAIN_H
 
 #include "Poco/DirectoryIterator.h"
 
@@ -10,7 +10,7 @@
 
 #include "functions/spaces/users.h"
 
-namespace StructBI
+namespace StructBX
 {
     namespace Functions
     {
@@ -21,10 +21,10 @@ namespace StructBI
     }
 }
 
-using namespace StructBI;
+using namespace StructBX;
 using namespace NAF;
 
-class StructBI::Functions::Spaces::Main : public Tools::FunctionData
+class StructBX::Functions::Spaces::Main : public Tools::FunctionData
 {
     public:
         Main(Tools::FunctionData& function_data);
@@ -42,4 +42,4 @@ class StructBI::Functions::Spaces::Main : public Tools::FunctionData
         Users users_;
 };
 
-#endif //STRUCTBI_FUNCTIONS_SPACES_MAIN_H
+#endif //STRUCTBX_FUNCTIONS_SPACES_MAIN_H

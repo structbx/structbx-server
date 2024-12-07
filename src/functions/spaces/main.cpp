@@ -3,7 +3,7 @@
 #include <string>
 #include <tools/output_logger.h>
 
-using namespace StructBI::Functions::Spaces;
+using namespace StructBX::Functions::Spaces;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
@@ -53,7 +53,7 @@ void Main::Read_()
             action2.set_sql_code(
                 "SELECT ROUND(SUM((DATA_LENGTH + INDEX_LENGTH)) / 1024 / 1024, 2) AS 'size' " \
                 "FROM information_schema.TABLES " \
-                "WHERE TABLE_SCHEMA = '_structbi_space_" + id->ToString_() + "'"
+                "WHERE TABLE_SCHEMA = '_structbx_space_" + id->ToString_() + "'"
             );
             if(!action2.Work_())
             {
@@ -62,7 +62,7 @@ void Main::Read_()
             }
 
             // Size of space directory
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + id->ToString_();
             float directory_size = 0;
             DirectoryIterator it(directory);
@@ -269,7 +269,7 @@ void Main::Add_()
         }
 
         // Create database
-        action4->set_sql_code("CREATE DATABASE _structbi_space_" + std::to_string(space_id));
+        action4->set_sql_code("CREATE DATABASE _structbx_space_" + std::to_string(space_id));
         if(!action4->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la DB de espacio");
@@ -285,7 +285,7 @@ void Main::Add_()
         // Create the directory to store files
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbi-web-uploaded");
+            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + std::to_string(space_id);
             Poco::File file(directory);
             if(file.exists())

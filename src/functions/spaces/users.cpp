@@ -1,7 +1,7 @@
 
 #include "functions/spaces/users.h"
 
-using namespace StructBI::Functions::Spaces;
+using namespace StructBX::Functions::Spaces;
 
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
