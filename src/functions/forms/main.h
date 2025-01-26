@@ -7,6 +7,7 @@
 
 #include "functions/forms/data.h"
 #include "functions/forms/columns.h"
+#include "functions/forms/permissions.h"
 
 namespace StructBX
 {
@@ -38,6 +39,7 @@ class StructBX::Functions::Forms::Main : public Tools::FunctionData
         Tools::ActionsData actions_;
         Data data_;
         Columns columns_;
+        Permissions permissions_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_FORMS_MAIN_H

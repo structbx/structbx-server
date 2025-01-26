@@ -8,6 +8,7 @@ Main::Main(Tools::FunctionData& function_data) :
     ,actions_(function_data)
     ,data_(function_data)
     ,columns_(function_data)
+    ,permissions_(function_data)
 {
     Read_();
     ReadSpecific_();
