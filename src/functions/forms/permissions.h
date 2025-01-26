@@ -14,6 +14,7 @@ namespace StructBX
     {
         namespace Forms
         {
+            struct PermissionsData;
             class Permissions;
         }
     }
@@ -21,6 +22,20 @@ namespace StructBX
 
 using namespace StructBX;
 using namespace NAF;
+
+struct StructBX::Functions::Forms::PermissionsData
+{
+    PermissionsData(Tools::FunctionData& function_data) : 
+        read_a01_(function_data)
+    {
+    }
+    class ReadA01 : public Tools::BaseAction
+    {
+        public:
+            using Tools::BaseAction::BaseAction;
+            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
+    } read_a01_;
+};
 
 class StructBX::Functions::Forms::Permissions : public Tools::FunctionData
 {
@@ -31,7 +46,7 @@ class StructBX::Functions::Forms::Permissions : public Tools::FunctionData
         void Read_();
 
     private:
-        Tools::ActionsData actions_;
+        PermissionsData actions_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_FORMS_PERMISSIONS_H

@@ -40,23 +40,6 @@ class StructBX::Tools::ActionsData
         } element_name_;
         */
 
-        struct FormsPermissions
-        {
-            FormsPermissions(Tools::FunctionData& function_data) : 
-                read_a01_(function_data)
-            {
-                
-            }
-
-            class ReadA01 : public Tools::BaseAction
-            {
-                public:
-                    using Tools::BaseAction::BaseAction;
-
-                    virtual void Setup_(Functions::Action::Ptr action) override;
-
-            } read_a01_;
-        } forms_permissions_;
 };
 
 #endif //STRUCTBX_TOOLS_ACTIONSDATA
