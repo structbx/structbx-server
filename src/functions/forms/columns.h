@@ -2,8 +2,8 @@
 #ifndef STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
 #define STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
 
+#include "tools/base_action.h"
 #include "tools/function_data.h"
-#include "tools/actions_data.h"
 
 namespace StructBX
 {

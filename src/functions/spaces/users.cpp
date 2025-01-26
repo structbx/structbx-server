@@ -5,7 +5,6 @@ using namespace StructBX::Functions::Spaces;
 
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
-    ,actions_(function_data)
 {
     Read_();
     ReadUserOutSpace_();

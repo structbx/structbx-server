@@ -3,8 +3,8 @@
 #define STRUCTBX_FUNCTIONS_ORGANIZATIONS_GROUPS_H
 
 
+#include "tools/base_action.h"
 #include "tools/function_data.h"
-#include "tools/actions_data.h"
 
 namespace StructBX
 {
@@ -29,7 +29,6 @@ class StructBX::Functions::Organizations::Groups : public Tools::FunctionData
         void Read_();
 
     private:
-        Tools::ActionsData actions_;
 
 };
 

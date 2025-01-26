@@ -3,8 +3,8 @@
 #define STRUCTBX_FUNCTIONS_ORGANIZATIONS_MAIN_H
 
 
+#include "tools/base_action.h"
 #include "tools/function_data.h"
-#include "tools/actions_data.h"
 
 #include "functions/organizations/users.h"
 #include "functions/organizations/groups.h"
@@ -33,7 +33,6 @@ class StructBX::Functions::Organizations::Main : public Tools::FunctionData
         void Modify_();
 
     private:
-        Tools::ActionsData actions_;
         Users users_;
         Groups groups_;
 

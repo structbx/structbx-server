@@ -3,8 +3,8 @@
 #define STRUCTBX_FUNCTIONS_SPACES_USERS_H
 
 
+#include "tools/base_action.h"
 #include "tools/function_data.h"
-#include "tools/actions_data.h"
 
 namespace StructBX
 {
@@ -32,7 +32,6 @@ class StructBX::Functions::Spaces::Users : public Tools::FunctionData
         void Delete_();
 
     private:
-        Tools::ActionsData actions_;
 
 };
 

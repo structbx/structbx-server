@@ -84,7 +84,6 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/forms/data.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/columns.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/permissions.cpp
-    ${PROJECT_SOURCE_DIR}/src/tools/actions_data.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
 )
 

@@ -6,8 +6,8 @@
 
 #include "tools/function_data.h"
 #include "tools/base64_tool.h"
-#include "tools/actions_data.h"
 
+#include "tools/base_action.h"
 #include "functions/spaces/users.h"
 
 namespace StructBX
