@@ -117,12 +117,16 @@ void Main::Add_()
     auto action3 = function->AddAction_("a3");
     actions_.forms_.add_a03_.Setup_(action3);
 
+    // Action 3_1: Add form permissions to current user
+    auto action3_1 = function->AddAction_("a3_1");
+    actions_.forms_.add_a03_1_.Setup_(action3_1);
+
     // Action 4: Create the table
     auto action4 = function->AddAction_("a4");
     
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3, action4](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3, action3_1, action4](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -138,6 +142,11 @@ void Main::Add_()
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+            return;
+        }
+        if(!action3_1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3_1->get_identifier() + ": " + action3_1->get_custom_error());
             return;
         }
 

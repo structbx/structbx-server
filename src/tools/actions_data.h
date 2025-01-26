@@ -276,6 +276,7 @@ class StructBX::Tools::ActionsData
                 ,add_a01_(function_data)
                 ,add_a02_(function_data)
                 ,add_a03_(function_data)
+                ,add_a03_1_(function_data)
                 ,modify_a01_(function_data)
                 ,modify_a02_(function_data)
                 ,modify_a03_(function_data)
@@ -339,6 +340,15 @@ class StructBX::Tools::ActionsData
 
             } add_a03_;
 
+            class AddA03_1 : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } add_a03_1_;
+
             class ModifyA01 : public Tools::BaseAction
             {
                 public:
@@ -389,7 +399,11 @@ class StructBX::Tools::ActionsData
         struct FormsData
         {
             FormsData(Tools::FunctionData& function_data) : 
-                read_a01_0_(function_data)
+                verify_permissions_read_(function_data)
+                ,verify_permissions_add_(function_data)
+                ,verify_permissions_modify_(function_data)
+                ,verify_permissions_delete_(function_data)
+                ,read_a01_0_(function_data)
                 ,read_a01_(function_data)
                 ,read_file_a01_(function_data)
                 ,read_specific_a01_(function_data)
@@ -405,6 +419,42 @@ class StructBX::Tools::ActionsData
             {
                 
             }
+
+            class VerifyPermissionsRead : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } verify_permissions_read_;
+
+            class VerifyPermissionsAdd : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } verify_permissions_add_;
+
+            class VerifyPermissionsModify : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } verify_permissions_modify_;
+
+            class VerifyPermissionsDelete : public Tools::BaseAction
+            {
+                public:
+                    using Tools::BaseAction::BaseAction;
+
+                    virtual void Setup_(Functions::Action::Ptr action) override;
+
+            } verify_permissions_delete_;
 
             class ReadA01_0 : public Tools::BaseAction
             {

@@ -62,9 +62,13 @@ void Forms::Data::Read_()
     auto action1 = function->AddAction_("a1");
     actions_.forms_data_.read_a01_.Setup_(action1);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_read_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1_0, action1](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1_0, action1, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1_0->Work_())
@@ -75,6 +79,11 @@ void Forms::Data::Read_()
         if(!action1->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 
@@ -340,9 +349,13 @@ void Forms::Data::ReadSpecific_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.read_specific_a02_.Setup_(action2);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_read_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1_0,action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1_0,action1, action2, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1_0->Work_())
@@ -353,6 +366,11 @@ void Forms::Data::ReadSpecific_()
         if(!action1->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 
@@ -434,14 +452,23 @@ void Forms::Data::ReadFile_()
     auto action1 = function->AddAction_("a1");
     actions_.forms_data_.read_file_a01_.Setup_(action1);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_read_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
         {
             self.HTMLResponse_(HTTP::Status::kHTTP_NOT_FOUND, "Archivo no encontrado en el formulario actual");
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 
@@ -495,9 +522,13 @@ void Forms::Data::Add_()
     auto action3 = function->AddAction_("a3");
     actions_.forms_data_.add_03_.Setup_(action3);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_add_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action3, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -508,6 +539,11 @@ void Forms::Data::Add_()
         if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": 9e8LhYKOdu");
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 
@@ -580,9 +616,13 @@ void Forms::Data::Modify_()
     auto action3 = function->AddAction_("a3");
     actions_.forms_data_.modify_03_.Setup_(action3);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_modify_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2, action3, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -593,6 +633,11 @@ void Forms::Data::Modify_()
         if(!action2->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": Fr5MHxX1wQ");
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 
@@ -685,9 +730,13 @@ void Forms::Data::Delete_()
     auto action2 = function->AddAction_("a2");
     actions_.forms_data_.delete_a02_.Setup_(action2);
 
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    actions_.forms_data_.verify_permissions_delete_.Setup_(fpv);
+
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2_0, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2_0, action2, fpv](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -698,6 +747,11 @@ void Forms::Data::Delete_()
         if(!action2_0->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2_0->get_identifier() + ": PYaZ1nddvm");
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
             return;
         }
 

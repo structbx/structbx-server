@@ -1,5 +1,6 @@
 
 #include "tools/actions_data.h"
+#include <functions/action.h>
 
 using namespace StructBX::Tools;
 
@@ -947,6 +948,22 @@ void ActionsData::Forms::AddA03::Setup_(Functions::Action::Ptr action)
     action_->AddParameter_("space_id", get_space_id(), false);
 }
 
+void ActionsData::Forms::AddA03_1::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_form, id_naf_user) " \
+        "SELECT 1, 1, 1, 1 " \
+            ",(SELECT id FROM forms WHERE identifier = ? and id_space = ?) " \
+            ",? "
+    );
+
+    action_->AddParameter_("identifier", "", true);
+    action_->AddParameter_("space_id", get_space_id(), false);
+    action_->AddParameter_("user_id", get_id_user(), false);
+}
+
 void ActionsData::Forms::ModifyA01::Setup_(Functions::Action::Ptr action)
 {
     action_ = action;
@@ -1128,6 +1145,146 @@ void ActionsData::Forms::DeleteA02::Setup_(Functions::Action::Ptr action)
     action_->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
     action_->AddParameter_("id", "", true);
     action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void ActionsData::FormsData::VerifyPermissionsRead::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT f.id " \
+        "FROM forms f " \
+        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fp.read = 1 AND fp.id_naf_user = ?"
+    );
+    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    {
+        if(action.get_results()->size() < 1)
+        {
+            action.set_custom_error("No posee los permisos");
+            return false;
+        }
+
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("id_user", get_id_user(), false);
+}
+
+void ActionsData::FormsData::VerifyPermissionsAdd::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT f.id " \
+        "FROM forms f " \
+        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fp.add = 1 AND fp.id_naf_user = ?"
+    );
+    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    {
+        if(action.get_results()->size() < 1)
+        {
+            action.set_custom_error("No posee los permisos");
+            return false;
+        }
+
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("id_user", get_id_user(), false);
+}
+
+void ActionsData::FormsData::VerifyPermissionsModify::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT f.id " \
+        "FROM forms f " \
+        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fp.modify = 1 AND fp.id_naf_user = ?"
+    );
+    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    {
+        if(action.get_results()->size() < 1)
+        {
+            action.set_custom_error("No posee los permisos");
+            return false;
+        }
+
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("id_user", get_id_user(), false);
+}
+
+void ActionsData::FormsData::VerifyPermissionsDelete::Setup_(Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT f.id " \
+        "FROM forms f " \
+        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fp.delete = 1 AND fp.id_naf_user = ?"
+    );
+    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    {
+        if(action.get_results()->size() < 1)
+        {
+            action.set_custom_error("No posee los permisos");
+            return false;
+        }
+
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action_->AddParameter_("id_space", get_space_id(), false);
+    action_->AddParameter_("id_user", get_id_user(), false);
 }
 
 void ActionsData::FormsData::ReadA01_0::Setup_(Functions::Action::Ptr action)
