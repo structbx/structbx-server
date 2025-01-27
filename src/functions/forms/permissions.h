@@ -45,6 +45,7 @@ class StructBX::Functions::Forms::Permissions : public Tools::FunctionData
     protected:
         void Read_();
         void ReadUsersOut_();
+        void Add_();
 
     private:
         PermissionsData actions_;

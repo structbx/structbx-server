@@ -34,6 +34,7 @@ Permissions::Permissions(Tools::FunctionData& function_data) :
 {
     Read_();
     ReadUsersOut_();
+    Add_();
 }
 
 void Permissions::Read_()
@@ -95,6 +96,82 @@ void Permissions::ReadUsersOut_()
         return true;
     });
     action1->AddParameter_("space_id", get_space_id(), false);
+
+    get_functions()->push_back(function);
+}
+
+void Permissions::Add_()
+{
+    // Function GET /api/forms/permissions/add
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/add", HTTP::EnumMethods::kHTTP_POST);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_naf_user, id_form) "
+        "SELECT "
+            "?, ?, ?, ? "
+            ",(SELECT id_naf_user FROM spaces_users WHERE id_naf_user = ? AND id_space = ?) "
+            ",(SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+    );
+    action1->AddParameter_("read", "", true)
+    ->SetupCondition_("condition-read", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action1->AddParameter_("add", "", true)
+    ->SetupCondition_("condition-add", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action1->AddParameter_("modify", "", true)
+    ->SetupCondition_("condition-modify", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action1->AddParameter_("delete", "", true)
+    ->SetupCondition_("condition-delete", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action1->AddParameter_("id_user", "", true)
+    ->SetupCondition_("condition-id_user", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de usuario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_space", get_space_id(), false);
+    action1->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 }
