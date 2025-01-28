@@ -28,13 +28,113 @@ void PermissionsData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
+void PermissionsData::ReadA02::Setup_(NAF::Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->set_sql_code(
+        "SELECT fp.*, nu.username AS username, f.name AS form_name " \
+        "FROM forms f " \
+        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "JOIN _naf_users nu ON nu.id = fp.id_naf_user "
+        "WHERE fp.id = ? AND f.identifier = ? AND f.id_space = ?"
+    );
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id del permiso de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
+void PermissionsData::ModifyA01::Setup_(NAF::Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->AddParameter_("read", "", true)
+    ->SetupCondition_("condition-read", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action_->AddParameter_("add", "", true)
+    ->SetupCondition_("condition-add", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action_->AddParameter_("modify", "", true)
+    ->SetupCondition_("condition-modify", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action_->AddParameter_("delete", "", true)
+    ->SetupCondition_("condition-delete", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() != "0" && param->ToString_() != "1")
+        {
+            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+        }
+        return true;
+    });
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id del permiso de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
 Permissions::Permissions(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
 {
     Read_();
+    ReadSpecific_();
     ReadUsersOut_();
     Add_();
+    Modify_();
 }
 
 void Permissions::Read_()
@@ -43,27 +143,20 @@ void Permissions::Read_()
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/forms/permissions/read", HTTP::EnumMethods::kHTTP_GET);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
-
     auto action1 = function->AddAction_("a1");
     actions_.read_a01_.Setup_(action1);
 
-    // Setup custom process
-    function->SetupCustomProcess_([action1](NAF::Functions::Function& self)
-    {
-        // Execute actions
-        if(!action1->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
-            return;
-        }
+    get_functions()->push_back(function);
+}
 
-        // JSON Results
-        auto json_results = action1->CreateJSONResult_();
+void Permissions::ReadSpecific_()
+{
+    // Function GET /api/forms/permissions/read/id
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/read/id", HTTP::EnumMethods::kHTTP_GET);
 
-        // Send results
-        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_results);
-    });
+    auto action1 = function->AddAction_("a1");
+    actions_.read_a02_.Setup_(action1);
 
     get_functions()->push_back(function);
 }
@@ -173,5 +266,23 @@ void Permissions::Add_()
     });
     action1->AddParameter_("id_space", get_space_id(), false);
 
+    get_functions()->push_back(function);
+}
+
+void Permissions::Modify_()
+{
+    // Function GET /api/forms/permissions/modify
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/modify", HTTP::EnumMethods::kHTTP_PUT);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "UPDATE forms_permissions "
+        "SET `read` = ?, `add` = ?, `modify` = ?, `delete` = ? "
+        "WHERE "
+            "id = ? "
+            "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+    );
+    actions_.modify_a01_.Setup_(action1);
     get_functions()->push_back(function);
 }
