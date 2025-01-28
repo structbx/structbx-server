@@ -1,0 +1,3 @@
+[submodule "web"]
+	path = frontend
+	url = git@github.com:structbx/web.git
