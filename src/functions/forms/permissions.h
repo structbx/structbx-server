@@ -29,6 +29,7 @@ struct StructBX::Functions::Forms::PermissionsData
         read_a01_(function_data)
         ,read_a02_(function_data)
         ,modify_a01_(function_data)
+        ,delete_a01_(function_data)
     {
     }
     class ReadA01 : public Tools::BaseAction
@@ -49,6 +50,12 @@ struct StructBX::Functions::Forms::PermissionsData
             using Tools::BaseAction::BaseAction;
             virtual void Setup_(NAF::Functions::Action::Ptr action) override;
     } modify_a01_;
+    class DeleteA01 : public Tools::BaseAction
+    {
+        public:
+            using Tools::BaseAction::BaseAction;
+            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
+    } delete_a01_;
 };
 
 class StructBX::Functions::Forms::Permissions : public Tools::FunctionData
@@ -62,6 +69,7 @@ class StructBX::Functions::Forms::Permissions : public Tools::FunctionData
         void ReadUsersOut_();
         void Add_();
         void Modify_();
+        void Delete_();
 
     private:
         PermissionsData actions_;

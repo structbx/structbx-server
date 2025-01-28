@@ -126,6 +126,33 @@ void PermissionsData::ModifyA01::Setup_(NAF::Functions::Action::Ptr action)
     action_->AddParameter_("id_space", get_space_id(), false);
 }
 
+void PermissionsData::DeleteA01::Setup_(NAF::Functions::Action::Ptr action)
+{
+    action_ = action;
+
+    action_->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id del permiso de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action_->AddParameter_("id_space", get_space_id(), false);
+}
+
 Permissions::Permissions(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,actions_(function_data)
@@ -135,6 +162,7 @@ Permissions::Permissions(Tools::FunctionData& function_data) :
     ReadUsersOut_();
     Add_();
     Modify_();
+    Delete_();
 }
 
 void Permissions::Read_()
@@ -284,5 +312,20 @@ void Permissions::Modify_()
             "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
     );
     actions_.modify_a01_.Setup_(action1);
+    get_functions()->push_back(function);
+}
+
+void Permissions::Delete_()
+{
+    // Function GET /api/forms/permissions/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "DELETE FROM forms_permissions " \
+        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
+    );
+    actions_.delete_a01_.Setup_(action1);
     get_functions()->push_back(function);
 }
