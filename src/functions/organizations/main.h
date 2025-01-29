@@ -29,12 +29,20 @@ class StructBX::Functions::Organizations::Main : public Tools::FunctionData
         Main(Tools::FunctionData& function_data);
         
     protected:
-        void Read_();
-        void Modify_();
+        struct Read : public Tools::FunctionData
+        {
+            Read(Tools::FunctionData& function_data);
+        };
+        struct Modify : public Tools::FunctionData
+        {
+            Modify(Tools::FunctionData& function_data);
+        };
 
     private:
-        Users users_;
-        Groups groups_;
+        Users function_users_;
+        Groups function_groups_;
+        Read struct_read_;
+        Modify struct_modify_;
 
 };
 

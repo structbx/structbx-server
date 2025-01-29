@@ -6,14 +6,16 @@ using namespace StructBX::Functions::Organizations;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
-    ,users_(function_data)
-    ,groups_(function_data)
+    ,function_users_(function_data)
+    ,function_groups_(function_data)
+    ,struct_read_(function_data)
+    ,struct_modify_(function_data)
 {
-    Read_();
-    Modify_();
+    
 }
 
-void Main::Read_()
+Main::Read::Read(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/organizations/read
     NAF::Functions::Function::Ptr function = 
@@ -31,7 +33,8 @@ void Main::Read_()
     get_functions()->push_back(function);
 }
 
-void Main::Modify_()
+Main::Modify::Modify(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/organizations/modify
     NAF::Functions::Function::Ptr function = 
