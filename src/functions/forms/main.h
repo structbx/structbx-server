@@ -25,103 +25,32 @@ using namespace StructBX;
 using namespace NAF;
 
 
-struct StructBX::Functions::Forms::MainData
-{
-    MainData(Tools::FunctionData& function_data) : 
-        read_a01_(function_data)
-        ,read_specific_a01_(function_data)
-        ,read_specific_a02_(function_data)
-        ,add_a01_(function_data)
-        ,add_a02_(function_data)
-        ,add_a03_(function_data)
-        ,add_a03_1_(function_data)
-        ,modify_a01_(function_data)
-        ,modify_a02_(function_data)
-        ,modify_a03_(function_data)
-        ,delete_a01_(function_data)
-        ,delete_a02_(function_data)
-    {
-    }
-    class ReadA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_a01_;
-    class ReadSpecificA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_specific_a01_;
-    class ReadSpecificA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_specific_a02_;
-    class AddA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a01_;
-    class AddA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a02_;
-    class AddA03 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a03_;
-    class AddA03_1 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a03_1_;
-    class ModifyA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a01_;
-    class ModifyA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a02_;
-    class ModifyA03 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a03_;
-    class DeleteA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } delete_a01_;
-    class DeleteA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } delete_a02_;
-};
-
 class StructBX::Functions::Forms::Main : public Tools::FunctionData
 {
     public:
         Main(Tools::FunctionData& function_data);
 
     protected:
+        struct ActionsData : public Tools::FunctionData
+        {
+            ActionsData(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+            {
+            }
+
+            void ReadA01(NAF::Functions::Action::Ptr action);
+            void ReadSpecificA01(NAF::Functions::Action::Ptr action);
+            void ReadSpecificA02(NAF::Functions::Action::Ptr action);
+            void AddA01(NAF::Functions::Action::Ptr action);
+            void AddA02(NAF::Functions::Action::Ptr action);
+            void AddA03(NAF::Functions::Action::Ptr action);
+            void AddA03_1(NAF::Functions::Action::Ptr action);
+            void ModifyA01(NAF::Functions::Action::Ptr action);
+            void ModifyA02(NAF::Functions::Action::Ptr action);
+            void ModifyA03(NAF::Functions::Action::Ptr action);
+            void DeleteA01(NAF::Functions::Action::Ptr action);
+            void DeleteA02(NAF::Functions::Action::Ptr action);
+        };
+
         void Read_();
         void ReadSpecific_();
         void Add_();
@@ -129,7 +58,7 @@ class StructBX::Functions::Forms::Main : public Tools::FunctionData
         void Delete_();
 
     private:
-        MainData actions_;
+        ActionsData actions_;
         Data data_;
         Columns columns_;
         Permissions permissions_;
