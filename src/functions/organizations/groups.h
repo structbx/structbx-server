@@ -26,10 +26,15 @@ class StructBX::Functions::Organizations::Groups : public Tools::FunctionData
         Groups(Tools::FunctionData& function_data);
         
     protected:
-        void Read_();
+        struct Read : public Tools::FunctionData
+        {
+            Read(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+        };
 
     private:
-
+        Read struct_read_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_ORGANIZATIONS_GROUPS_H
