@@ -916,6 +916,7 @@ bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables
                 new Query::Parameter("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), false)
             )
         );
+        auto end = self.get_parameters().end();
         link_to = self.GetParameter_("link_to");
         if(link_to == end)
             return false;
