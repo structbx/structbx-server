@@ -4,17 +4,33 @@
 using namespace StructBX::Functions;
 using namespace StructBX::Functions::Forms;
 
-void DataData::VerifyPermissionsRead::Setup_(NAF::Functions::Action::Ptr action)
+Forms::Data::Data(Tools::FunctionData& function_data) :
+    FunctionData(function_data)
+    ,struct_read_(function_data)
+    ,struct_read_change_int_(function_data)
+    ,struct_read_specific_(function_data)
+    ,struct_read_file_(function_data)
+    ,struct_add_(function_data)
+    ,struct_modify_(function_data)
+    ,struct_delete_(function_data)
 {
-    action_ = action;
+    
+}
 
-    action_->set_sql_code(
+Forms::Data::VerifyPermissionsRead::VerifyPermissionsRead(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+
+}
+
+void Forms::Data::VerifyPermissionsRead::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT f.id " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.read = 1 AND fp.id_naf_user = ?"
     );
-    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
     {
         if(action.get_results()->size() < 1)
         {
@@ -24,7 +40,7 @@ void DataData::VerifyPermissionsRead::Setup_(NAF::Functions::Action::Ptr action)
 
         return true;
     });
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -35,21 +51,24 @@ void DataData::VerifyPermissionsRead::Setup_(NAF::Functions::Action::Ptr action)
         return true;
     });
 
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("id_user", get_id_user(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_user", get_id_user(), false);
 }
 
-void DataData::VerifyPermissionsAdd::Setup_(NAF::Functions::Action::Ptr action)
+Forms::Data::VerifyPermissionsAdd::VerifyPermissionsAdd(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    action_ = action;
+    
+}
 
-    action_->set_sql_code(
+void Forms::Data::VerifyPermissionsAdd::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT f.id " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.add = 1 AND fp.id_naf_user = ?"
     );
-    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
     {
         if(action.get_results()->size() < 1)
         {
@@ -59,7 +78,7 @@ void DataData::VerifyPermissionsAdd::Setup_(NAF::Functions::Action::Ptr action)
 
         return true;
     });
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -70,21 +89,24 @@ void DataData::VerifyPermissionsAdd::Setup_(NAF::Functions::Action::Ptr action)
         return true;
     });
 
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("id_user", get_id_user(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_user", get_id_user(), false);
 }
 
-void DataData::VerifyPermissionsModify::Setup_(NAF::Functions::Action::Ptr action)
+Forms::Data::VerifyPermissionsModify::VerifyPermissionsModify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    action_ = action;
+    
+}
 
-    action_->set_sql_code(
+void Forms::Data::VerifyPermissionsModify::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT f.id " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.modify = 1 AND fp.id_naf_user = ?"
     );
-    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
     {
         if(action.get_results()->size() < 1)
         {
@@ -94,7 +116,7 @@ void DataData::VerifyPermissionsModify::Setup_(NAF::Functions::Action::Ptr actio
 
         return true;
     });
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -105,21 +127,24 @@ void DataData::VerifyPermissionsModify::Setup_(NAF::Functions::Action::Ptr actio
         return true;
     });
 
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("id_user", get_id_user(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_user", get_id_user(), false);
 }
 
-void DataData::VerifyPermissionsDelete::Setup_(NAF::Functions::Action::Ptr action)
+Forms::Data::VerifyPermissionsDelete::VerifyPermissionsDelete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    action_ = action;
+    
+}
 
-    action_->set_sql_code(
+void Forms::Data::VerifyPermissionsDelete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT f.id " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.delete = 1 AND fp.id_naf_user = ?"
     );
-    action_->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
+    action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](NAF::Functions::Action& action)
     {
         if(action.get_results()->size() < 1)
         {
@@ -129,7 +154,7 @@ void DataData::VerifyPermissionsDelete::Setup_(NAF::Functions::Action::Ptr actio
 
         return true;
     });
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -140,362 +165,11 @@ void DataData::VerifyPermissionsDelete::Setup_(NAF::Functions::Action::Ptr actio
         return true;
     });
 
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("id_user", get_id_user(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_user", get_id_user(), false);
 }
 
-void DataData::ReadA01_0::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? " \
-        "ORDER BY fc.position ASC"
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ReadFileA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT f.id " \
-        "FROM forms f " \
-        "WHERE f.identifier = ? AND f.id_space = ? "
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ? " \
-        "ORDER BY fc.position ASC"
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ReadSpecificA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void DataData::AddA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action_->set_final(false);
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() != 1)
-        {
-            self.set_custom_error("El formulario solicitado no existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("id_space", get_space_id(), false);
-
-}
-
-void DataData::AddA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::AddA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-
-}
-
-void DataData::ModifyA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
-        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
-    );
-    action_->set_final(false);
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() != 1)
-        {
-            self.set_custom_error("El formulario solicitado no existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ModifyA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-    action_->set_final(false);
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::ModifyA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-}
-
-void DataData::DeleteA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
-        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
-    );
-    action_->set_final(false);
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() != 1)
-        {
-            self.set_custom_error("El formulario solicitado no existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void DataData::DeleteA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de registro no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-Forms::Data::Data(Tools::FunctionData& function_data) :
-    FunctionData(function_data)
-    ,actions_(function_data)
-{
-    ReadChangeInt_();
-    Read_();
-    ReadSpecific_();
-    ReadFile_();
-    Add_();
-    Modify_();
-    Delete_();
-}
-
-void Forms::Data::ReadChangeInt_()
-{
-    // Function GET /api/forms/data/read/changeInt
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/data/read/changeInt", HTTP::EnumMethods::kHTTP_GET);
-
-    // Action 1: Get Change int
-    auto action1 = function->AddAction_("a1");
-    action1->set_sql_code(
-        "SELECT f.change_int "
-        "FROM forms f "
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-
-    action1->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action1->AddParameter_("id_space", get_space_id(), false);
-
-    get_functions()->push_back(function);
-}
-
-void Forms::Data::Read_()
+Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/read
     NAF::Functions::Function::Ptr function = 
@@ -505,15 +179,16 @@ void Forms::Data::Read_()
 
     // Action 1_0: Get form id
     auto action1_0 = function->AddAction_("a1_0");
-    actions_.read_a01_0_.Setup_(action1_0);
+    A1(action1_0);
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
-    actions_.read_a01_.Setup_(action1);
+    A2(action1);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_read_.Setup_(fpv);
+    VerifyPermissionsRead struct_verify_permissions_read(function_data);
+    struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -778,7 +453,92 @@ void Forms::Data::Read_()
     get_functions()->push_back(function);
 }
 
-void Forms::Data::ReadSpecific_()
+void Forms::Data::Read::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::Read::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "ORDER BY fc.position ASC"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Forms::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function GET /api/forms/data/read/changeInt
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/data/read/changeInt", HTTP::EnumMethods::kHTTP_GET);
+
+    // Action 1: Get Change int
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    get_functions()->push_back(function);
+}
+
+void Forms::Data::ReadChangeInt::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.change_int "
+        "FROM forms f "
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/read/id
     NAF::Functions::Function::Ptr function = 
@@ -788,19 +548,20 @@ void Forms::Data::ReadSpecific_()
 
     // Action 1_0: Get form id
     auto action1_0 = function->AddAction_("a1_0");
-    actions_.read_a01_0_.Setup_(action1_0);
+    A1(action1_0);
 
     // Action 1: Get form columns
     auto action1 = function->AddAction_("a1");
-    actions_.read_specific_a01_.Setup_(action1);
+    A2(action1);
 
     // Action 2: Get Form data
     auto action2 = function->AddAction_("a2");
-    actions_.read_specific_a02_.Setup_(action2);
+    A3(action2);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_read_.Setup_(fpv);
+    VerifyPermissionsRead struct_verify_permissions_read(function_data);
+    struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -889,7 +650,72 @@ void Forms::Data::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void Forms::Data::ReadFile_()
+void Forms::Data::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::ReadSpecific::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
+            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
+            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "ORDER BY fc.position ASC"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::ReadSpecific::A3(NAF::Functions::Action::Ptr action)
+{
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+Forms::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/file/read
     NAF::Functions::Function::Ptr function = 
@@ -899,11 +725,12 @@ void Forms::Data::ReadFile_()
 
     // Action 1: Get form id
     auto action1 = function->AddAction_("a1");
-    actions_.read_file_a01_.Setup_(action1);
+    A1(action1);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_read_.Setup_(fpv);
+    VerifyPermissionsRead struct_verify_permissions_read(function_data);
+    struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -951,7 +778,29 @@ void Forms::Data::ReadFile_()
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Add_()
+void Forms::Data::ReadFile::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.id " \
+        "FROM forms f " \
+        "WHERE f.identifier = ? AND f.id_space = ? "
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/add
     NAF::Functions::Function::Ptr function = 
@@ -961,19 +810,18 @@ void Forms::Data::Add_()
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    actions_.add_01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
-    actions_.add_02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Save new record
     auto action3 = function->AddAction_("a3");
-    actions_.add_03_.Setup_(action3);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_add_.Setup_(fpv);
+    VerifyPermissionsAdd(function_data).A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -1045,7 +893,60 @@ void Forms::Data::Add_()
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Modify_()
+void Forms::Data::Add::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->set_final(false);
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+
+}
+
+void Forms::Data::Add::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/modify
     NAF::Functions::Function::Ptr function = 
@@ -1055,19 +956,18 @@ void Forms::Data::Modify_()
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    actions_.modify_01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Get form columns
     auto action2 = function->AddAction_("a2");
-    actions_.modify_02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Update record
     auto action3 = function->AddAction_("a3");
-    actions_.modify_03_.Setup_(action3);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_modify_.Setup_(fpv);
+    VerifyPermissionsModify(function_data).A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -1159,7 +1059,65 @@ void Forms::Data::Modify_()
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Delete_()
+void Forms::Data::Modify::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+    );
+    action->set_final(false);
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::Modify::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/delete
     NAF::Functions::Function::Ptr function = 
@@ -1169,19 +1127,19 @@ void Forms::Data::Delete_()
 
     // Action 1: Verify form existence
     auto action1 = function->AddAction_("a1");
-    actions_.delete_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2_0: Get form columns
     auto action2_0 = function->AddAction_("a2_0");
-    actions_.add_02_.Setup_(action2_0);
+    A2(action2_0);
 
     // Action 2: Delete record from table
     auto action2 = function->AddAction_("a2");
-    actions_.delete_a02_.Setup_(action2);
+    A3(action2);
 
     // Form permissions verifications
     auto fpv = function->AddAction_("fpv");
-    actions_.verify_permissions_delete_.Setup_(fpv);
+    VerifyPermissionsDelete(function_data).A1(fpv);
 
     // Setup Custom Process
     auto id_space = get_space_id();
@@ -1309,6 +1267,78 @@ void Forms::Data::Delete_()
     });
 
     get_functions()->push_back(function);
+}
+
+void Forms::Data::Delete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT f.id, fc.id AS column_id " \
+        "FROM forms f " \
+        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+    );
+    action->set_final(false);
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::Delete::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Forms::Data::Delete::A3(NAF::Functions::Action::Ptr action)
+{
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de registro no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 }
 
 bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
