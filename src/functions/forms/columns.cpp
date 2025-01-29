@@ -1,15 +1,35 @@
 
 #include "functions/forms/columns.h"
-#include <query/parameter.h>
-#include <tools/dvalue.h>
 
 using namespace StructBX::Functions::Forms;
 
-void ColumnsData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
+Columns::Columns(Tools::FunctionData& function_data) :
+    FunctionData(function_data)
+    ,struct_read_(function_data)
+    ,struct_read_specific_(function_data)
+    ,struct_read_types_(function_data)
+    ,struct_add_(function_data)
+    ,struct_modify_(function_data)
+    ,struct_delete_(function_data)
 {
-    action_ = action;
+    
+}
 
-    action_->set_sql_code(
+Columns::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function GET /api/forms/columns/read
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
+
+    auto action = function->AddAction_("a1");
+    A1(action);
+
+    get_functions()->push_back(function);
+}
+
+void Columns::Read::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT " \
             "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
             ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
@@ -22,9 +42,9 @@ void ColumnsData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
         "ORDER BY fc.position ASC"
     );
 
-    action_->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
 
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -36,11 +56,21 @@ void ColumnsData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
     });
 }
 
-void ColumnsData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
+Columns::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    action_ = action;
+    // Function GET /api/forms/columns/read/id
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
 
-    action_->set_sql_code(
+    auto action = function->AddAction_("a1");
+    A1(action);
+
+    get_functions()->push_back(function);
+}
+
+void Columns::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
         "SELECT " \
             "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
             ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
@@ -52,7 +82,7 @@ void ColumnsData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
             "fc.id = ? AND id_space = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
     );
-    action_->AddParameter_("id", "", true)
+    action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -62,8 +92,8 @@ void ColumnsData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
         }
         return true;
     });
-    action_->AddParameter_("id_space", get_space_id(), false);
-    action_->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -75,536 +105,24 @@ void ColumnsData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
     });
 }
 
-void ColumnsData::ReadTypesA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("SELECT * FROM forms_columns_types ");
-}
-
-void ColumnsData::AddA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_final(false);
-    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() < 1)
-        {
-            self.set_custom_error("El formulario solicitado no existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::AddA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
-    );
-
-    action_->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() > 0)
-        {
-            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::AddA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-    
-    action_->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_form) " \
-        "SELECT " \
-            "?, ? " \
-            ",MAX(fc.position) + 1 " \
-            ",?, ?, ?, ?, ?, ? " \
-            ",f.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
-    );
-
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El identificador debe ser una cadena de texto");
-            return false;
-        }
-        if(string_param == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        if(string_param.size() < 3)
-        {
-            param->set_error("El identificador no puede ser menor a 3 dígitos");
-            return false;
-        }
-        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
-        if(!result)
-        {
-            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("name", "", true)
-    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El nombre debe ser una cadena de texto");
-            return false;
-        }
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El nombre no puede estar vacío");
-            return false;
-        }
-        if(param->get_value()->ToString_().size() < 3)
-        {
-            param->set_error("El nombre no puede ser menor a 3 dígitos");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("length", "", true);
-    action_->AddParameter_("required", "", true)
-    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
-        {
-            return true;
-        }
-        else
-        {
-            param->set_error("El valor de obligatorio debe ser boleano");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("default_value", "", true);
-    action_->AddParameter_("description", "", true);
-    action_->AddParameter_("id_column_type", "", true)
-    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El tipo de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-    ->SetupCondition_("condition-link_to", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
-        }
-        return true;
-    });
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador del formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::ModifyA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_final(false);
-    action_->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() < 1)
-        {
-            self.set_custom_error("El formulario solicitado no existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::ModifyA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.identifier, fc.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE fc.id != ? AND fc.identifier = ? AND f.identifier = ?"
-    );
-
-    action_->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() > 0)
-        {
-            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void ColumnsData::ModifyA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-    
-    action_->set_sql_code(
-        "UPDATE forms_columns SET " \
-            "identifier = ?, name = ?, length = ?, required = ? " \
-            ",default_value = ?, description = ?, id_column_type = ?, link_to = ?, position = ? " \
-        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
-    );
-
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El identificador debe ser una cadena de texto");
-            return false;
-        }
-        if(string_param == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        if(string_param.size() < 3)
-        {
-            param->set_error("El identificador no puede ser menor a 3 dígitos");
-            return false;
-        }
-        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
-        if(!result)
-        {
-            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("name", "", true)
-    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El nombre debe ser una cadena de texto");
-            return false;
-        }
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El nombre no puede estar vacío");
-            return false;
-        }
-        if(param->get_value()->ToString_().size() < 3)
-        {
-            param->set_error("El nombre no puede ser menor a 3 dígitos");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("length", "", true);
-    action_->AddParameter_("required", "", true)
-    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
-        {
-            return true;
-        }
-        else
-        {
-            param->set_error("El valor de obligatorio debe ser boleano");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("default_value", "", true);
-    action_->AddParameter_("description", "", true);
-    action_->AddParameter_("id_column_type", "", true)
-    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El tipo de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
-        }
-        return true;
-    });
-    action_->AddParameter_("position", "", true)
-    ->SetupCondition_("condition-position", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("La posici&oacute;n no puede estar vacía");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de la columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador del formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::DeleteA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT fc.id AS column_id, f.id AS form_id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
-    );
-    action_->set_final(false);
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() != 1)
-        {
-            self.set_custom_error("La columna solicitada no existe en el formulario actual");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador de formulario no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void ColumnsData::DeleteA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-}
-
-void ColumnsData::DeleteA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("DELETE FROM forms_columns WHERE id = ?");
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id de columna no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-Columns::Columns(Tools::FunctionData& function_data) :
-    FunctionData(function_data)
-    ,actions_(function_data)
-{
-    Read_();
-    ReadSpecific_();
-    ReadTypes_();
-    Add_();
-    Modify_();
-    Delete_();
-}
-
-void Columns::Read_()
-{
-    // Function GET /api/forms/columns/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
-
-    auto action = function->AddAction_("a1");
-    actions_.read_a01_.Setup_(action);
-
-    get_functions()->push_back(function);
-}
-
-void Columns::ReadSpecific_()
-{
-    // Function GET /api/forms/columns/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
-
-    auto action = function->AddAction_("a1");
-    actions_.read_specific_a01_.Setup_(action);
-
-    get_functions()->push_back(function);
-}
-
-void Columns::ReadTypes_()
+Columns::ReadTypes::ReadTypes(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/types/read
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
-    actions_.read_types_a01_.Setup_(action);
+    A1(action);
 
     get_functions()->push_back(function);
 }
 
-void Columns::Add_()
+void Columns::ReadTypes::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("SELECT * FROM forms_columns_types ");
+}
+
+Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/forms/columns/add
     NAF::Functions::Function::Ptr function = 
@@ -614,15 +132,15 @@ void Columns::Add_()
 
     // Action 1: Verify that the form exists
     auto action1 = function->AddAction_("a1");
-    actions_.add_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Verify that the columns don't exists in the form
     auto action2 = function->AddAction_("a2");
-    actions_.add_a02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Save the column
     auto action3 = function->AddAction_("a3");
-    actions_.add_a03_.Setup_(action3);
+    A3(action3);
 
     // Action 4: Add the column in the table
     auto action4 = function->AddAction_("a4");
@@ -753,7 +271,191 @@ void Columns::Add_()
     get_functions()->push_back(function);
 }
 
-void Columns::Modify_()
+void Columns::Add::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_final(false);
+    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Columns::Add::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
+    );
+
+    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Columns::Add::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_form) " \
+        "SELECT " \
+            "?, ? " \
+            ",MAX(fc.position) + 1 " \
+            ",?, ?, ?, ?, ?, ? " \
+            ",f.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        auto string_param = param->get_value()->ToString_();
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El identificador debe ser una cadena de texto");
+            return false;
+        }
+        if(string_param == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        if(string_param.size() < 3)
+        {
+            param->set_error("El identificador no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre debe ser una cadena de texto");
+            return false;
+        }
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        if(param->get_value()->ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 dígitos");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("length", "", true);
+    action->AddParameter_("required", "", true)
+    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
+        {
+            return true;
+        }
+        else
+        {
+            param->set_error("El valor de obligatorio debe ser boleano");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("default_value", "", true);
+    action->AddParameter_("description", "", true);
+    action->AddParameter_("id_column_type", "", true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El tipo de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-link_to", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+        }
+        return true;
+    });
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/forms/columns/modify
     NAF::Functions::Function::Ptr function = 
@@ -763,15 +465,15 @@ void Columns::Modify_()
 
     // Action 1: Verify that the form exists
     auto action1 = function->AddAction_("a1");
-    actions_.modify_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Verify that the columns don't exists in the form
     auto action2 = function->AddAction_("a2");
-    actions_.modify_a02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Update the column
     auto action3 = function->AddAction_("a3");
-    actions_.modify_a03_.Setup_(action3);
+    A3(action3);
 
     // Setup Custom Process
     auto space_id = get_space_id();
@@ -842,7 +544,214 @@ void Columns::Modify_()
     get_functions()->push_back(function);
 }
 
-void Columns::Delete_()
+void Columns::Modify::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_final(false);
+    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Columns::Modify::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.identifier, fc.id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.id != ? AND fc.identifier = ? AND f.identifier = ?"
+    );
+
+    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("La columna solicitada ya existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "UPDATE forms_columns SET " \
+            "identifier = ?, name = ?, length = ?, required = ? " \
+            ",default_value = ?, description = ?, id_column_type = ?, link_to = ?, position = ? " \
+        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
+    );
+
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        auto string_param = param->get_value()->ToString_();
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El identificador debe ser una cadena de texto");
+            return false;
+        }
+        if(string_param == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        if(string_param.size() < 3)
+        {
+            param->set_error("El identificador no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre debe ser una cadena de texto");
+            return false;
+        }
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        if(param->get_value()->ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 dígitos");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("length", "", true);
+    action->AddParameter_("required", "", true)
+    ->SetupCondition_("condition-required", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "1" || param->get_value()->ToString_() == "0")
+        {
+            return true;
+        }
+        else
+        {
+            param->set_error("El valor de obligatorio debe ser boleano");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("default_value", "", true);
+    action->AddParameter_("description", "", true);
+    action->AddParameter_("id_column_type", "", true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El tipo de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+        }
+        return true;
+    });
+    action->AddParameter_("position", "", true)
+    ->SetupCondition_("condition-position", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("La posici&oacute;n no puede estar vacía");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de la columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador del formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/delete
     NAF::Functions::Function::Ptr function = 
@@ -852,18 +761,18 @@ void Columns::Delete_()
 
     // Action 1: Verify column existence
     auto action1 = function->AddAction_("a1");
-    actions_.delete_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2_0: Delete foreign key if exists
     auto action2_0 = function->AddAction_("a2_0");
 
     // Action 2: Delete column from table
     auto action2 = function->AddAction_("a2");
-    actions_.delete_a02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Delete column record
     auto action3 = function->AddAction_("a3");
-    actions_.delete_a03_.Setup_(action3);
+    A3(action3);
 
     // Setup Custom Process
     auto space_id = get_space_id();
@@ -926,6 +835,72 @@ void Columns::Delete_()
     });
 
     get_functions()->push_back(function);
+}
+
+void Columns::Delete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.id AS column_id, f.id AS form_id " \
+        "FROM forms_columns fc " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
+    );
+    action->set_final(false);
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("La columna solicitada no existe en el formulario actual");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
+void Columns::Delete::A2(NAF::Functions::Action::Ptr)
+{
+    
+}
+
+void Columns::Delete::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("DELETE FROM forms_columns WHERE id = ?");
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id de columna no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 }
 
 bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)

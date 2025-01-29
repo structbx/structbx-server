@@ -11,7 +11,6 @@ namespace StructBX
     {
         namespace Forms
         {
-            struct ColumnsData;
             class Columns;
         }
     }
@@ -19,97 +18,6 @@ namespace StructBX
 
 using namespace StructBX;
 using namespace NAF;
-
-struct StructBX::Functions::Forms::ColumnsData
-{
-    ColumnsData(Tools::FunctionData& function_data) : 
-        read_a01_(function_data)
-        ,read_specific_a01_(function_data)
-        ,read_types_a01_(function_data)
-        ,add_a01_(function_data)
-        ,add_a02_(function_data)
-        ,add_a03_(function_data)
-        ,modify_a01_(function_data)
-        ,modify_a02_(function_data)
-        ,modify_a03_(function_data)
-        ,delete_a01_(function_data)
-        ,delete_a02_(function_data)
-        ,delete_a03_(function_data)
-    {
-    }
-    class ReadA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_a01_;
-    class ReadSpecificA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_specific_a01_;
-    class ReadTypesA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } read_types_a01_;
-    class AddA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a01_;
-    class AddA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a02_;
-    class AddA03 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a03_;
-    class ModifyA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a01_;
-    class ModifyA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a02_;
-    class ModifyA03 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a03_;
-    class DeleteA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } delete_a01_;
-    class DeleteA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } delete_a02_;
-    class DeleteA03 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } delete_a03_;
-};
 
 class StructBX::Functions::Forms::Columns : public Tools::FunctionData
 {
@@ -141,15 +49,56 @@ class StructBX::Functions::Forms::Columns : public Tools::FunctionData
         Columns(Tools::FunctionData& function_data);
 
     protected:
-        void Read_();
-        void ReadSpecific_();
-        void ReadTypes_();
-        void Add_();
-        void Modify_();
-        void Delete_();
+        struct Read : public Tools::FunctionData
+        {
+            Read(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+        };
+        struct ReadSpecific : public Tools::FunctionData
+        {
+            ReadSpecific(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+        };
+        struct ReadTypes : public Tools::FunctionData
+        {
+            ReadTypes(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+        };
+        struct Add : public Tools::FunctionData
+        {
+            Add(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+        };
+        struct Modify : public Tools::FunctionData
+        {
+            Modify(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+        };
+        struct Delete : public Tools::FunctionData
+        {
+            Delete(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+        };
 
     private:
-        ColumnsData actions_;
+        Read struct_read_;
+        ReadSpecific struct_read_specific_;
+        ReadTypes struct_read_types_;
+        Add struct_add_;
+        Modify struct_modify_;
+        Delete struct_delete_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_FORMS_COLUMNS_H
