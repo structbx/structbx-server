@@ -15,7 +15,6 @@ namespace StructBX
     {
         namespace Forms
         {
-            struct MainData;
             class Main;
         }
     }
@@ -31,37 +30,53 @@ class StructBX::Functions::Forms::Main : public Tools::FunctionData
         Main(Tools::FunctionData& function_data);
 
     protected:
-        struct ActionsData : public Tools::FunctionData
+        struct Read : public Tools::FunctionData
         {
-            ActionsData(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
-            {
-            }
+            Read(Tools::FunctionData& function_data);
 
-            void ReadA01(NAF::Functions::Action::Ptr action);
-            void ReadSpecificA01(NAF::Functions::Action::Ptr action);
-            void ReadSpecificA02(NAF::Functions::Action::Ptr action);
-            void AddA01(NAF::Functions::Action::Ptr action);
-            void AddA02(NAF::Functions::Action::Ptr action);
-            void AddA03(NAF::Functions::Action::Ptr action);
-            void AddA03_1(NAF::Functions::Action::Ptr action);
-            void ModifyA01(NAF::Functions::Action::Ptr action);
-            void ModifyA02(NAF::Functions::Action::Ptr action);
-            void ModifyA03(NAF::Functions::Action::Ptr action);
-            void DeleteA01(NAF::Functions::Action::Ptr action);
-            void DeleteA02(NAF::Functions::Action::Ptr action);
+            void A1(NAF::Functions::Action::Ptr action);
+        };
+        struct ReadSpecific : public Tools::FunctionData
+        {
+            ReadSpecific(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+        };
+        struct Add : public Tools::FunctionData
+        {
+            Add(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+            void A3_1(NAF::Functions::Action::Ptr action);
+        };
+        struct Modify : public Tools::FunctionData
+        {
+            Modify(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+        };
+        struct Delete : public Tools::FunctionData
+        {
+            Delete(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
         };
 
-        void Read_();
-        void ReadSpecific_();
-        void Add_();
-        void Modify_();
-        void Delete_();
-
     private:
-        ActionsData actions_;
-        Data data_;
-        Columns columns_;
-        Permissions permissions_;
+        Data function_data_;
+        Columns function_columns_;
+        Permissions function_permissions_;
+        Read struct_read_;
+        ReadSpecific struct_read_specific_;
+        Add struct_add_;
+        Modify struct_modify_;
+        Delete struct_delete_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_FORMS_MAIN_H
