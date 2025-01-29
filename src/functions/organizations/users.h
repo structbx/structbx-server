@@ -12,7 +12,6 @@ namespace StructBX
     {
         namespace Organizations
         {
-            struct UsersData;
             class Users;
         }
     }
@@ -22,93 +21,69 @@ using namespace StructBX;
 using namespace NAF;
 
 
-struct StructBX::Functions::Organizations::UsersData
-{
-    UsersData(Tools::FunctionData& function_data) : 
-        modify_a01_(function_data)
-        ,modify_a02_(function_data)
-        ,modify_password_a01_(function_data)
-        ,modify_password_a02_(function_data)
-        ,add_a01_(function_data)
-        ,add_a02_(function_data)
-        ,modify_user_a01_0_(function_data)
-        ,modify_user_a01_(function_data)
-        ,modify_user_a02_(function_data)
-    {
-    }
-    class ModifyA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a01_;
-    class ModifyA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_a02_;
-    class ModifyPasswordA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_password_a01_;
-    class ModifyPasswordA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_password_a02_;
-    class AddA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a01_;
-    class AddA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } add_a02_;
-    class ModifyUserA01_0 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_user_a01_0_;
-    class ModifyUserA01 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_user_a01_;
-    class ModifyUserA02 : public Tools::BaseAction
-    {
-        public:
-            using Tools::BaseAction::BaseAction;
-            virtual void Setup_(NAF::Functions::Action::Ptr action) override;
-    } modify_user_a02_;
-};
-
 class StructBX::Functions::Organizations::Users : public Tools::FunctionData
 {
     public:
         Users(Tools::FunctionData& function_data);
         
     protected:
-        void Read_();
-        void ReadCurrent_();
-        void ReadSpecific_();
-        void ModifyCurrentUsername_();
-        void ModifyCurrentPassword_();
-        void Add_();
-        void Modify_();
-        void Delete_();
+        struct Read : public Tools::FunctionData
+        {
+            Read(Tools::FunctionData& function_data);
+        };
+        struct ReadCurrent : public Tools::FunctionData
+        {
+            ReadCurrent(Tools::FunctionData& function_data);
+        };
+        struct ReadSpecific : public Tools::FunctionData
+        {
+            ReadSpecific(Tools::FunctionData& function_data);
+        };
+        struct ModifyCurrentUsername : public Tools::FunctionData
+        {
+            ModifyCurrentUsername(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+        };
+        struct ModifyCurrentPassword : public Tools::FunctionData
+        {
+            ModifyCurrentPassword(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+        };
+        struct Add : public Tools::FunctionData
+        {
+            Add(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+        };
+        struct Modify : public Tools::FunctionData
+        {
+            Modify(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+            void A3(NAF::Functions::Action::Ptr action);
+        };
+        struct Delete : public Tools::FunctionData
+        {
+            Delete(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+        };
 
     private:
-        UsersData actions_;
+        Read struct_read_;
+        ReadCurrent struct_read_current_;
+        ReadSpecific struct_read_specific_;
+        ModifyCurrentUsername struct_modify_current_username_;
+        ModifyCurrentPassword struct_modify_current_password_;
+        Add struct_add_;
+        Modify struct_modify_;
+        Delete struct_delete_;
 
 };
 
