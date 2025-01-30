@@ -3,358 +3,21 @@
 
 using namespace StructBX::Functions::Spaces;
 
-void MainData::ReadA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.* " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE su.id_naf_user = ?"
-    );
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-
-}
-
-void MainData::ReadSpecificA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.* " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE su.id_naf_user = ? AND s.id = ?"
-    );
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-    action_->AddParameter_("id_space", get_space_id(), false);
-}
-
-void MainData::AddA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
-    action_->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() > 0)
-        {
-            self.set_custom_error("Un espacio con este identificador ya existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("identifier", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador de espacio no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void MainData::AddA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "INSERT INTO spaces (identifier, name, description) VALUES (?, ?, ?)"
-    );
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador del espacio no puede estar vacío");
-            return false;
-        }
-        if(param->ToString_().size() <= 3)
-        {
-            param->set_error("El identificador debe tener más de 3 caracteres");
-            return false;
-        }
-        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
-        if(!result)
-        {
-            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("name", "", true)
-    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El nombre del espacio no puede estar vacío");
-            return false;
-        }
-        if(param->ToString_().size() <= 3)
-        {
-            param->set_error("El nombre del espacio debe tener más de 3 caracteres");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("description", "", true);
-}
-
-void MainData::AddA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "INSERT INTO spaces_users (id_naf_user, id_space) " \
-        "SELECT ?, s.id FROM spaces s WHERE identifier = ?"
-    );
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-    action_->AddParameter_("identifier", "", true);
-}
-
-void MainData::ChangeA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE su.id_naf_user = ? AND s.id = ?"
-    );
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-    action_->AddParameter_("id_space", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
-    ->SetupCondition_("condition-id_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador de cambio de espacio no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void MainData::ModifyA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.id " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE su.id_naf_user = ?"
-    );
-    action_->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() < 1)
-        {
-            self.set_custom_error("El usuario actual no pertenece al espacio que intenta modificar");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-}
-
-void MainData::ModifyA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_final(false);
-    action_->set_sql_code("SELECT id FROM spaces WHERE identifier = ? AND id != ?");
-    action_->SetupCondition_("verify-space-identifier", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() > 0)
-        {
-            self.set_custom_error("Un espacio con este identificador ya existe");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->get_value()->ToString_() == "")
-        {
-            param->set_error("El id no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void MainData::ModifyA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "UPDATE spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "SET s.identifier = ?, s.name = ?, s.description = ? " \
-        "WHERE su.id_naf_user = ? AND s.id = ?"
-    );
-
-    action_->AddParameter_("identifier", "", true)
-    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El identificador debe ser una cadena de texto");
-            return false;
-        }
-        if(param->ToString_() == "")
-        {
-            param->set_error("El identificador no puede estar vacío");
-            return false;
-        }
-        if(param->ToString_().size() < 3)
-        {
-            param->set_error("El identificador no puede ser menor a 3 dígitos");
-            return false;
-        }
-        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
-        if(!result)
-        {
-            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("name", "", true)
-    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
-        {
-            param->set_error("El nombre debe ser una cadena de texto");
-            return false;
-        }
-        if(param->ToString_() == "")
-        {
-            param->set_error("El nombre no puede estar vacío");
-            return false;
-        }
-        if(param->ToString_().size() < 3)
-        {
-            param->set_error("El nombre no puede ser menor a 3 dígitos");
-            return false;
-        }
-        return true;
-    });
-    action_->AddParameter_("description", "", true);
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El id no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void MainData::DeleteA01::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "SELECT s.id " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "WHERE su.id_naf_user = ?"
-    );
-    action_->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
-    {
-        if(self.get_results()->size() < 1)
-        {
-            self.set_custom_error("El usuario actual no pertenece al espacio que intenta eliminar");
-            return false;
-        }
-
-        return true;
-    });
-
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-}
-
-void MainData::DeleteA02::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code(
-        "UPDATE spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
-        "SET s.state = 'DELETED' " \
-        "WHERE su.id_naf_user = ? AND s.id = ?"
-    );
-
-    action_->AddParameter_("id_naf_user", get_id_user(), false);
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El id de espacio no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
-void MainData::DeleteA03::Setup_(NAF::Functions::Action::Ptr action)
-{
-    action_ = action;
-
-    action_->set_sql_code("DELETE FROM spaces_users WHERE id_space = ?");
-
-    action_->AddParameter_("id", "", true)
-    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("El id de espacio no puede estar vacío");
-            return false;
-        }
-        return true;
-    });
-}
-
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
-    ,actions_(function_data)
-    ,users_(function_data)
+    ,function_users_(function_data)
+    ,struct_read_(function_data)
+    ,struct_read_specific_(function_data)
+    ,struct_change_(function_data)
+    ,struct_add_(function_data)
+    ,struct_modify_(function_data)
+    ,struct_delete_(function_data)
 {
-    Read_();
-    ReadSpecific_();
-    Change_();
-    Add_();
-    Modify_();
-    Delete_();
+    
 }
 
-void Main::Read_()
+Main::Read::Read(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/read
     NAF::Functions::Function::Ptr function = 
@@ -363,7 +26,7 @@ void Main::Read_()
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    actions_.read_a01_.Setup_(action);
+    A1(action);
 
     // Setup custom process
     auto space_id = get_space_id();
@@ -449,7 +112,19 @@ void Main::Read_()
     get_functions()->push_back(function);
 }
 
-void Main::ReadSpecific_()
+void Main::Read::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT s.* " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ?"
+    );
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
+Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/read/id
     NAF::Functions::Function::Ptr function = 
@@ -457,7 +132,7 @@ void Main::ReadSpecific_()
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
-    actions_.read_specific_a01_.Setup_(action);
+    A1(action);
 
     auto space_id = get_space_id();
     auto id_user = get_id_user();
@@ -499,61 +174,20 @@ void Main::ReadSpecific_()
     get_functions()->push_back(function);
 }
 
-void Main::Change_()
+void Main::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
 {
-    // Function GET /api/spaces/change
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
-
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
-
-    auto action = function->AddAction_("a1");
-    actions_.change_a01_.Setup_(action);
-
-    function->SetupCustomProcess_([&](NAF::Functions::Function& self)
-    {
-        // Search first action
-        auto action = *self.get_actions().begin();
-        if(self.get_actions().begin() == self.get_actions().end())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No actions found.");
-            return;
-        }
-        
-        // Execute action
-        if(!action->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action->get_custom_error());
-            return;
-        }
-        auto result = action->get_json_result();
-
-        // Set Space ID Cookie to the client
-        auto field = action->get_results()->First_();
-        if(!field->IsNull_())
-        {
-            // Set Cookie Space ID
-            auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(field->ToString_());
-            Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
-            cookie.setPath("/");
-            cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
-            cookie.setSecure(true);
-            cookie.setHttpOnly();
-
-            auto& response = self.get_http_server_response().value();
-            response->addCookie(cookie);
-            
-            // Send results
-            self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
-        }
-        else
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
-    });
-
-    get_functions()->push_back(function);
+    action->set_sql_code(
+        "SELECT s.* " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Main::Add_()
+Main::Add::Add(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/add
     NAF::Functions::Function::Ptr function = 
@@ -563,15 +197,15 @@ void Main::Add_()
 
     // Action1: Verify space if exists
     auto action1 = function->AddAction_("a1");
-    actions_.add_a01_.Setup_(action1);
+    A1(action1);
 
     // Action2: Add space
     auto action2 = function->AddAction_("a2");
-    actions_.add_a02_.Setup_(action2);
+    A2(action2);
 
     // Action3: Add current user to the new space
     auto action3 = function->AddAction_("a3");
-    actions_.add_a03_.Setup_(action3);
+    A3(action3);
 
     // Action4: Create database
     auto action4 = function->AddAction_("a4");
@@ -655,7 +289,164 @@ void Main::Add_()
     get_functions()->push_back(function);
 }
 
-void Main::Modify_()
+void Main::Add::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Un espacio con este identificador ya existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("identifier", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Main::Add::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "INSERT INTO spaces (identifier, name, description) VALUES (?, ?, ?)"
+    );
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador del espacio no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() <= 3)
+        {
+            param->set_error("El identificador debe tener más de 3 caracteres");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre del espacio no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() <= 3)
+        {
+            param->set_error("El nombre del espacio debe tener más de 3 caracteres");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("description", "", true);
+}
+
+void Main::Add::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "INSERT INTO spaces_users (id_naf_user, id_space) " \
+        "SELECT ?, s.id FROM spaces s WHERE identifier = ?"
+    );
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("identifier", "", true);
+}
+
+Main::Change::Change(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+{
+    // Function GET /api/spaces/change
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
+
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
+    auto action = function->AddAction_("a1");
+    A1(action);
+
+    function->SetupCustomProcess_([&](NAF::Functions::Function& self)
+    {
+        // Search first action
+        auto action = *self.get_actions().begin();
+        if(self.get_actions().begin() == self.get_actions().end())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "No actions found.");
+            return;
+        }
+        
+        // Execute action
+        if(!action->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, action->get_custom_error());
+            return;
+        }
+        auto result = action->get_json_result();
+
+        // Set Space ID Cookie to the client
+        auto field = action->get_results()->First_();
+        if(!field->IsNull_())
+        {
+            // Set Cookie Space ID
+            auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(field->ToString_());
+            Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
+            cookie.setPath("/");
+            cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
+            cookie.setSecure(true);
+            cookie.setHttpOnly();
+
+            auto& response = self.get_http_server_response().value();
+            response->addCookie(cookie);
+            
+            // Send results
+            self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
+        }
+        else
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
+    });
+
+    get_functions()->push_back(function);
+}
+
+void Main::Change::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("id_space", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    ->SetupCondition_("condition-id_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador de cambio de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+Main::Modify::Modify(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function PUT /api/spaces/modify
     NAF::Functions::Function::Ptr function = 
@@ -663,20 +454,150 @@ void Main::Modify_()
 
     // Action 1: Verify that current user is in the space
     auto action1 = function->AddAction_("a1");
-    actions_.modify_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Verify space identifier
     auto action2 = function->AddAction_("a2");
-    actions_.modify_a02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Modify space
     auto action3 = function->AddAction_("a3");
-    actions_.modify_a03_.Setup_(action3);
+    A3(action3);
 
     get_functions()->push_back(function);
 }
 
-void Main::Delete_()
+void Main::Modify::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT s.id " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ?"
+    );
+    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El usuario actual no pertenece al espacio que intenta modificar");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
+void Main::Modify::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_final(false);
+    action->set_sql_code("SELECT id FROM spaces WHERE identifier = ? AND id != ?");
+    action->SetupCondition_("verify-space-identifier", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Un espacio con este identificador ya existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Main::Modify::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "UPDATE spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "SET s.identifier = ?, s.name = ?, s.description = ? " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+
+    action->AddParameter_("identifier", "", true)
+    ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El identificador debe ser una cadena de texto");
+            return false;
+        }
+        if(param->ToString_() == "")
+        {
+            param->set_error("El identificador no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() < 3)
+        {
+            param->set_error("El identificador no puede ser menor a 3 dígitos");
+            return false;
+        }
+        bool result = Tools::IDChecker().Check_(param->get_value()->ToString_());
+        if(!result)
+        {
+            param->set_error("El identificador solo puede tener a-z, A-Z, 0-9 y \"_\", sin espacios en blanco");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("name", "", true)
+    ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        {
+            param->set_error("El nombre debe ser una cadena de texto");
+            return false;
+        }
+        if(param->ToString_() == "")
+        {
+            param->set_error("El nombre no puede estar vacío");
+            return false;
+        }
+        if(param->ToString_().size() < 3)
+        {
+            param->set_error("El nombre no puede ser menor a 3 dígitos");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("description", "", true);
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+Main::Delete::Delete(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/delete
     NAF::Functions::Function::Ptr function = 
@@ -684,15 +605,75 @@ void Main::Delete_()
 
     // Action 1: Verify that current user is in the space
     auto action1 = function->AddAction_("a1");
-    actions_.delete_a01_.Setup_(action1);
+    A1(action1);
 
     // Action 2: Mark space like "deleted"
     auto action2 = function->AddAction_("a2");
-    actions_.delete_a02_.Setup_(action2);
+    A2(action2);
 
     // Action 3: Delete users from space
     auto action3 = function->AddAction_("a3");
-    actions_.delete_a03_.Setup_(action3);
+    A3(action3);
 
     get_functions()->push_back(function);
+}
+
+void Main::Delete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT s.id " \
+        "FROM spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "WHERE su.id_naf_user = ?"
+    );
+    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El usuario actual no pertenece al espacio que intenta eliminar");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+}
+
+void Main::Delete::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "UPDATE spaces s " \
+        "JOIN spaces_users su ON su.id_space = s.id " \
+        "SET s.state = 'DELETED' " \
+        "WHERE su.id_naf_user = ? AND s.id = ?"
+    );
+
+    action->AddParameter_("id_naf_user", get_id_user(), false);
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Main::Delete::A3(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("DELETE FROM spaces_users WHERE id_space = ?");
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de espacio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
 }
