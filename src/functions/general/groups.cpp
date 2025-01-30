@@ -12,9 +12,9 @@ Groups::Groups(Tools::FunctionData& function_data) :
 
 Groups::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/groups/read
+    // Function GET /api/general/groups/read
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/groups/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<NAF::Functions::Function>("/api/general/groups/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
