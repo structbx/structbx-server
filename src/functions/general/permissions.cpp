@@ -137,19 +137,15 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
 }
 void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("INSERT INTO _naf_permissions (endpoint, action, id_group) VALUES (?, ?, ?)");
+    action->set_sql_code(
+        "INSERT INTO _naf_permissions (endpoint, action, id_group) "
+        "SELECT ?, action, ? "
+        "FROM endpoints "
+        "WHERE endpoint = ?"
+    );
     action->AddParameter_("endpoint", "", true);
-    action->AddParameter_("action", "", true)
-    ->SetupCondition_("condition-action", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
-    {
-        if(param->ToString_() == "")
-        {
-            param->set_error("La acción no puede estar vacía");
-            return false;
-        }
-        return true;
-    });
     action->AddParameter_("id_group", "", true);
+    action->AddParameter_("endpoint", "", true);
 }
 
 Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
