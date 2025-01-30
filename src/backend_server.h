@@ -6,7 +6,7 @@
 #include "handlers/backend_handler.h"
 
 #include "tools/function_data.h"
-#include "functions/organizations/main.h"
+#include "functions/general/main.h"
 #include "functions/spaces/main.h"
 #include "functions/forms/main.h"
 

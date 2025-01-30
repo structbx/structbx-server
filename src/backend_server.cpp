@@ -13,7 +13,7 @@ BackendServer::BackendServer() :
 void BackendServer::AddFunctions_()
 {
     // Functions
-    auto organizations = Organizations::Main(function_data_);
+    auto general = General::Main(function_data_);
     auto spaces = Spaces::Main(function_data_);
     auto forms = Forms::Main(function_data_);
 
