@@ -26,13 +26,28 @@ class StructBX::Functions::Spaces::Users : public Tools::FunctionData
         Users(Tools::FunctionData& function_data);
         
     protected:
-        void Read_();
-        void ReadUserOutSpace_();
-        void Add_();
-        void Delete_();
+        struct Read : public Tools::FunctionData
+        {
+            Read(Tools::FunctionData& function_data);
+        };
+        struct ReadUserOutSpace : public Tools::FunctionData
+        {
+            ReadUserOutSpace(Tools::FunctionData& function_data);
+        };
+        struct Add : public Tools::FunctionData
+        {
+            Add(Tools::FunctionData& function_data);
+        };
+        struct Delete : public Tools::FunctionData
+        {
+            Delete(Tools::FunctionData& function_data);
+        };
 
     private:
-
+        Read struct_read_;
+        ReadUserOutSpace struct_read_user_out_space_;
+        Add struct_add_;
+        Delete struct_delete_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_SPACES_USERS_H

@@ -5,14 +5,16 @@ using namespace StructBX::Functions::Spaces;
 
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
+    ,struct_read_(function_data)
+    ,struct_read_user_out_space_(function_data)
+    ,struct_add_(function_data)
+    ,struct_delete_(function_data)
 {
-    Read_();
-    ReadUserOutSpace_();
-    Add_();
-    Delete_();
+    
 }
 
-void Users::Read_()
+Users::Read::Read(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/read
     NAF::Functions::Function::Ptr function = 
@@ -39,7 +41,8 @@ void Users::Read_()
     get_functions()->push_back(function);
 }
 
-void Users::ReadUserOutSpace_()
+Users::ReadUserOutSpace::ReadUserOutSpace(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/out/read
     NAF::Functions::Function::Ptr function = 
@@ -73,7 +76,8 @@ void Users::ReadUserOutSpace_()
     get_functions()->push_back(function);
 }
 
-void Users::Add_()
+Users::Add::Add(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/add
     NAF::Functions::Function::Ptr function = 
@@ -110,7 +114,8 @@ void Users::Add_()
     get_functions()->push_back(function);
 }
 
-void Users::Delete_()
+Users::Delete::Delete(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/delete
     NAF::Functions::Function::Ptr function = 
