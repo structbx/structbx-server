@@ -85,7 +85,7 @@ Users::Add::Add(Tools::FunctionData& function_data) :
         "INSERT INTO spaces_users (id_space, id_naf_user) "
         "SELECT "
             "(SELECT id FROM spaces WHERE identifier = ?) "
-            ",(SELECT id_naf_user FROM organizations_users WHERE id_naf_user = ?) "
+            ",? "
     );
     action1->AddParameter_("identifier_space", "", true)
     ->SetupCondition_("condition-identifier_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
