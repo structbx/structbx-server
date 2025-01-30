@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_FUNCTIONS_ORGANIZATIONS_GROUPS_H
-#define STRUCTBX_FUNCTIONS_ORGANIZATIONS_GROUPS_H
+#ifndef STRUCTBX_FUNCTIONS_GENERAL_GROUPS_H
+#define STRUCTBX_FUNCTIONS_GENERAL_GROUPS_H
 
 
 #include "tools/base_action.h"
@@ -10,7 +10,7 @@ namespace StructBX
 {
     namespace Functions
     {
-        namespace Organizations
+        namespace General
         {
             class Groups;
         }
@@ -20,7 +20,7 @@ namespace StructBX
 using namespace StructBX;
 using namespace NAF;
 
-class StructBX::Functions::Organizations::Groups : public Tools::FunctionData
+class StructBX::Functions::General::Groups : public Tools::FunctionData
 {
     public:
         Groups(Tools::FunctionData& function_data);
@@ -37,4 +37,4 @@ class StructBX::Functions::Organizations::Groups : public Tools::FunctionData
         Read struct_read_;
 };
 
-#endif //STRUCTBX_FUNCTIONS_ORGANIZATIONS_GROUPS_H
+#endif //STRUCTBX_FUNCTIONS_GENERAL_GROUPS_H
