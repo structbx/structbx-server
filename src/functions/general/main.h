@@ -8,6 +8,7 @@
 
 #include "functions/general/users.h"
 #include "functions/general/groups.h"
+#include "functions/general/permissions.h"
 
 namespace StructBX
 {
@@ -41,6 +42,7 @@ class StructBX::Functions::General::Main : public Tools::FunctionData
     private:
         Users function_users_;
         Groups function_groups_;
+        Permissions function_permissions_;
         ReadInstanceName struct_read_instance_name_;
         ModifyInstanceName struct_modify_instance_name_;
 

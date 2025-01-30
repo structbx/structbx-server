@@ -7,6 +7,7 @@ Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,function_users_(function_data)
     ,function_groups_(function_data)
+    ,function_permissions_(function_data)
     ,struct_read_instance_name_(function_data)
     ,struct_modify_instance_name_(function_data)
 {
