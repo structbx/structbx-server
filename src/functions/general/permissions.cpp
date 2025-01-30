@@ -85,6 +85,8 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/general/permissions/add", HTTP::EnumMethods::kHTTP_POST);
     
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
     // Verify if permission in group don't exists yet
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -92,6 +94,28 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     // Add permission
     auto action2 = function->AddAction_("a2");
     A2(action2);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        // Execute actions
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+
+        NAF::Security::PermissionsManager::LoadPermissions_();
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
@@ -154,6 +178,8 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/general/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
     
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
     // Verify if group don't exists
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -161,6 +187,28 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     // Delete group
     auto action2 = function->AddAction_("a2");
     A2(action2);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        // Execute actions
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+
+        NAF::Security::PermissionsManager::LoadPermissions_();
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
