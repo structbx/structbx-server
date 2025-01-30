@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_FUNCTIONS_ORGANIZATIONS_USERS_H
-#define STRUCTBX_FUNCTIONS_ORGANIZATIONS_USERS_H
+#ifndef STRUCTBX_FUNCTIONS_GENERAL_USERS_H
+#define STRUCTBX_FUNCTIONS_GENERAL_USERS_H
 
 
 #include "tools/base_action.h"
@@ -10,7 +10,7 @@ namespace StructBX
 {
     namespace Functions
     {
-        namespace Organizations
+        namespace General
         {
             class Users;
         }
@@ -21,7 +21,7 @@ using namespace StructBX;
 using namespace NAF;
 
 
-class StructBX::Functions::Organizations::Users : public Tools::FunctionData
+class StructBX::Functions::General::Users : public Tools::FunctionData
 {
     public:
         Users(Tools::FunctionData& function_data);
@@ -87,4 +87,4 @@ class StructBX::Functions::Organizations::Users : public Tools::FunctionData
 
 };
 
-#endif //STRUCTBX_FUNCTIONS_ORGANIZATIONS_USERS_H
+#endif //STRUCTBX_FUNCTIONS_GENERAL_USERS_H

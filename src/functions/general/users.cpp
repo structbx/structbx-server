@@ -1,8 +1,7 @@
 
-#include "functions/organizations/users.h"
-#include <query/parameter.h>
+#include "functions/general/users.h"
 
-using namespace StructBX::Functions::Organizations;
+using namespace StructBX::Functions::General;
 
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
