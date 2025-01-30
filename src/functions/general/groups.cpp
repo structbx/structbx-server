@@ -73,6 +73,8 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     NAF::Functions::Function::Ptr function = 
         std::make_shared<NAF::Functions::Function>("/api/general/groups/add", HTTP::EnumMethods::kHTTP_POST);
     
+    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+
     // Verify if group new name don't exists yet
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -80,6 +82,45 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     // Add group
     auto action2 = function->AddAction_("a2");
     A2(action2);
+
+    // Add all permissions to the group
+    auto action3 = function->AddAction_("a3");
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([action1, action2, action3](NAF::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": " + action1->get_custom_error());
+            return;
+        }
+        // Execute actions
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": " + action2->get_custom_error());
+            return;
+        }
+
+        int group_id = action2->get_last_insert_id();
+        if(group_id == 0)
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error dl6IDr5edD");
+            return;
+        }
+
+        // Action 3: Add the column in the table
+        action3->set_sql_code("INSERT INTO _naf_permissions (endpoint, action, id_group) SELECT endpoint, action, ? FROM endpoints");
+        action3->AddParameter_("id_group", group_id, false);
+        if(!action3->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": " + action3->get_custom_error());
+            return;
+        }
+
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
+    });
 
     get_functions()->push_back(function);
 }
