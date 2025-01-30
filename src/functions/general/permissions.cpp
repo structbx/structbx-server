@@ -46,3 +46,36 @@ void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
+Permissions::ReadOutGroup::ReadOutGroup(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function GET /api/general/permissions/out/read
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/general/permissions/out/read", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    get_functions()->push_back(function);
+}
+
+void Permissions::ReadOutGroup::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT e.* "
+        "FROM endpoints e "
+        "LEFT JOIN _naf_permissions ng ON ng.endpoint = e.endpoint AND id_group = ? "
+        "WHERE ng.endpoint IS NULL "
+        "ORDER BY e.title ASC"
+    );
+    action->AddParameter_("id_group", "", true)
+    ->SetupCondition_("condition-id_group", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de grupo no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
