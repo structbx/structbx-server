@@ -79,3 +79,76 @@ void Permissions::ReadOutGroup::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
+Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function POST /api/general/permissions/add
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/general/permissions/add", HTTP::EnumMethods::kHTTP_POST);
+    
+    // Verify if permission in group don't exists yet
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    // Add permission
+    auto action2 = function->AddAction_("a2");
+    A2(action2);
+
+    get_functions()->push_back(function);
+}
+
+void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT id "
+        "FROM _naf_permissions "
+        "WHERE endpoint = ? AND id_group = ?"
+    );
+    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() > 0)
+        {
+            self.set_custom_error("Este permiso ya está registrado en este grupo");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("endpoint", "", true)
+    ->SetupCondition_("condition-endpoint", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El endpoint no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_group", "", true)
+    ->SetupCondition_("condition-id_group", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de grupo no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("INSERT INTO _naf_permissions (endpoint, action, id_group) VALUES (?, ?, ?)");
+    action->AddParameter_("endpoint", "", true);
+    action->AddParameter_("action", "", true)
+    ->SetupCondition_("condition-action", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("La acción no puede estar vacía");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_group", "", true);
+}
+
