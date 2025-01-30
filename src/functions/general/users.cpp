@@ -20,19 +20,16 @@ Users::Users(Tools::FunctionData& function_data) :
 Users::Read::Read(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/read
+    // Function GET /api/general/users/read
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
-        "WHERE ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ?)"
     );
-    action1->AddParameter_("id_user", get_id_user(), false);
 
     get_functions()->push_back(function);
 }
@@ -40,17 +37,16 @@ Users::Read::Read(Tools::FunctionData& function_data) :
 Users::ReadCurrent::ReadCurrent(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/current/read
+    // Function GET /api/general/users/current/read
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/current/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/current/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
-        "WHERE ou.id_naf_user = ?"
+        "WHERE nu.id = ?"
     );
     action1->AddParameter_("id_user", get_id_user(), false);
 
@@ -60,17 +56,16 @@ Users::ReadCurrent::ReadCurrent(Tools::FunctionData& function_data) :
 Users::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/read/id
+    // Function GET /api/general/users/read/id
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/read/id", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
         "FROM _naf_users nu "
         "JOIN _naf_groups ng ON ng.id = nu.id_group "
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
-        "WHERE ou.id_naf_user = ?"
+        "WHERE nu.id = ?"
     );
     action1->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id_user", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -89,9 +84,9 @@ Users::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
 Users::ModifyCurrentUsername::ModifyCurrentUsername(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/current/username/modify
+    // Function GET /api/general/users/current/username/modify
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/current/username/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/current/username/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     // Action1: Verify if username don't exists
     auto action1 = function->AddAction_("a1");
@@ -172,9 +167,9 @@ void Users::ModifyCurrentUsername::A2(NAF::Functions::Action::Ptr action)
 Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/current/password/modify
+    // Function GET /api/general/users/current/password/modify
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/current/password/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/current/password/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
@@ -289,9 +284,9 @@ void Users::ModifyCurrentPassword::A2(NAF::Functions::Action::Ptr action)
 Users::Add::Add(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/add
+    // Function GET /api/general/users/add
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/add", HTTP::EnumMethods::kHTTP_POST);
     
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
@@ -304,8 +299,7 @@ Users::Add::Add(Tools::FunctionData& function_data) :
     A2(action2);
 
     // Setup custom process
-    auto current_user = get_id_user();
-    function->SetupCustomProcess_([current_user, action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -326,23 +320,7 @@ Users::Add::Add(Tools::FunctionData& function_data) :
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Hubo un error al guardar el usuario");
             return;
         }
-
-        // Action3: Add username to the current organization
-        auto action3 = self.AddAction_("a3");
-        action3->set_sql_code(
-            "INSERT INTO organizations_users (id_organization, id_naf_user) "
-            "SELECT ou.id_organization, ? "
-            "FROM organizations_users ou "
-            "WHERE ou.id_naf_user = ? "
-        );
-        action3->AddParameter_("id_user", std::to_string(user_id), false);
-        action3->AddParameter_("id_naf_user", current_user, false);
-        if(!action3->Work_())
-        {
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action3->get_identifier() + ": No se pudo guardar el nuevo usuario");
-            return;
-        }
-
+        
         // Send results
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok");
     });
@@ -443,9 +421,9 @@ void Users::Add::A2(NAF::Functions::Action::Ptr action)
 Users::Modify::Modify(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/modify
+    // Function GET /api/general/users/modify
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
 
@@ -544,10 +522,8 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE _naf_users n "
-        "JOIN organizations_users ou ON ou.id_naf_user = n.id "
         "SET username = ?, password = ?, status = ?, id_group = ? "
         "WHERE n.id = ? "
-            "AND ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ? LIMIT 1)"
     );
 
     action->AddParameter_("username", "", true)
@@ -625,17 +601,14 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
 void Users::Modify::A3(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE _naf_users n "
-        "JOIN organizations_users ou ON ou.id_naf_user = n.id "
         "SET username = ?, status = ?, id_group = ? "
         "WHERE n.id = ? "
-            "AND ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ? LIMIT 1)"
     );
 
     action->AddParameter_("username", "", true)
@@ -694,15 +667,14 @@ void Users::Modify::A3(NAF::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
 Users::Delete::Delete(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/organizations/users/delete
+    // Function GET /api/general/users/delete
     NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/organizations/users/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<NAF::Functions::Function>("/api/general/users/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -714,10 +686,8 @@ void Users::Delete::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "DELETE nu FROM _naf_users nu "
-        "JOIN organizations_users ou ON ou.id_naf_user = nu.id "
         "WHERE "
             "nu.id = ? "
-            "AND ou.id_organization = (SELECT id_organization FROM organizations_users WHERE id_naf_user = ? LIMIT 1)"
     );
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
