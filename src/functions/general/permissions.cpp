@@ -152,3 +152,56 @@ void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_group", "", true);
 }
 
+Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function PUT /api/general/permissions/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/general/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
+    
+    // Verify if group don't exists
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    // Delete group
+    auto action2 = function->AddAction_("a2");
+    A2(action2);
+
+    get_functions()->push_back(function);
+}
+
+void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT id "
+        "FROM _naf_permissions "
+        "WHERE id = ?"
+    );
+    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El permiso al que intenta borrar no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de permiso no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Permissions::Delete::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("DELETE FROM _naf_permissions WHERE id = ?");
+    action->AddParameter_("id", "", true);
+
+}
