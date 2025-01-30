@@ -1,5 +1,6 @@
 
 #include "functions/general/groups.h"
+#include <http/methods.h>
 
 using namespace StructBX::Functions::General;
 
@@ -9,6 +10,7 @@ Groups::Groups(Tools::FunctionData& function_data) :
     ,struct_read_specific_(function_data)
     ,struct_add_(function_data)
     ,struct_modify_(function_data)
+    ,struct_delete_(function_data)
 {
     
 }
@@ -203,6 +205,60 @@ void Groups::Modify::A3(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code("UPDATE _naf_groups SET `group` = ? WHERE id = ?");
     action->AddParameter_("group", "", true);
+    action->AddParameter_("id", "", true);
+
+}
+
+Groups::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function PUT /api/general/groups/delete
+    NAF::Functions::Function::Ptr function = 
+        std::make_shared<NAF::Functions::Function>("/api/general/groups/delete", HTTP::EnumMethods::kHTTP_DEL);
+    
+    // Verify if group don't exists
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    // Delete group
+    auto action2 = function->AddAction_("a2");
+    A2(action2);
+
+    get_functions()->push_back(function);
+}
+
+void Groups::Delete::A1(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT id "
+        "FROM _naf_groups "
+        "WHERE id = ?"
+    );
+    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    {
+        if(self.get_results()->size() < 1)
+        {
+            self.set_custom_error("El grupo al que intenta borrar no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("id", "", true)
+    ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El id de grupo no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+}
+
+void Groups::Delete::A2(NAF::Functions::Action::Ptr action)
+{
+    action->set_sql_code("DELETE FROM _naf_groups WHERE id = ?");
     action->AddParameter_("id", "", true);
 
 }

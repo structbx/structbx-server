@@ -53,12 +53,20 @@ class StructBX::Functions::General::Groups : public Tools::FunctionData
             void A2(NAF::Functions::Action::Ptr action);
             void A3(NAF::Functions::Action::Ptr action);
         };
+        struct Delete : public Tools::FunctionData
+        {
+            Delete(Tools::FunctionData& function_data);
+
+            void A1(NAF::Functions::Action::Ptr action);
+            void A2(NAF::Functions::Action::Ptr action);
+        };
 
     private:
         Read struct_read_;
         ReadSpecific struct_read_specific_;
         Add struct_add_;
         Modify struct_modify_;
+        Delete struct_delete_;
 };
 
 #endif //STRUCTBX_FUNCTIONS_GENERAL_GROUPS_H
