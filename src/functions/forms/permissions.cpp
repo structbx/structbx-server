@@ -33,7 +33,7 @@ void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
         "SELECT fp.*, nu.username AS username, f.name AS form_name " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
-        "JOIN _naf_users nu ON nu.id = fp.id_naf_user "
+        "JOIN users nu ON nu.id = fp.id_naf_user "
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
 
@@ -68,7 +68,7 @@ void Permissions::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
         "SELECT fp.*, nu.username AS username, f.name AS form_name " \
         "FROM forms f " \
         "JOIN forms_permissions fp ON fp.id_form = f.id " \
-        "JOIN _naf_users nu ON nu.id = fp.id_naf_user "
+        "JOIN users nu ON nu.id = fp.id_naf_user "
         "WHERE fp.id = ? AND f.identifier = ? AND f.id_space = ?"
     );
 
@@ -111,7 +111,7 @@ void Permissions::ReadUsersOut::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT nu.id, nu.username "
-        "FROM _naf_users nu "
+        "FROM users nu "
         "LEFT JOIN forms_permissions su ON "
             "su.id_naf_user = nu.id AND "
             "su.id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
