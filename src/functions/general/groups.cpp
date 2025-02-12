@@ -31,7 +31,7 @@ void Groups::Read::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.* "
-        "FROM _naf_groups ng "
+        "FROM groups ng "
     );
 }
 
@@ -51,7 +51,7 @@ void Groups::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.* "
-        "FROM _naf_groups ng "
+        "FROM groups ng "
         "WHERE ng.id = ?"
     );
 
@@ -111,7 +111,7 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
         }
 
         // Action 3: Add the column in the table
-        action3->set_sql_code("INSERT INTO _naf_permissions (endpoint, action, id_group) SELECT endpoint, action, ? FROM endpoints");
+        action3->set_sql_code("INSERT INTO permissions (endpoint, action, id_group) SELECT endpoint, action, ? FROM endpoints");
         action3->AddParameter_("id_group", group_id, false);
         if(!action3->Work_())
         {
@@ -129,7 +129,7 @@ void Groups::Add::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_groups "
+        "FROM groups "
         "WHERE `group` = ?"
     );
     action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -156,7 +156,7 @@ void Groups::Add::A1(NAF::Functions::Action::Ptr action)
 }
 void Groups::Add::A2(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("INSERT INTO _naf_groups (`group`) VALUES (?)");
+    action->set_sql_code("INSERT INTO groups (`group`) VALUES (?)");
     action->AddParameter_("group", "", true);
 
 }
@@ -186,7 +186,7 @@ void Groups::Modify::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_groups "
+        "FROM groups "
         "WHERE id = ?"
     );
     action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -216,7 +216,7 @@ void Groups::Modify::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_groups "
+        "FROM groups "
         "WHERE `group` = ?"
     );
     action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -244,7 +244,7 @@ void Groups::Modify::A2(NAF::Functions::Action::Ptr action)
 
 void Groups::Modify::A3(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("UPDATE _naf_groups SET `group` = ? WHERE id = ?");
+    action->set_sql_code("UPDATE groups SET `group` = ? WHERE id = ?");
     action->AddParameter_("group", "", true);
     action->AddParameter_("id", "", true);
 
@@ -271,7 +271,7 @@ void Groups::Delete::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_groups "
+        "FROM groups "
         "WHERE id = ?"
     );
     action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -299,7 +299,7 @@ void Groups::Delete::A1(NAF::Functions::Action::Ptr action)
 
 void Groups::Delete::A2(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM _naf_groups WHERE id = ?");
+    action->set_sql_code("DELETE FROM groups WHERE id = ?");
     action->AddParameter_("id", "", true);
 
 }
