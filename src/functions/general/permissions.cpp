@@ -29,7 +29,7 @@ void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.*, e.title AS title "
-        "FROM _naf_permissions ng "
+        "FROM permissions ng "
         "JOIN endpoints e ON e.endpoint = ng.endpoint "
         "WHERE id_group = ? "
         "ORDER BY e.title ASC"
@@ -63,7 +63,7 @@ void Permissions::ReadOutGroup::A1(NAF::Functions::Action::Ptr action)
     action->set_sql_code(
         "SELECT e.* "
         "FROM endpoints e "
-        "LEFT JOIN _naf_permissions ng ON ng.endpoint = e.endpoint AND id_group = ? "
+        "LEFT JOIN permissions ng ON ng.endpoint = e.endpoint AND id_group = ? "
         "WHERE ng.endpoint IS NULL "
         "ORDER BY e.title ASC"
     );
@@ -124,7 +124,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_permissions "
+        "FROM permissions "
         "WHERE endpoint = ? AND id_group = ?"
     );
     action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -162,7 +162,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
 void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO _naf_permissions (endpoint, action, id_group) "
+        "INSERT INTO permissions (endpoint, action, id_group) "
         "SELECT ?, action, ? "
         "FROM endpoints "
         "WHERE endpoint = ?"
@@ -217,7 +217,7 @@ void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
-        "FROM _naf_permissions "
+        "FROM permissions "
         "WHERE id = ?"
     );
     action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
@@ -245,7 +245,7 @@ void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
 
 void Permissions::Delete::A2(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM _naf_permissions WHERE id = ?");
+    action->set_sql_code("DELETE FROM permissions WHERE id = ?");
     action->AddParameter_("id", "", true);
 
 }
