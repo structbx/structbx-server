@@ -27,8 +27,8 @@ Users::Read::Read(Tools::FunctionData& function_data) :
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
-        "FROM _naf_users nu "
-        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "FROM users nu "
+        "JOIN groups ng ON ng.id = nu.id_group "
     );
 
     get_functions()->push_back(function);
@@ -44,8 +44,8 @@ Users::ReadCurrent::ReadCurrent(Tools::FunctionData& function_data) :
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
-        "FROM _naf_users nu "
-        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "FROM users nu "
+        "JOIN groups ng ON ng.id = nu.id_group "
         "WHERE nu.id = ?"
     );
     action1->AddParameter_("id_user", get_id_user(), false);
@@ -63,8 +63,8 @@ Users::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, nu.status, nu.id_group, nu.created_at, ng.group AS 'group' "
-        "FROM _naf_users nu "
-        "JOIN _naf_groups ng ON ng.id = nu.id_group "
+        "FROM users nu "
+        "JOIN groups ng ON ng.id = nu.id_group "
         "WHERE nu.id = ?"
     );
     action1->AddParameter_("id", "", true)
@@ -102,7 +102,7 @@ Users::ModifyCurrentUsername::ModifyCurrentUsername(Tools::FunctionData& functio
 void Users::ModifyCurrentUsername::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM _naf_users WHERE username = ? AND id != ?");
+    action->set_sql_code("SELECT id FROM users WHERE username = ? AND id != ?");
     action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
@@ -130,7 +130,7 @@ void Users::ModifyCurrentUsername::A1(NAF::Functions::Action::Ptr action)
 void Users::ModifyCurrentUsername::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE _naf_users "
+        "UPDATE users "
         "SET username = ? "
         "WHERE id = ?"
     );
@@ -221,7 +221,7 @@ Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& functio
 void Users::ModifyCurrentPassword::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM _naf_users WHERE password = ? AND id = ?");
+    action->set_sql_code("SELECT id FROM users WHERE password = ? AND id = ?");
     action->SetupCondition_("verify-username-password", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
@@ -254,7 +254,7 @@ void Users::ModifyCurrentPassword::A1(NAF::Functions::Action::Ptr action)
 void Users::ModifyCurrentPassword::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE _naf_users "
+        "UPDATE users "
         "SET password = ? "
         "WHERE id = ?"
     );
@@ -329,7 +329,7 @@ Users::Add::Add(Tools::FunctionData& function_data) :
 
 void Users::Add::A1(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM _naf_users WHERE username = ?");
+    action->set_sql_code("SELECT id FROM users WHERE username = ?");
     action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
@@ -356,7 +356,7 @@ void Users::Add::A1(NAF::Functions::Action::Ptr action)
 void Users::Add::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO _naf_users (username, password, status, id_group) "
+        "INSERT INTO users (username, password, status, id_group) "
         "VALUES (?, ?, ?, ?) "
     );
 
@@ -484,7 +484,7 @@ Users::Modify::Modify(Tools::FunctionData& function_data) :
 
 void Users::Modify::A1(NAF::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM _naf_users WHERE username = ? AND id != ?");
+    action->set_sql_code("SELECT id FROM users WHERE username = ? AND id != ?");
     action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
@@ -521,7 +521,7 @@ void Users::Modify::A1(NAF::Functions::Action::Ptr action)
 void Users::Modify::A2(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE _naf_users n "
+        "UPDATE users n "
         "SET username = ?, password = ?, status = ?, id_group = ? "
         "WHERE n.id = ? "
     );
@@ -606,7 +606,7 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
 void Users::Modify::A3(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE _naf_users n "
+        "UPDATE users n "
         "SET username = ?, status = ?, id_group = ? "
         "WHERE n.id = ? "
     );
@@ -685,7 +685,7 @@ Users::Delete::Delete(Tools::FunctionData& function_data) :
 void Users::Delete::A1(NAF::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "DELETE nu FROM _naf_users nu "
+        "DELETE nu FROM users nu "
         "WHERE "
             "nu.id = ? "
     );
