@@ -63,6 +63,13 @@ void BackendServer::Process_()
         return;
     }
 
+    // Verify if user is active
+    if(!VerifyActiveUser_())
+    {
+        JSONResponse_(HTTP::Status::kHTTP_FORBIDDEN, "The user is inactive.");
+        return;
+    }
+
     // Process actions
     ProcessActions_();
 }
@@ -116,4 +123,23 @@ void BackendServer::SetupFunctionData_()
             }
         }
     }
+}
+
+bool BackendServer::VerifyActiveUser_()
+{
+    // Action to check if user is active
+    auto action = NAF::Functions::Action("a1");
+    action.set_sql_code(
+        "SELECT nu.id " \
+        "FROM _naf_users nu " \
+        "WHERE nu.id = ? AND nu.status = 'activo'"
+    );
+    action.AddParameter_("id_naf_user", function_data_.get_id_user(), false);
+    if(action.Work_())
+    {
+        if(action.get_results()->size() != 1)
+            return false;
+    }
+
+    return true;
 }

@@ -30,6 +30,7 @@ class StructBX::BackendServer : public Handlers::BackendHandler
 
     protected:
         void SetupFunctionData_();
+        bool VerifyActiveUser_();
 
     private:
         Tools::FunctionData function_data_;
