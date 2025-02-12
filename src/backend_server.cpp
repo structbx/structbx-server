@@ -131,7 +131,7 @@ bool BackendServer::VerifyActiveUser_()
     auto action = NAF::Functions::Action("a1");
     action.set_sql_code(
         "SELECT nu.id " \
-        "FROM _naf_users nu " \
+        "FROM users nu " \
         "WHERE nu.id = ? AND nu.status = 'activo'"
     );
     action.AddParameter_("id_naf_user", function_data_.get_id_user(), false);
