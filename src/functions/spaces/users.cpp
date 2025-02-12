@@ -23,7 +23,7 @@ Users::Read::Read(Tools::FunctionData& function_data) :
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username, sp.created_at " \
-        "FROM _naf_users nu " \
+        "FROM users nu " \
         "JOIN spaces_users sp ON sp.id_naf_user = nu.id " \
         "WHERE sp.id_space = (SELECT id FROM spaces WHERE identifier = ?)"
     );
@@ -51,7 +51,7 @@ Users::ReadUserOutSpace::ReadUserOutSpace(Tools::FunctionData& function_data) :
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "SELECT nu.id, nu.username "
-        "FROM _naf_users nu "
+        "FROM users nu "
         "LEFT JOIN spaces_users su ON "
             "su.id_naf_user = nu.id AND "
             "su.id_space = (SELECT s.id FROM spaces s JOIN spaces_users su2 ON su2.id_space = s.id WHERE identifier = ? AND su2.id_naf_user = ? LIMIT 1) "
