@@ -15,6 +15,9 @@ key: "key.pem"
 rootcert: ""
 logger_output_file: "structbx.log"
 debug: true
+permissions_table: "permissions"
+users_table: "users"
+sessions_table: "sessions"
 
 directory_for_uploaded_files : "/var/www/structbx-web-uploaded"
 space_id_cookie_name: "1f3efd18688d2b844f4fa1e800712c9b5750c031"
