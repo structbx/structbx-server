@@ -1,9 +1,15 @@
 
+#include <Poco/Exception.h>
+#include <iostream>
+
+#include <Poco/File.h>
+
 #include "core/nebula_atom.h"
 #include "functions/action.h"
 #include "handlers/custom_handler.h"
 #include "handlers/root_handler.h"
 #include "tools/route.h"
+#include <memory>
 #include <query/parameter.h>
 #include <tools/dvalue.h>
 #include <tools/output_logger.h>
@@ -12,6 +18,7 @@
 #include "web_server.h"
 #include "backend_server.h"
 
+using namespace Poco;
 using namespace StructBX;
 using namespace NAF;
 
@@ -20,7 +27,51 @@ struct Parameters
     std::string properties_file = "";
 };
 
-void SetupSettings()
+bool SetupOutputLog()
+{
+    // File for output log
+    File file_output_log(NAF::Tools::SettingsManager::GetSetting_("logger_output_file", "/var/log/structbx.log"));
+    if(!file_output_log.exists())
+    {
+        try
+        {
+            if (!file_output_log.createFile())
+            {
+                std::cerr << "The file could not be created: " << file_output_log.path() << std::endl;
+                return false;
+            }
+        }
+        catch (Poco::FileException& e)
+        {
+            std::cerr << "The file could not be created " << file_output_log.path() << ": " << e.what() << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SetupUploadedDir()
+{
+    // Directory for uploaded files
+    File dir_uploaded_files(NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded"));
+    if(!dir_uploaded_files.exists())
+    {
+        try
+        {
+            dir_uploaded_files.createDirectories();
+        }
+        catch (Poco::FileException& e)
+        {
+            std::cerr << "The directory could not be created " << dir_uploaded_files.path() << ": " << e.what() << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void AddCustomSettings()
 {
     NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbx-web-uploaded"));
     NAF::Tools::SettingsManager::AddSetting_("space_id_cookie_name", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("1f3efd18688d2"));
@@ -54,10 +105,11 @@ int main(int argc, char** argv)
 
     // Settings
         NAF::Tools::SettingsManager::set_config_path(params.properties_file);
-        NAF::Tools::OutputLogger::set_log_to_file(true);
-        SetupSettings();
+        AddCustomSettings();
         NAF::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
+        NAF::Tools::OutputLogger::set_log_to_file(SetupOutputLog());
+        SetupUploadedDir();
 
     // Setup
         NAF::Query::DatabaseManager::StartMySQL_();
@@ -122,4 +174,5 @@ int main(int argc, char** argv)
     // End
         NAF::Query::DatabaseManager::StopMySQL_();
         return code;
+
 }
