@@ -31,4 +31,4 @@ COPY --from=build /usr/src/structbx/conf/* /etc/structbx/
 
 WORKDIR /
 
-ENTRYPOINT ["/bin/structbx-server", "--config /etc/structbx/properties.yaml"]
+ENTRYPOINT ["/bin/structbx-server", "--config", "/etc/structbx/properties.yaml"]
