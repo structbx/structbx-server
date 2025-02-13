@@ -23,15 +23,12 @@ RUN mkdir build && cd build && \
 
 FROM ghcr.io/nebulaatom/nebulaatom:latest
 
-COPY --from=build /structbx /structbx
+COPY --from=build /structbx /
 
 COPY --from=build /usr/src/structbx/build/structbx-web /var/www/structbx-web
 
-COPY --from=build /usr/src/structbx/conf/*.pem /structbx/etc/structbx/
+COPY --from=build /usr/src/structbx/conf/* /etc/structbx/
 
-WORKDIR /structbx
+WORKDIR /
 
-RUN mkdir -p /var/www/structbx-web-uploaded && \
-    touch /var/log/structbx.log
-
-# ENTRYPOINT ["/structbx/bin/structbx-server", "--config /structbx/etc/structbx/properties.yaml"]
+ENTRYPOINT ["/bin/structbx-server", "--config /etc/structbx/properties.yaml"]
