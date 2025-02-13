@@ -21,5 +21,20 @@
             ,"type": "shell"
             ,"command": "cd build/Debug && sudo cmake --build . --target install"
         }
+        ,{
+            "label": "Create Docker Image"
+            ,"type": "shell"
+            ,"command": "docker build -t structbx:latest ."
+        }
+        ,{
+            "label": "Create Docker Container"
+            ,"type": "shell"
+            ,"command": "docker run -d -t -v ${workspaceFolder}/build/Debug/DockerVolume:/structbx/etc/structbx --name test-structbx -p 3001:3001 --init --rm structbx:latest"
+        }
+        ,{
+            "label": "Copy conf"
+            ,"type": "shell"
+            ,"command": "mkdir -p build/Debug/DockerVolume && cp conf/* build/Debug && cp conf/* build/Debug/DockerVolume"
+        }
     ]
 }
