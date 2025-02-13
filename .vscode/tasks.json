@@ -29,7 +29,7 @@
         ,{
             "label": "Create Docker Container"
             ,"type": "shell"
-            ,"command": "docker run -d -t -v ${workspaceFolder}/build/Debug/DockerVolume:/structbx/etc/structbx --name test-structbx -p 3001:3001 --init --rm structbx:latest"
+            ,"command": "docker run -t -v ${workspaceFolder}/build/Debug/DockerVolume:/etc/structbx -v /var/www/structbx-web-uploaded:/var/www/structbx-web-uploaded --name test-structbx -p 3001:3001 --init --rm structbx:latest"
         }
         ,{
             "label": "Copy conf"
