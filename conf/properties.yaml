@@ -13,7 +13,7 @@ directory_for_temp_files : "/tmp"
 certificate: "cert.pem"
 key: "key.pem"
 rootcert: ""
-logger_output_file: "structbx.log"
+logger_output_file: "/var/log/structbx.log"
 debug: true
 permissions_table: "permissions"
 users_table: "users"
