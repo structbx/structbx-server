@@ -15,10 +15,31 @@
 using namespace StructBX;
 using namespace NAF;
 
+struct Parameters
+{
+    std::string properties_file = "";
+};
+
 void SetupSettings()
 {
     NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbx-web-uploaded"));
     NAF::Tools::SettingsManager::AddSetting_("space_id_cookie_name", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("1f3efd18688d2"));
+}
+
+Parameters SetupParameters(std::vector<std::string>& parameters)
+{
+    Parameters params;
+
+    // Properties file
+    auto config = std::find(parameters.begin(), parameters.end(), "--config");
+    params.properties_file = config != parameters.end() ? *(config + 1) : "properties.yaml";
+
+    // Remove all parameters except the first one
+    std::string first_param = parameters.front();
+    parameters = std::vector<std::string>();
+    parameters.push_back(first_param);
+
+    return params;
 }
 
 int main(int argc, char** argv)
@@ -26,7 +47,14 @@ int main(int argc, char** argv)
     // Setup
         Core::NebulaAtom app(true);
 
-    // Setup settings
+    // Parameters
+        auto& parameters = app.get_console_parameters();
+        parameters = std::vector<std::string>(argv, argv + argc);
+        Parameters params = SetupParameters(parameters);
+
+    // Settings
+        NAF::Tools::SettingsManager::set_config_path(params.properties_file);
+        NAF::Tools::OutputLogger::set_log_to_file(true);
         SetupSettings();
         NAF::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
@@ -89,7 +117,7 @@ int main(int argc, char** argv)
         });
 
     // Run
-        auto code = app.Init_(argc, argv);
+        auto code = app.Init_();
 
     // End
         NAF::Query::DatabaseManager::StopMySQL_();
