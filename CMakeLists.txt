@@ -93,7 +93,13 @@ add_executable(structbx-server ${SOURCES})
 target_link_libraries(structbx-server PUBLIC ${LIB_DEPENDECIES})
 target_include_directories(structbx-server PUBLIC ${HEADER})
 
-# Copy properties file
-file(COPY ${CMAKE_SOURCE_DIR}/properties.yaml
-	DESTINATION ${CMAKE_BINARY_DIR}
+# Install files
+include(GNUInstallDirs)
+install(
+    TARGETS structbx-server
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+install(
+	FILES ${PROJECT_SOURCE_DIR}/conf/properties.yaml
+	DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/structbx/
 )
