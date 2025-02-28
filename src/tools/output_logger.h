@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_TOOLS_OUTPUTLOGGER
-#define NAF_TOOLS_OUTPUTLOGGER
+#ifndef STRUCTBX_TOOLS_OUTPUTLOGGER
+#define STRUCTBX_TOOLS_OUTPUTLOGGER
 
 
 #include <iostream>
@@ -76,4 +76,4 @@ class NAF::Tools::OutputLogger
         static std::string output_file_address_;
 };
 
-#endif // NAF_TOOLS_OUTPUTLOGGER
+#endif // STRUCTBX_TOOLS_OUTPUTLOGGER

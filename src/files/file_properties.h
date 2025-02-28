@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_FILES_FILEPROPERTIES
-#define NAF_FILES_FILEPROPERTIES
+#ifndef STRUCTBX_FILES_FILEPROPERTIES
+#define STRUCTBX_FILES_FILEPROPERTIES
 
 
 #include <string>
@@ -60,4 +60,4 @@ class NAF::Files::FileProperties
 		std::vector<std::string> other_extensions_;
 };
 
-#endif // NAF_FILES_FILEPROPERTIES
+#endif // STRUCTBX_FILES_FILEPROPERTIES

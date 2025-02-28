@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_TOOLS_SETTINGSMANAGER
-#define NAF_TOOLS_SETTINGSMANAGER
+#ifndef STRUCTBX_TOOLS_SETTINGSMANAGER
+#define STRUCTBX_TOOLS_SETTINGSMANAGER
 
 
 #include <iostream>
@@ -94,4 +94,4 @@ class NAF::Tools::SettingsManager
         static std::string config_path_;
 };
 
-#endif // NAF_TOOLS_SETTINGSMANAGER
+#endif // STRUCTBX_TOOLS_SETTINGSMANAGER

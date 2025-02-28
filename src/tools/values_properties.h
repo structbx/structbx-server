@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_EXTRAS_VALUESPROPERTIES
-#define NAF_EXTRAS_VALUESPROPERTIES
+#ifndef STRUCTBX_EXTRAS_VALUESPROPERTIES
+#define STRUCTBX_EXTRAS_VALUESPROPERTIES
 
 
 #include <string>
@@ -89,4 +89,4 @@ class NAF::Extras::ValuesProperties
         bool quotes_;
 };
 
-#endif // NAF_EXTRAS_VALUESPROPERTIES
+#endif // STRUCTBX_EXTRAS_VALUESPROPERTIES

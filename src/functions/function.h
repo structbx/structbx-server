@@ -1,6 +1,6 @@
 
-#ifndef NAF_FUNCTIONS_FUNCTION
-#define NAF_FUNCTIONS_FUNCTION
+#ifndef STRUCTBX_FUNCTIONS_FUNCTION
+#define STRUCTBX_FUNCTIONS_FUNCTION
 
 
 #include <functional>
@@ -116,4 +116,4 @@ class NAF::Functions::Function : public HTTP::CommonResponses
 };
 
 
-#endif // NAF_FUNCTIONS_FUNCTION
+#endif // STRUCTBX_FUNCTIONS_FUNCTION

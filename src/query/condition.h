@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_CONDITION
-#define NAF_QUERY_CONDITION
+#ifndef STRUCTBX_QUERY_CONDITION
+#define STRUCTBX_QUERY_CONDITION
 
 
 #include "query/results.h"
@@ -81,4 +81,4 @@ template <typename T> bool NAF::Query::Condition<T>::VerifyCondition_(T t)
     return functor_(t);
 }
 
-#endif // NAF_QUERY_CONDITION
+#endif // STRUCTBX_QUERY_CONDITION

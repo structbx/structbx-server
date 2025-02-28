@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HTTP_REQUEST
-#define NAF_HTTP_REQUEST
+#ifndef STRUCTBX_HTTP_REQUEST
+#define STRUCTBX_HTTP_REQUEST
 
 
 #include <vector>
@@ -123,4 +123,4 @@ class NAF::HTTP::Request
         std::vector<HTTP::Cookie> cookies_;
 };
 
-#endif // NAF_HTTP_REQUEST
+#endif // STRUCTBX_HTTP_REQUEST

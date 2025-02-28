@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_TOOLS_ROUTE
-#define NAF_TOOLS_ROUTE
+#ifndef STRUCTBX_TOOLS_ROUTE
+#define STRUCTBX_TOOLS_ROUTE
 
 
 #include <string>
@@ -73,4 +73,4 @@ class NAF::Tools::Route
         std::vector<std::string> segments_;
 };
 
-#endif // NAF_TOOLS_ROUTE
+#endif // STRUCTBX_TOOLS_ROUTE

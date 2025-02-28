@@ -1,6 +1,6 @@
 
-#ifndef NAF_TOOLS_BASE64TOOL
-#define NAF_TOOLS_BASE64TOOL
+#ifndef STRUCTBX_TOOLS_BASE64TOOL
+#define STRUCTBX_TOOLS_BASE64TOOL
 
 #include <string>
 #include <sstream>
@@ -29,4 +29,4 @@ class NAF::Tools::Base64Tool
         std::string Decode_(std::string text_to_decode);
 };
 
-#endif //NAF_TOOLS_BASE64TOOL
+#endif //STRUCTBX_TOOLS_BASE64TOOL

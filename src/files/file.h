@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2022 <copyright holder> <email>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef NAF_FILES_FILE
-#define NAF_FILES_FILE
+#ifndef STRUCTBX_FILES_FILE
+#define STRUCTBX_FILES_FILE
 
 
 #include <string>
@@ -87,4 +87,4 @@ class NAF::Files::File
         std::shared_ptr<Poco::File> tmp_file_;
 };
 
-#endif // NAF_FILES_FILE
+#endif // STRUCTBX_FILES_FILE

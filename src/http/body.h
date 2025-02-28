@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HTTP_BODY
-#define NAF_HTTP_BODY
+#ifndef STRUCTBX_HTTP_BODY
+#define STRUCTBX_HTTP_BODY
 
 
 #include <istream>
@@ -94,4 +94,4 @@ class NAF::HTTP::Body : public Tools::ManageJSON
         
 };
 
-#endif // NAF_HTTP_BODY
+#endif // STRUCTBX_HTTP_BODY

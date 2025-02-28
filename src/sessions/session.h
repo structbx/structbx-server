@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_EXTRAS_SESSION
-#define NAF_EXTRAS_SESSION
+#ifndef STRUCTBX_EXTRAS_SESSION
+#define STRUCTBX_EXTRAS_SESSION
 
 
 #include <string>
@@ -95,4 +95,4 @@ class NAF::Extras::Session
 };
 
 
-#endif // NAF_EXTRAS_SESSION
+#endif // STRUCTBX_EXTRAS_SESSION

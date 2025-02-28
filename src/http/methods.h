@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HTTPMETHODS
-#define NAF_HTTPMETHODS
+#ifndef STRUCTBX_HTTPMETHODS
+#define STRUCTBX_HTTPMETHODS
 
 #include <map>
 #include <string>
@@ -96,4 +96,4 @@ class NAF::HTTP::Methods
         std::list<MethodStruct> process_;
 };
 
-#endif // NAF_HTTPMETHODS
+#endif // STRUCTBX_HTTPMETHODS

@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HTTP_CLIENT
-#define NAF_HTTP_CLIENT
+#ifndef STRUCTBX_HTTP_CLIENT
+#define STRUCTBX_HTTP_CLIENT
 
 
 #include <functional>
@@ -119,4 +119,4 @@ class NAF::HTTP::Client
         Context::Ptr ssl_context_;
 };
 
-#endif // NAF_HTTP_CLIENT
+#endif // STRUCTBX_HTTP_CLIENT

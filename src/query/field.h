@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_FIELD
-#define NAF_QUERY_FIELD
+#ifndef STRUCTBX_QUERY_FIELD
+#define STRUCTBX_QUERY_FIELD
 
 
 #include <string>
@@ -75,4 +75,4 @@ class NAF::Query::Field
 };
 
 
-#endif // NAF_QUERY_FIELD
+#endif // STRUCTBX_QUERY_FIELD

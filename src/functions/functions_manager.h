@@ -1,6 +1,6 @@
 
-#ifndef NAF_FUNCTIONS_FUNCTIONS_MANAGER
-#define NAF_FUNCTIONS_FUNCTIONS_MANAGER
+#ifndef STRUCTBX_FUNCTIONS_FUNCTIONS_MANAGER
+#define STRUCTBX_FUNCTIONS_FUNCTIONS_MANAGER
 
 
 #include <string>
@@ -38,4 +38,4 @@ class NAF::Functions::FunctionsManager
         FunctionsMap functions_;
 };
 
-#endif // NAF_FUNCTIONS_FUNCTIONS_MANAGER
+#endif // STRUCTBX_FUNCTIONS_FUNCTIONS_MANAGER

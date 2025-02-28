@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HANDLERS_BACKENDHANDLER
-#define NAF_HANDLERS_BACKENDHANDLER
+#ifndef STRUCTBX_HANDLERS_BACKENDHANDLER
+#define STRUCTBX_HANDLERS_BACKENDHANDLER
 
 
 #include "handlers/root_handler.h"
@@ -43,4 +43,4 @@ class NAF::Handlers::BackendHandler : public RootHandler
         void ProcessActions_();
 };
 
-#endif // NAF_HANDLERS_BACKENDHANDLER
+#endif // STRUCTBX_HANDLERS_BACKENDHANDLER

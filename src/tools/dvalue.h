@@ -16,8 +16,8 @@
  */
 
 
-#ifndef NAF_TOOLS_DVALUE
-#define NAF_TOOLS_DVALUE
+#ifndef STRUCTBX_TOOLS_DVALUE
+#define STRUCTBX_TOOLS_DVALUE
 
 
 #include <string>
@@ -121,4 +121,4 @@ class NAF::Tools::DValue
 };
 
 
-#endif // NAF_TOOLS_DVALUE
+#endif // STRUCTBX_TOOLS_DVALUE

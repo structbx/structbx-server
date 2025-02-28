@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_PARAMETER
-#define NAF_QUERY_PARAMETER
+#ifndef STRUCTBX_QUERY_PARAMETER
+#define STRUCTBX_QUERY_PARAMETER
 
 
 #include <string>
@@ -98,4 +98,4 @@ class NAF::Query::Parameter
         Query::Condition<Ptr>::Ptr condition_;
 };
 
-#endif // NAF_QUERY_PARAMETER
+#endif // STRUCTBX_QUERY_PARAMETER

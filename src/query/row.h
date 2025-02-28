@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_ROW
-#define NAF_QUERY_ROW
+#ifndef STRUCTBX_QUERY_ROW
+#define STRUCTBX_QUERY_ROW
 
 
 #include <vector>
@@ -46,4 +46,4 @@ class NAF::Query::Row : public std::vector<Field::Ptr>
         Field::Ptr AddField_(std::string column_name, Tools::DValue::Ptr value);
 };
 
-#endif // NAF_QUERY_ROW
+#endif // STRUCTBX_QUERY_ROW

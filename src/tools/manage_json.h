@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_TOOLS_MANAGEJSON
-#define NAF_TOOLS_MANAGEJSON
+#ifndef STRUCTBX_TOOLS_MANAGEJSON
+#define STRUCTBX_TOOLS_MANAGEJSON
 
 
 #include <istream>
@@ -75,4 +75,4 @@ class NAF::Tools::ManageJSON
         JSON::Object::Ptr json_object_;
 };
 
-#endif // NAF_TOOLS_MANAGEJSON
+#endif // STRUCTBX_TOOLS_MANAGEJSON

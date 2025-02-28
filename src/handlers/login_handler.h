@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HANDLERS_LOGINHANDLER
-#define NAF_HANDLERS_LOGINHANDLER
+#ifndef STRUCTBX_HANDLERS_LOGINHANDLER
+#define STRUCTBX_HANDLERS_LOGINHANDLER
 
 
 #include "handlers/root_handler.h"
@@ -48,4 +48,4 @@ class NAF::Handlers::LoginHandler :
     private:
 };
 
-#endif // NAF_HANDLERS_LOGINHANDLER
+#endif // STRUCTBX_HANDLERS_LOGINHANDLER

@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HTTP_COMMONRESPONSES
-#define NAF_HTTP_COMMONRESPONSES
+#ifndef STRUCTBX_HTTP_COMMONRESPONSES
+#define STRUCTBX_HTTP_COMMONRESPONSES
 
 
 #include <string>
@@ -101,4 +101,4 @@ class NAF::HTTP::CommonResponses : public HTTP::Request
         std::map<HTTP::Status, Attributes> responses_;
 };
 
-#endif // NAF_HTTP_COMMONRESPONSES
+#endif // STRUCTBX_HTTP_COMMONRESPONSES

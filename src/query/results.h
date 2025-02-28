@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_RESULTS
-#define NAF_QUERY_RESULTS
+#ifndef STRUCTBX_QUERY_RESULTS
+#define STRUCTBX_QUERY_RESULTS
 
 
 #include <vector>
@@ -48,4 +48,4 @@ class NAF::Query::Results : public std::vector<Row::Ptr>
         Row::Ptr AddRow_();
 };
 
-#endif // NAF_QUERY_RESULTS
+#endif // STRUCTBX_QUERY_RESULTS

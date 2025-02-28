@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_QUERY_DATABASE_MANAGER
-#define NAF_QUERY_DATABASE_MANAGER
+#ifndef STRUCTBX_QUERY_DATABASE_MANAGER
+#define STRUCTBX_QUERY_DATABASE_MANAGER
 
 
 #include <iostream>
@@ -91,4 +91,4 @@ class NAF::Query::DatabaseManager
 
 };
 
-#endif // NAF_QUERY_DATABASE_MANAGER
+#endif // STRUCTBX_QUERY_DATABASE_MANAGER

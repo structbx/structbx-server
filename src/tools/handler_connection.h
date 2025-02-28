@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2022 <copyright holder> <email>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef NAF_TOOLS_HANDLERCONNECTION
-#define NAF_TOOLS_HANDLERCONNECTION
+#ifndef STRUCTBX_TOOLS_HANDLERCONNECTION
+#define STRUCTBX_TOOLS_HANDLERCONNECTION
 
 
 #include <functional>
@@ -34,4 +34,4 @@ class NAF::Tools::HandlerConnection
 };
 
 
-#endif // NAF_TOOLS_HANDLERCONNECTION
+#endif // STRUCTBX_TOOLS_HANDLERCONNECTION

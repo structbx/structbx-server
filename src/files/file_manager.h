@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_FILES_FILEMANAGER
-#define NAF_FILES_FILEMANAGER
+#ifndef STRUCTBX_FILES_FILEMANAGER
+#define STRUCTBX_FILES_FILEMANAGER
 
 
 #include <string>
@@ -137,4 +137,4 @@ class NAF::Files::FileManager: public Net::PartHandler
         std::vector<Files::File> files_;
 };
 
-#endif // NAF_FILES_FILEMANAGER
+#endif // STRUCTBX_FILES_FILEMANAGER

@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_SECURITY_SECURITY_VERIFICATION
-#define NAF_SECURITY_SECURITY_VERIFICATION
+#ifndef STRUCTBX_SECURITY_SECURITY_VERIFICATION
+#define STRUCTBX_SECURITY_SECURITY_VERIFICATION
 
 
 #include <string>
@@ -77,4 +77,4 @@ class NAF::Extras::SecurityVerification
 };
 
 
-#endif // NAF_SECURITY_SECURITY_VERIFICATION
+#endif // STRUCTBX_SECURITY_SECURITY_VERIFICATION

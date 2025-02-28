@@ -1,6 +1,6 @@
 
-#ifndef NAF_TOOLS_HMACTOOL
-#define NAF_TOOLS_HMACTOOL
+#ifndef STRUCTBX_TOOLS_HMACTOOL
+#define STRUCTBX_TOOLS_HMACTOOL
 
 #include <string>
 
@@ -26,4 +26,4 @@ class NAF::Tools::HMACTool
         std::string Encode_(std::string text_to_encode);
 };
 
-#endif //NAF_TOOLS_HMACTOOL
+#endif //STRUCTBX_TOOLS_HMACTOOL

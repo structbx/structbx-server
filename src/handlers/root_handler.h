@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HANDLERS_ROOTHANDLER
-#define NAF_HANDLERS_ROOTHANDLER
+#ifndef STRUCTBX_HANDLERS_ROOTHANDLER
+#define STRUCTBX_HANDLERS_ROOTHANDLER
 
 
 #include <istream>
@@ -156,4 +156,4 @@ class NAF::Handlers::RootHandler :
         Functions::Function::Ptr current_function_;
 };
 
-#endif // NAF_HANDLERS_ROOTHANDLER
+#endif // STRUCTBX_HANDLERS_ROOTHANDLER

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NAF_TOOLS_SESSIONSMANAGER
-#define NAF_TOOLS_SESSIONSMANAGER
+#ifndef STRUCTBX_TOOLS_SESSIONSMANAGER
+#define STRUCTBX_TOOLS_SESSIONSMANAGER
 
 
 #include <string>
@@ -74,4 +74,4 @@ class NAF::Tools::SessionsManager
         static Query::DatabaseManager::Credentials credentials_;
 };
 
-#endif // NAF_TOOLS_SESSIONSMANAGER
+#endif // STRUCTBX_TOOLS_SESSIONSMANAGER
