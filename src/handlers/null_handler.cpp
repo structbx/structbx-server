@@ -17,7 +17,7 @@
 
 #include "handlers/null_handler.h"
 
-using namespace NAF::Handlers;
+using namespace StructBX::Handlers;
 
 NullHandler::~NullHandler()
 {

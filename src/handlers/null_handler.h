@@ -15,14 +15,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HANDLERS_NULLHANDLER
-#define NAF_HANDLERS_NULLHANDLER
+#ifndef STRUCTBX_HANDLERS_NULLHANDLER
+#define STRUCTBX_HANDLERS_NULLHANDLER
 
 
 #include "handlers/root_handler.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Handlers
     {
@@ -31,7 +31,7 @@ namespace NAF
 }
 
 
-class NAF::Handlers::NullHandler :
+class StructBX::Handlers::NullHandler :
     public RootHandler
 {
     public:
@@ -45,4 +45,4 @@ class NAF::Handlers::NullHandler :
         void NullResponse_();
 };
 
-#endif // NAF_HANDLERS_NULLHANDLER
+#endif // STRUCTBX_HANDLERS_NULLHANDLER

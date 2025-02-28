@@ -15,14 +15,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAF_HANDLERS_CUSTOMANDLER
-#define NAF_HANDLERS_CUSTOMANDLER
+#ifndef STRUCTBX_HANDLERS_CUSTOMANDLER
+#define STRUCTBX_HANDLERS_CUSTOMANDLER
 
 
 #include "handlers/root_handler.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Handlers
     {
@@ -31,7 +31,7 @@ namespace NAF
 }
 
 
-class NAF::Handlers::CustomHandler :
+class StructBX::Handlers::CustomHandler :
     public RootHandler
 {
     public:
@@ -51,4 +51,4 @@ class NAF::Handlers::CustomHandler :
         std::function<void(CustomHandler&)> process_function_;
 };
 
-#endif // NAF_HANDLERS_CUSTOMANDLER
+#endif // STRUCTBX_HANDLERS_CUSTOMANDLER
