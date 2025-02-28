@@ -50,7 +50,7 @@
 #include "tools/output_logger.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Files
     {
@@ -64,7 +64,7 @@ using namespace Poco;
 using namespace Poco::Net;
 
 
-enum class NAF::Files::OperationType
+enum class StructBX::Files::OperationType
 {
     kDownload
     ,kUpload
@@ -72,7 +72,7 @@ enum class NAF::Files::OperationType
 };
 
 
-class NAF::Files::FileManager: public Net::PartHandler
+class StructBX::Files::FileManager: public Net::PartHandler
 {
     public:
         using Ptr = std::shared_ptr<FileManager>;

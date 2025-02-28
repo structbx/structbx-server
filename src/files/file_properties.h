@@ -23,7 +23,7 @@
 #include <vector>
 
 
-namespace NAF
+namespace StructBX
 {
 	namespace Files
 	{
@@ -32,7 +32,7 @@ namespace NAF
 }
 
 
-class NAF::Files::FileProperties
+class StructBX::Files::FileProperties
 {
 	public:
 		FileProperties(std::string content_type, bool binary, std::vector<std::string> other_extensions);

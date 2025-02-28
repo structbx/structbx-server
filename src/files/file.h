@@ -15,7 +15,7 @@
 #include "files/file_properties.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Files
     {
@@ -27,14 +27,14 @@ namespace NAF
 using namespace Poco;
 
 
-enum class NAF::Files::FileType
+enum class StructBX::Files::FileType
 {
     kBinary
     ,kTextPlain
 };
 
 
-class NAF::Files::File
+class StructBX::Files::File
 {
     public:
         File();
