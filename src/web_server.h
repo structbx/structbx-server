@@ -6,15 +6,12 @@
 #include "core/nebula_atom.h"
 #include "handlers/root_handler.h"
 
-using namespace NAF;
-
 namespace StructBX
 {
     class Webserver;
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Webserver : public Handlers::RootHandler
 {

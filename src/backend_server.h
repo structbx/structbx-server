@@ -16,7 +16,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::BackendServer : public Handlers::BackendHandler
 {

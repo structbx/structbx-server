@@ -20,7 +20,6 @@
 
 using namespace Poco;
 using namespace StructBX;
-using namespace NAF;
 
 struct Parameters
 {
@@ -30,7 +29,7 @@ struct Parameters
 bool SetupOutputLog()
 {
     // File for output log
-    File file_output_log(NAF::Tools::SettingsManager::GetSetting_("logger_output_file", "/var/log/structbx.log"));
+    File file_output_log(StructBX::Tools::SettingsManager::GetSetting_("logger_output_file", "/var/log/structbx.log"));
     if(!file_output_log.exists())
     {
         try
@@ -54,7 +53,7 @@ bool SetupOutputLog()
 bool SetupUploadedDir()
 {
     // Directory for uploaded files
-    File dir_uploaded_files(NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded"));
+    File dir_uploaded_files(StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded"));
     if(!dir_uploaded_files.exists())
     {
         try
@@ -73,8 +72,8 @@ bool SetupUploadedDir()
 
 void AddCustomSettings()
 {
-    NAF::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("/var/www/structbx-web-uploaded"));
-    NAF::Tools::SettingsManager::AddSetting_("space_id_cookie_name", NAF::Tools::DValue::Type::kString, NAF::Tools::DValue("1f3efd18688d2"));
+    StructBX::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("/var/www/structbx-web-uploaded"));
+    StructBX::Tools::SettingsManager::AddSetting_("space_id_cookie_name", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("1f3efd18688d2"));
 }
 
 Parameters SetupParameters(std::vector<std::string>& parameters)
@@ -104,54 +103,54 @@ int main(int argc, char** argv)
         Parameters params = SetupParameters(parameters);
 
     // Settings
-        NAF::Tools::SettingsManager::set_config_path(params.properties_file);
+        StructBX::Tools::SettingsManager::set_config_path(params.properties_file);
         AddCustomSettings();
-        NAF::Tools::SettingsManager::ReadSettings_();
+        StructBX::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
-        NAF::Tools::OutputLogger::set_log_to_file(SetupOutputLog());
+        StructBX::Tools::OutputLogger::set_log_to_file(SetupOutputLog());
         SetupUploadedDir();
 
     // Setup
-        NAF::Query::DatabaseManager::StartMySQL_();
-        NAF::Security::PermissionsManager::LoadPermissions_();
-        NAF::Tools::SessionsManager::ReadSessions_();
+        StructBX::Query::DatabaseManager::StartMySQL_();
+        StructBX::Security::PermissionsManager::LoadPermissions_();
+        StructBX::Tools::SessionsManager::ReadSessions_();
 
     // Custom Handler Creator
         app.CustomHandlerCreator_([&](Core::HTTPRequestInfo& info)
         {
-            NAF::Handlers::RootHandler* handler;
+            StructBX::Handlers::RootHandler* handler;
 
             // Manage the route type
-            NAF::Tools::Route route(info.uri);
+            StructBX::Tools::Route route(info.uri);
 
             switch(route.get_current_route_type())
             {
                 // Manage Frontend
-                case NAF::Tools::RouteType::kEntrypoint:
+                case StructBX::Tools::RouteType::kEntrypoint:
                 {
                     handler = new StructBX::Webserver;
                     break;
                 }
 
                 // Manage Backend
-                case NAF::Tools::RouteType::kEndpoint:
+                case StructBX::Tools::RouteType::kEndpoint:
                 {
                     // Routes
-                    NAF::Tools::Route requested_route(info.uri);
-                    NAF::Tools::Route login_route("/api/system/login");
-                    NAF::Tools::Route logout_route("/api/system/logout");
+                    StructBX::Tools::Route requested_route(info.uri);
+                    StructBX::Tools::Route login_route("/api/system/login");
+                    StructBX::Tools::Route logout_route("/api/system/logout");
 
                     if(requested_route == login_route || requested_route == logout_route)
                     {
-                        handler = new NAF::Handlers::LoginHandler();
+                        handler = new StructBX::Handlers::LoginHandler();
                         auto password = handler->get_users_manager().get_action()->GetParameter("password");
                         if(password != handler->get_users_manager().get_action()->get_parameters().end())
                         {
                             password->get()->SetupCondition_("condition-password", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
                             {
                                 std::string password = param->ToString_();
-                                std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
-                                param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+                                std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+                                param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
                                 return true;
                             });
                         }
@@ -172,7 +171,7 @@ int main(int argc, char** argv)
         auto code = app.Init_();
 
     // End
-        NAF::Query::DatabaseManager::StopMySQL_();
+        StructBX::Query::DatabaseManager::StopMySQL_();
         return code;
 
 }

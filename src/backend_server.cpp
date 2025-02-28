@@ -4,7 +4,7 @@
 using namespace StructBX::Functions;
 
 BackendServer::BackendServer() :
-    space_id_cookie_(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), "")
+    space_id_cookie_(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), "")
     ,add_space_id_cookie_(false)
 {
 
@@ -24,7 +24,7 @@ void BackendServer::AddFunctions_()
 
 void BackendServer::Process_()
 {
-    get_files_parameters()->set_directory_base(NAF::Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
+    get_files_parameters()->set_directory_base(StructBX::Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
     
     // Set security type
     set_security_type(Extras::SecurityType::kDisableAll);
@@ -82,12 +82,12 @@ void BackendServer::SetupFunctionData_()
     // Get Cookie Space ID
     Poco::Net::NameValueCollection cookies;
     get_http_server_request().value()->getCookies(cookies);
-    auto cookie_space_id = cookies.find(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"));
+    auto cookie_space_id = cookies.find(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"));
 
     // Set Space ID if exists in Cookies
     if(cookie_space_id != cookies.end())
     {
-        auto space_id_decoded = NAF::Tools::Base64Tool().Decode_(cookie_space_id->second);
+        auto space_id_decoded = StructBX::Tools::Base64Tool().Decode_(cookie_space_id->second);
         function_data_.set_space_id(space_id_decoded);
     }
     else
@@ -95,7 +95,7 @@ void BackendServer::SetupFunctionData_()
         add_space_id_cookie_ = true;
 
         // Get Space ID Cookie if not exists in Cookies
-        auto action = NAF::Functions::Action("a1");
+        auto action = StructBX::Functions::Action("a1");
         action.set_sql_code(
             "SELECT s.id " \
             "FROM spaces s " \
@@ -112,9 +112,9 @@ void BackendServer::SetupFunctionData_()
                 function_data_.set_space_id(space_id->ToString_());
 
                 // Save Space ID to Cookie
-                auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(space_id->ToString_());
+                auto space_id_encoded = StructBX::Tools::Base64Tool().Encode_(space_id->ToString_());
 
-                Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
+                Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
                 cookie.setPath("/");
                 cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
                 cookie.setSecure(true);
@@ -128,7 +128,7 @@ void BackendServer::SetupFunctionData_()
 bool BackendServer::VerifyActiveUser_()
 {
     // Action to check if user is active
-    auto action = NAF::Functions::Action("a1");
+    auto action = StructBX::Functions::Action("a1");
     action.set_sql_code(
         "SELECT nu.id " \
         "FROM users nu " \
