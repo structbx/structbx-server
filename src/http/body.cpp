@@ -18,7 +18,7 @@
 
 #include "http/body.h"
 
-using namespace NAF::HTTP;
+using namespace StructBX::HTTP;
 
 Body::Body() :
     body_type_(Type::kURI)

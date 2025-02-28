@@ -20,7 +20,7 @@
 #include <exception>
 #include <stdexcept>
 
-using namespace NAF::HTTP;
+using namespace StructBX::HTTP;
 
 Methods::Methods()
 {

@@ -48,7 +48,7 @@
 #include "tools/output_logger.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace HTTP
     {
@@ -60,7 +60,7 @@ using namespace Poco;
 using namespace Poco::Net;
 
 
-class NAF::HTTP::Client
+class StructBX::HTTP::Client
 {
     public:
         using ClientResponseFunction = std::function<void(std::stringstream& response, Net::HTTPRequest& http_request, Net::HTTPResponse& http_response)>;

@@ -29,7 +29,7 @@
 #include <Poco/Net/NameValueCollection.h>
 
 
-namespace NAF
+namespace StructBX
 {
     namespace HTTP
     {
@@ -44,7 +44,7 @@ using namespace Poco::Net;
 
 
 
-class NAF::HTTP::Header
+class StructBX::HTTP::Header
 {
     public:
         Header(std::string name, std::string value) : 
@@ -57,7 +57,7 @@ class NAF::HTTP::Header
         std::string value;
 };
 
-class NAF::HTTP::Cookie
+class StructBX::HTTP::Cookie
 {
     public:
         Cookie(std::string name, std::string value) : 
@@ -76,7 +76,7 @@ class NAF::HTTP::Cookie
         Net::HTTPCookie cookie;
 };
 
-class NAF::HTTP::Request
+class StructBX::HTTP::Request
 {
     public:
         using HTTPServerRequestPtr = std::optional<HTTPServerRequest*>;

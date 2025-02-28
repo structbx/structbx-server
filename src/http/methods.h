@@ -26,7 +26,7 @@
 #include <exception>
 
 
-namespace NAF
+namespace StructBX
 {
     namespace HTTP
     {
@@ -44,7 +44,7 @@ namespace NAF
 }
 
 
-enum class NAF::HTTP::EnumMethods
+enum class StructBX::HTTP::EnumMethods
 {
     kHTTP_GET
     ,kHTTP_POST
@@ -56,7 +56,7 @@ enum class NAF::HTTP::EnumMethods
     ,kNULL
 };
 
-class NAF::HTTP::Methods
+class StructBX::HTTP::Methods
 {
     public:
         using MethodProcess = std::function<void(HTTP::Methods&)>;

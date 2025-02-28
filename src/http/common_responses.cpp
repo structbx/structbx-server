@@ -19,7 +19,7 @@
 #include "files/file_manager.h"
 #include "http/request.h"
 
-using namespace NAF::HTTP;
+using namespace StructBX::HTTP;
 
 CommonResponses::CommonResponses()
 {

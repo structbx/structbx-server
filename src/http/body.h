@@ -37,7 +37,7 @@
 #include "files/file_manager.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace HTTP
     {
@@ -48,7 +48,7 @@ namespace NAF
 using namespace Poco;
 
 
-class NAF::HTTP::Body : public Tools::ManageJSON
+class StructBX::HTTP::Body : public Tools::ManageJSON
 {
     public:
         enum class Type

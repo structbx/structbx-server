@@ -31,7 +31,7 @@
 #include "http/request.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace HTTP
     {
@@ -45,7 +45,7 @@ using namespace Poco;
 using namespace Poco::Net;
 
 
-enum class NAF::HTTP::ResponseType
+enum class StructBX::HTTP::ResponseType
 {
     kError
     ,kWarning
@@ -53,7 +53,7 @@ enum class NAF::HTTP::ResponseType
     ,kSuccess
 };
 
-enum class NAF::HTTP::Status
+enum class StructBX::HTTP::Status
 {
     kHTTP_OK = 200
     ,kHTTP_BAD_REQUEST = 400
@@ -65,7 +65,7 @@ enum class NAF::HTTP::Status
     ,kHTTP_SERVICE_UNAVAILABLE = 503
 };
 
-class NAF::HTTP::CommonResponses : public HTTP::Request
+class StructBX::HTTP::CommonResponses : public HTTP::Request
 {
     public:
         struct Attributes

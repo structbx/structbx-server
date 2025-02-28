@@ -18,7 +18,7 @@
 
 #include "http/request.h"
 
-using namespace NAF::HTTP;
+using namespace StructBX::HTTP;
 
 Request::Request()
 {

@@ -18,7 +18,7 @@
 
 #include "http/client.h"
 
-using namespace NAF::HTTP;
+using namespace StructBX::HTTP;
 
 Client::Client(std::string uri, const std::string method) :
     use_ssl_(false)
