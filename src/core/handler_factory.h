@@ -64,7 +64,7 @@ class StructBX::Core::HandlerFactory :
 {
     public:
         using FunctionHandler = std::function<Handlers::RootHandler*()>;
-        using FunctionHandlerCreator = std::function<NAF::Handlers::RootHandler*(Core::HTTPRequestInfo& info)>;
+        using FunctionHandlerCreator = std::function<StructBX::Handlers::RootHandler*(Core::HTTPRequestInfo& info)>;
         using Connections = std::map<std::string, Tools::HandlerConnection>;
 
         HandlerFactory();

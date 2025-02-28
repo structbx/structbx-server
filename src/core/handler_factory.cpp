@@ -29,7 +29,7 @@ HTTPRequestHandler* HandlerFactory::createRequestHandler(const HTTPServerRequest
                 if(found != connections_.end())
                     f = found->second.return_handler_;
                 else
-                    f = [&](){return new NAF::Handlers::NullHandler();};
+                    f = [&](){return new StructBX::Handlers::NullHandler();};
 
                 return f();
             };
@@ -66,7 +66,7 @@ HTTPRequestHandler* HandlerFactory::createRequestHandler(const HTTPServerRequest
         ErrorResponse_(request, "Internal server error. " +  std::string(error.what()));
     }
 
-    return new NAF::Handlers::NullHandler();
+    return new StructBX::Handlers::NullHandler();
 }
 
 void HandlerFactory::ErrorResponse_(const HTTPServerRequest& request, std::string error)
