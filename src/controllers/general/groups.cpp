@@ -18,8 +18,8 @@ Groups::Groups(Tools::FunctionData& function_data) :
 Groups::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/general/groups/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/groups/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/groups/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -27,7 +27,7 @@ Groups::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(fun
     get_functions()->push_back(function);
 }
 
-void Groups::Read::A1(NAF::Functions::Action::Ptr action)
+void Groups::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.* "
@@ -38,8 +38,8 @@ void Groups::Read::A1(NAF::Functions::Action::Ptr action)
 Groups::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/general/groups/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/groups/read/id", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/groups/read/id", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -47,7 +47,7 @@ Groups::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::
     get_functions()->push_back(function);
 }
 
-void Groups::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+void Groups::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.* "
@@ -70,10 +70,10 @@ void Groups::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
 Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/general/groups/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/groups/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/groups/add", HTTP::EnumMethods::kHTTP_POST);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Verify if group new name don't exists yet
     auto action1 = function->AddAction_("a1");
@@ -88,7 +88,7 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -125,14 +125,14 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     get_functions()->push_back(function);
 }
 
-void Groups::Add::A1(NAF::Functions::Action::Ptr action)
+void Groups::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM groups "
         "WHERE `group` = ?"
     );
-    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -154,7 +154,7 @@ void Groups::Add::A1(NAF::Functions::Action::Ptr action)
         return true;
     });
 }
-void Groups::Add::A2(NAF::Functions::Action::Ptr action)
+void Groups::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("INSERT INTO groups (`group`) VALUES (?)");
     action->AddParameter_("group", "", true);
@@ -164,8 +164,8 @@ void Groups::Add::A2(NAF::Functions::Action::Ptr action)
 Groups::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function PUT /api/general/groups/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/groups/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/groups/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     // Verify if group don't exists
     auto action1 = function->AddAction_("a1");
@@ -182,14 +182,14 @@ Groups::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData
     get_functions()->push_back(function);
 }
 
-void Groups::Modify::A1(NAF::Functions::Action::Ptr action)
+void Groups::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM groups "
         "WHERE id = ?"
     );
-    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -212,14 +212,14 @@ void Groups::Modify::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Groups::Modify::A2(NAF::Functions::Action::Ptr action)
+void Groups::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM groups "
         "WHERE `group` = ?"
     );
-    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -242,7 +242,7 @@ void Groups::Modify::A2(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Groups::Modify::A3(NAF::Functions::Action::Ptr action)
+void Groups::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("UPDATE groups SET `group` = ? WHERE id = ?");
     action->AddParameter_("group", "", true);
@@ -253,8 +253,8 @@ void Groups::Modify::A3(NAF::Functions::Action::Ptr action)
 Groups::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function PUT /api/general/groups/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/groups/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/groups/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     // Verify if group don't exists
     auto action1 = function->AddAction_("a1");
@@ -267,14 +267,14 @@ Groups::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData
     get_functions()->push_back(function);
 }
 
-void Groups::Delete::A1(NAF::Functions::Action::Ptr action)
+void Groups::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM groups "
         "WHERE id = ?"
     );
-    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-group-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -297,7 +297,7 @@ void Groups::Delete::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Groups::Delete::A2(NAF::Functions::Action::Ptr action)
+void Groups::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("DELETE FROM groups WHERE id = ?");
     action->AddParameter_("id", "", true);

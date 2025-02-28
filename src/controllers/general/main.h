@@ -22,7 +22,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Functions::General::Main : public Tools::FunctionData
 {

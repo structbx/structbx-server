@@ -21,8 +21,8 @@ Users::Read::Read(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -38,8 +38,8 @@ Users::ReadCurrent::ReadCurrent(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/current/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/current/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/current/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -57,8 +57,8 @@ Users::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/read/id", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/read/id", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -85,8 +85,8 @@ Users::ModifyCurrentUsername::ModifyCurrentUsername(Tools::FunctionData& functio
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/current/username/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/current/username/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/current/username/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     // Action1: Verify if username don't exists
     auto action1 = function->AddAction_("a1");
@@ -99,11 +99,11 @@ Users::ModifyCurrentUsername::ModifyCurrentUsername(Tools::FunctionData& functio
     get_functions()->push_back(function);
 }
 
-void Users::ModifyCurrentUsername::A1(NAF::Functions::Action::Ptr action)
+void Users::ModifyCurrentUsername::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM users WHERE username = ? AND id != ?");
-    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -127,7 +127,7 @@ void Users::ModifyCurrentUsername::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id", get_id_user(), false);
 }
 
-void Users::ModifyCurrentUsername::A2(NAF::Functions::Action::Ptr action)
+void Users::ModifyCurrentUsername::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE users "
@@ -138,7 +138,7 @@ void Users::ModifyCurrentUsername::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("username", "", true)
     ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre de usuario debe ser una cadena de texto");
             return false;
@@ -168,10 +168,10 @@ Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& functio
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/current/password/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/current/password/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/current/password/modify", HTTP::EnumMethods::kHTTP_PUT);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action1: Verify current password
     auto action1 = function->AddAction_("a1");
@@ -183,7 +183,7 @@ Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& functio
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([id_space, action1, action2](StructBX::Functions::Function& self)
     {
         auto new_password = self.GetParameter_("new_password");
         auto new_password2 = self.GetParameter_("new_password2");
@@ -218,11 +218,11 @@ Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& functio
     get_functions()->push_back(function);
 }
 
-void Users::ModifyCurrentPassword::A1(NAF::Functions::Action::Ptr action)
+void Users::ModifyCurrentPassword::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM users WHERE password = ? AND id = ?");
-    action->SetupCondition_("verify-username-password", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-username-password", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -243,15 +243,15 @@ void Users::ModifyCurrentPassword::A1(NAF::Functions::Action::Ptr action)
         }
 
         std::string password = param->ToString_();
-        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
-        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+        param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
 
         return true;
     });
     action->AddParameter_("id", get_id_user(), false);
 }
 
-void Users::ModifyCurrentPassword::A2(NAF::Functions::Action::Ptr action)
+void Users::ModifyCurrentPassword::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE users "
@@ -274,8 +274,8 @@ void Users::ModifyCurrentPassword::A2(NAF::Functions::Action::Ptr action)
         }
 
         std::string password = param->ToString_();
-        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
-        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+        param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
         return true;
     });
     action->AddParameter_("id_naf_user", get_id_user(), false);
@@ -285,10 +285,10 @@ Users::Add::Add(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/add", HTTP::EnumMethods::kHTTP_POST);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action1: Verify if username don't exists
     auto action1 = function->AddAction_("a1");
@@ -299,7 +299,7 @@ Users::Add::Add(Tools::FunctionData& function_data) :
     A2(action2);
 
     // Setup custom process
-    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -327,10 +327,10 @@ Users::Add::Add(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Users::Add::A1(NAF::Functions::Action::Ptr action)
+void Users::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT id FROM users WHERE username = ?");
-    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -353,7 +353,7 @@ void Users::Add::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Users::Add::A2(NAF::Functions::Action::Ptr action)
+void Users::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO users (username, password, status, id_group) "
@@ -363,7 +363,7 @@ void Users::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("username", "", true)
     ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre de usuario debe ser una cadena de texto");
             return false;
@@ -401,8 +401,8 @@ void Users::Add::A2(NAF::Functions::Action::Ptr action)
         }
 
         std::string password = param->ToString_();
-        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
-        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+        param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
         return true;
     });
     action->AddParameter_("status", "activo", false);
@@ -422,10 +422,10 @@ Users::Modify::Modify(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/modify", HTTP::EnumMethods::kHTTP_PUT);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action1: Verify if username don't exists
     auto action1 = function->AddAction_("a1");
@@ -440,7 +440,7 @@ Users::Modify::Modify(Tools::FunctionData& function_data) :
     A3(action3);
 
     // Setup custom process
-    function->SetupCustomProcess_([action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -482,10 +482,10 @@ Users::Modify::Modify(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Users::Modify::A1(NAF::Functions::Action::Ptr action)
+void Users::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT id FROM users WHERE username = ? AND id != ?");
-    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-username-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -518,7 +518,7 @@ void Users::Modify::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Users::Modify::A2(NAF::Functions::Action::Ptr action)
+void Users::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE users n "
@@ -529,7 +529,7 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("username", "", true)
     ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre de usuario debe ser una cadena de texto");
             return false;
@@ -567,8 +567,8 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
         }
 
         std::string password = param->ToString_();
-        std::string password_encoded = NAF::Tools::HMACTool().Encode_(password);
-        param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(password_encoded)));
+        std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+        param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
         return true;
     });
     action->AddParameter_("status", "", true)
@@ -603,7 +603,7 @@ void Users::Modify::A2(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Users::Modify::A3(NAF::Functions::Action::Ptr action)
+void Users::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE users n "
@@ -614,7 +614,7 @@ void Users::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("username", "", true)
     ->SetupCondition_("condition-username", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre de usuario debe ser una cadena de texto");
             return false;
@@ -673,8 +673,8 @@ Users::Delete::Delete(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/users/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/users/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/users/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -682,7 +682,7 @@ Users::Delete::Delete(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Users::Delete::A1(NAF::Functions::Action::Ptr action)
+void Users::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "DELETE nu FROM users nu "

@@ -16,8 +16,8 @@ Permissions::Permissions(Tools::FunctionData& function_data) :
 Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/general/permissions/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/permissions/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/permissions/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -25,7 +25,7 @@ Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
     get_functions()->push_back(function);
 }
 
-void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT ng.*, e.title AS title "
@@ -49,8 +49,8 @@ void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
 Permissions::ReadOutGroup::ReadOutGroup(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/general/permissions/out/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/permissions/out/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/permissions/out/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -58,7 +58,7 @@ Permissions::ReadOutGroup::ReadOutGroup(Tools::FunctionData& function_data) : To
     get_functions()->push_back(function);
 }
 
-void Permissions::ReadOutGroup::A1(NAF::Functions::Action::Ptr action)
+void Permissions::ReadOutGroup::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT e.* "
@@ -82,10 +82,10 @@ void Permissions::ReadOutGroup::A1(NAF::Functions::Action::Ptr action)
 Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/general/permissions/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/permissions/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/permissions/add", HTTP::EnumMethods::kHTTP_POST);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Verify if permission in group don't exists yet
     auto action1 = function->AddAction_("a1");
@@ -97,7 +97,7 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -112,7 +112,7 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
             return;
         }
 
-        NAF::Security::PermissionsManager::LoadPermissions_();
+        StructBX::Security::PermissionsManager::LoadPermissions_();
 
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
     });
@@ -120,14 +120,14 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     get_functions()->push_back(function);
 }
 
-void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM permissions "
         "WHERE endpoint = ? AND id_group = ?"
     );
-    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -159,7 +159,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
         return true;
     });
 }
-void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
+void Permissions::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO permissions (endpoint, action, id_group) "
@@ -175,10 +175,10 @@ void Permissions::Add::A2(NAF::Functions::Action::Ptr action)
 Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function PUT /api/general/permissions/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Verify if group don't exists
     auto action1 = function->AddAction_("a1");
@@ -190,7 +190,7 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
 
     // Setup Custom Process
     auto id_space = get_space_id();
-    function->SetupCustomProcess_([action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -205,7 +205,7 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
             return;
         }
 
-        NAF::Security::PermissionsManager::LoadPermissions_();
+        StructBX::Security::PermissionsManager::LoadPermissions_();
 
         self.JSONResponse_(HTTP::Status::kHTTP_OK, "OK.");
     });
@@ -213,14 +213,14 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT id "
         "FROM permissions "
         "WHERE id = ?"
     );
-    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("condition-permission-exists", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -243,7 +243,7 @@ void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Permissions::Delete::A2(NAF::Functions::Action::Ptr action)
+void Permissions::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("DELETE FROM permissions WHERE id = ?");
     action->AddParameter_("id", "", true);

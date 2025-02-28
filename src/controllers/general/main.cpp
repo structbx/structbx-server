@@ -18,8 +18,8 @@ Main::ReadInstanceName::ReadInstanceName(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/instanceName/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/instanceName/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -35,8 +35,8 @@ Main::ModifyInstanceName::ModifyInstanceName(Tools::FunctionData& function_data)
     Tools::FunctionData(function_data)
 {
     // Function GET /api/general/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/general/instanceName/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/instanceName/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
