@@ -18,7 +18,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Functions::Spaces::Users : public Tools::FunctionData
 {

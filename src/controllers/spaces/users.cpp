@@ -17,8 +17,8 @@ Users::Read::Read(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/users/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/users/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -45,8 +45,8 @@ Users::ReadUserOutSpace::ReadUserOutSpace(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/out/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/users/out/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/users/out/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -77,8 +77,8 @@ Users::Add::Add(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/users/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/users/add", HTTP::EnumMethods::kHTTP_POST);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -115,8 +115,8 @@ Users::Delete::Delete(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/users/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/users/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/users/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(

@@ -20,17 +20,17 @@ Main::Read::Read(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
     
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
     A1(action);
 
     // Setup custom process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action->Work_())
@@ -48,7 +48,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
                 continue;
 
             // Action 2: Size
-            auto action2 = NAF::Functions::Action("a2");
+            auto action2 = StructBX::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT ROUND(SUM((DATA_LENGTH + INDEX_LENGTH)) / 1024 / 1024, 2) AS 'size' " \
                 "FROM information_schema.TABLES " \
@@ -61,7 +61,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
             }
 
             // Size of space directory
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
+            auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + id->ToString_();
             float directory_size = 0;
             DirectoryIterator it(directory);
@@ -91,13 +91,13 @@ Main::Read::Read(Tools::FunctionData& function_data) :
             auto size = action2.get_results()->First_();
             if(size->IsNull_())
             {
-                row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(0)));
-                row->AddField_("directory_size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(directory_size)));
+                row->AddField_("size", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(0)));
+                row->AddField_("directory_size", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(directory_size)));
             }
             else
             {
-                row->AddField_("size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(size->Float_())));
-                row->AddField_("directory_size", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(directory_size)));
+                row->AddField_("size", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(size->Float_())));
+                row->AddField_("directory_size", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(directory_size)));
             }
 
         }
@@ -112,7 +112,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::Read::A1(NAF::Functions::Action::Ptr action)
+void Main::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.* " \
@@ -127,16 +127,16 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
     A1(action);
 
     auto space_id = get_space_id();
     auto id_user = get_id_user();
-    function->SetupCustomProcess_([space_id, id_user, action](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, id_user, action](StructBX::Functions::Function& self)
     {
         // Get identifier
         auto identifier = self.GetParameter_("identifier");
@@ -174,7 +174,7 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.* " \
@@ -190,10 +190,10 @@ Main::Add::Add(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action1: Verify space if exists
     auto action1 = function->AddAction_("a1");
@@ -211,7 +211,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
     auto action4 = function->AddAction_("a4");
 
     // Setup Custom Process
-    function->SetupCustomProcess_([action1, action2, action3, action4](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([action1, action2, action3, action4](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -245,7 +245,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la DB de espacio");
 
             // Delete space from table
-            NAF::Functions::Action action5("a5");
+            StructBX::Functions::Action action5("a5");
             action5.set_sql_code("DELETE FROM spaces WHERE id = ?");
             action5.AddParameter_("id", std::to_string(space_id), false);
 
@@ -255,7 +255,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         // Create the directory to store files
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
+            auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + std::to_string(space_id);
             Poco::File file(directory);
             if(file.exists())
@@ -274,13 +274,13 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         }
         catch(Poco::FileException& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_(e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
             return;
         }
         catch(std::exception& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_(e.what());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
             return;
         }
@@ -289,10 +289,10 @@ Main::Add::Add(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::Add::A1(NAF::Functions::Action::Ptr action)
+void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -303,7 +303,7 @@ void Main::Add::A1(NAF::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("identifier", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    action->AddParameter_("identifier", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
@@ -315,7 +315,7 @@ void Main::Add::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Main::Add::A2(NAF::Functions::Action::Ptr action)
+void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO spaces (identifier, name, description) VALUES (?, ?, ?)"
@@ -359,7 +359,7 @@ void Main::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("description", "", true);
 }
 
-void Main::Add::A3(NAF::Functions::Action::Ptr action)
+void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO spaces_users (id_naf_user, id_space) " \
@@ -373,15 +373,15 @@ Main::Change::Change(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/change
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
     A1(action);
 
-    function->SetupCustomProcess_([&](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([&](StructBX::Functions::Function& self)
     {
         // Search first action
         auto action = *self.get_actions().begin();
@@ -404,8 +404,8 @@ Main::Change::Change(Tools::FunctionData& function_data) :
         if(!field->IsNull_())
         {
             // Set Cookie Space ID
-            auto space_id_encoded = NAF::Tools::Base64Tool().Encode_(field->ToString_());
-            Net::HTTPCookie cookie(NAF::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
+            auto space_id_encoded = StructBX::Tools::Base64Tool().Encode_(field->ToString_());
+            Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
             cookie.setPath("/");
             cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
             cookie.setSecure(true);
@@ -424,7 +424,7 @@ Main::Change::Change(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::Change::A1(NAF::Functions::Action::Ptr action)
+void Main::Change::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
@@ -433,7 +433,7 @@ void Main::Change::A1(NAF::Functions::Action::Ptr action)
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
     action->AddParameter_("id_naf_user", get_id_user(), false);
-    action->AddParameter_("id_space", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    action->AddParameter_("id_space", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
     ->SetupCondition_("condition-id_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
@@ -449,8 +449,8 @@ Main::Modify::Modify(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function PUT /api/spaces/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     // Action 1: Verify that current user is in the space
     auto action1 = function->AddAction_("a1");
@@ -467,7 +467,7 @@ Main::Modify::Modify(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::Modify::A1(NAF::Functions::Action::Ptr action)
+void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id " \
@@ -475,7 +475,7 @@ void Main::Modify::A1(NAF::Functions::Action::Ptr action)
         "JOIN spaces_users su ON su.id_space = s.id " \
         "WHERE su.id_naf_user = ?"
     );
-    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -489,11 +489,11 @@ void Main::Modify::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
-void Main::Modify::A2(NAF::Functions::Action::Ptr action)
+void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM spaces WHERE identifier = ? AND id != ?");
-    action->SetupCondition_("verify-space-identifier", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-space-identifier", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -527,7 +527,7 @@ void Main::Modify::A2(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Main::Modify::A3(NAF::Functions::Action::Ptr action)
+void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE spaces s " \
@@ -539,7 +539,7 @@ void Main::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -565,7 +565,7 @@ void Main::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -600,8 +600,8 @@ Main::Delete::Delete(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
     // Function GET /api/spaces/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/spaces/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/delete", HTTP::EnumMethods::kHTTP_DEL);
 
     // Action 1: Verify that current user is in the space
     auto action1 = function->AddAction_("a1");
@@ -618,7 +618,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) :
     get_functions()->push_back(function);
 }
 
-void Main::Delete::A1(NAF::Functions::Action::Ptr action)
+void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id " \
@@ -626,7 +626,7 @@ void Main::Delete::A1(NAF::Functions::Action::Ptr action)
         "JOIN spaces_users su ON su.id_space = s.id " \
         "WHERE su.id_naf_user = ?"
     );
-    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -640,7 +640,7 @@ void Main::Delete::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_naf_user", get_id_user(), false);
 }
 
-void Main::Delete::A2(NAF::Functions::Action::Ptr action)
+void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE spaces s " \
@@ -662,7 +662,7 @@ void Main::Delete::A2(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Main::Delete::A3(NAF::Functions::Action::Ptr action)
+void Main::Delete::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("DELETE FROM spaces_users WHERE id_space = ?");
 
