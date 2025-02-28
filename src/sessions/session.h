@@ -29,7 +29,7 @@
 #include "Poco/MD5Engine.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Extras
     {
@@ -41,7 +41,7 @@ using namespace Poco;
 using namespace Poco::Net;
 
 
-class NAF::Extras::Session
+class StructBX::Extras::Session
 {
     public:
         Session();

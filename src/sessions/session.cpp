@@ -18,7 +18,7 @@
 
 #include "extras/session.h"
 
-using namespace NAF::Extras;
+using namespace StructBX::Extras;
 
 Session::Session() :
     id_("")

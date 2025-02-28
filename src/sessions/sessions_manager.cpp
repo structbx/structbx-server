@@ -18,11 +18,11 @@
 
 #include "tools/sessions_manager.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
-std::map<std::string, NAF::Extras::Session> SessionsManager::sessions_ = {};
+std::map<std::string, StructBX::Extras::Session> SessionsManager::sessions_ = {};
 std::mutex SessionsManager::mutex_;
-NAF::Query::DatabaseManager::Credentials SessionsManager::credentials_ = Query::DatabaseManager::Credentials
+StructBX::Query::DatabaseManager::Credentials SessionsManager::credentials_ = Query::DatabaseManager::Credentials
 (
     Tools::SettingsManager::GetSetting_("db_host", "localhost")
     ,Tools::SettingsManager::GetSetting_("db_port", "3306")
@@ -99,7 +99,7 @@ void SessionsManager::ReadSessions_()
     }
 }
 
-NAF::Extras::Session& SessionsManager::CreateSession_(int id_user, std::string path, int max_age)
+StructBX::Extras::Session& SessionsManager::CreateSession_(int id_user, std::string path, int max_age)
 {
     Extras::Session new_session;
     new_session.set_id_user(id_user);

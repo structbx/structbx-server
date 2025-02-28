@@ -35,7 +35,7 @@
 #include "tools/dvalue.h"
 #include "tools/settings_manager.h"
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -44,13 +44,13 @@ namespace NAF
 }
 
 
-class NAF::Tools::SessionsManager
+class StructBX::Tools::SessionsManager
 {
     public:
         SessionsManager();
         ~SessionsManager();
 
-        static std::map<std::string, NAF::Extras::Session>& get_sessions()
+        static std::map<std::string, StructBX::Extras::Session>& get_sessions()
         {
             auto& var = sessions_;
             return var;
@@ -62,7 +62,7 @@ class NAF::Tools::SessionsManager
         }
 
         static void ReadSessions_();
-        static NAF::Extras::Session& CreateSession_(int id_user, std::string path, int max_age);
+        static StructBX::Extras::Session& CreateSession_(int id_user, std::string path, int max_age);
         static void DeleteSession_(std::string id);
 
     protected:
@@ -70,7 +70,7 @@ class NAF::Tools::SessionsManager
 
     private:
         static std::mutex mutex_;
-        static std::map<std::string, NAF::Extras::Session> sessions_;
+        static std::map<std::string, StructBX::Extras::Session> sessions_;
         static Query::DatabaseManager::Credentials credentials_;
 };
 
