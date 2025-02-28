@@ -17,7 +17,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Functions::Forms::Columns : public Tools::FunctionData
 {
@@ -36,7 +35,7 @@ class StructBX::Functions::Forms::Columns : public Tools::FunctionData
         {
             ColumnSetup(){}
             
-            bool Setup(NAF::Functions::Function& self, ColumnVariables& variables);
+            bool Setup(StructBX::Functions::Function& self, ColumnVariables& variables);
         };
 
         struct ColumnTypeSetup
@@ -53,43 +52,43 @@ class StructBX::Functions::Forms::Columns : public Tools::FunctionData
         {
             Read(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct ReadSpecific : public Tools::FunctionData
         {
             ReadSpecific(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct ReadTypes : public Tools::FunctionData
         {
             ReadTypes(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct Add : public Tools::FunctionData
         {
             Add(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
-            void A3(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+            void A3(StructBX::Functions::Action::Ptr action);
         };
         struct Modify : public Tools::FunctionData
         {
             Modify(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
-            void A3(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+            void A3(StructBX::Functions::Action::Ptr action);
         };
         struct Delete : public Tools::FunctionData
         {
             Delete(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
-            void A3(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+            void A3(StructBX::Functions::Action::Ptr action);
         };
 
     private:

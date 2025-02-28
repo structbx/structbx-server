@@ -18,8 +18,8 @@ Columns::Columns(Tools::FunctionData& function_data) :
 Columns::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -27,7 +27,7 @@ Columns::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(fu
     get_functions()->push_back(function);
 }
 
-void Columns::Read::A1(NAF::Functions::Action::Ptr action)
+void Columns::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
@@ -59,8 +59,8 @@ void Columns::Read::A1(NAF::Functions::Action::Ptr action)
 Columns::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -68,7 +68,7 @@ Columns::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools:
     get_functions()->push_back(function);
 }
 
-void Columns::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
@@ -108,8 +108,8 @@ void Columns::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
 Columns::ReadTypes::ReadTypes(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/types/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -117,7 +117,7 @@ Columns::ReadTypes::ReadTypes(Tools::FunctionData& function_data) : Tools::Funct
     get_functions()->push_back(function);
 }
 
-void Columns::ReadTypes::A1(NAF::Functions::Action::Ptr action)
+void Columns::ReadTypes::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT * FROM forms_columns_types ");
 }
@@ -125,10 +125,10 @@ void Columns::ReadTypes::A1(NAF::Functions::Action::Ptr action)
 Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/forms/columns/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form exists
     auto action1 = function->AddAction_("a1");
@@ -153,13 +153,13 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3, action4, action5, action6](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3, action4, action5, action6](StructBX::Functions::Function& self)
     {
         // If error, delete the column from the table
         auto delete_column_table = [](int column_id)
         {
             // Delete space from table
-            NAF::Functions::Action action("action_delete_column");
+            StructBX::Functions::Action action("action_delete_column");
             action.set_sql_code("DELETE FROM forms_columns WHERE id = ?");
             action.AddParameter_("id", column_id, false);
             action.Work_();
@@ -271,11 +271,11 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
     get_functions()->push_back(function);
 }
 
-void Columns::Add::A1(NAF::Functions::Action::Ptr action)
+void Columns::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -300,7 +300,7 @@ void Columns::Add::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Columns::Add::A2(NAF::Functions::Action::Ptr action)
+void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.id " \
@@ -309,7 +309,7 @@ void Columns::Add::A2(NAF::Functions::Action::Ptr action)
         "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
     );
 
-    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -344,7 +344,7 @@ void Columns::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Columns::Add::A3(NAF::Functions::Action::Ptr action)
+void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_form) " \
@@ -362,7 +362,7 @@ void Columns::Add::A3(NAF::Functions::Action::Ptr action)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -388,7 +388,7 @@ void Columns::Add::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -433,12 +433,12 @@ void Columns::Add::A3(NAF::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    action->AddParameter_("link_to", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
     ->SetupCondition_("condition-link_to", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
-            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+            param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()));
         }
         return true;
     });
@@ -458,10 +458,10 @@ void Columns::Add::A3(NAF::Functions::Action::Ptr action)
 Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/forms/columns/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form exists
     auto action1 = function->AddAction_("a1");
@@ -477,7 +477,7 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -544,11 +544,11 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
     get_functions()->push_back(function);
 }
 
-void Columns::Modify::A1(NAF::Functions::Action::Ptr action)
+void Columns::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -573,7 +573,7 @@ void Columns::Modify::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Columns::Modify::A2(NAF::Functions::Action::Ptr action)
+void Columns::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.identifier, fc.id " \
@@ -582,7 +582,7 @@ void Columns::Modify::A2(NAF::Functions::Action::Ptr action)
         "WHERE fc.id != ? AND fc.identifier = ? AND f.identifier = ?"
     );
 
-    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -626,7 +626,7 @@ void Columns::Modify::A2(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
+void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE forms_columns SET " \
@@ -639,7 +639,7 @@ void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -665,7 +665,7 @@ void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -709,12 +709,12 @@ void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), true)
+    action->AddParameter_("link_to", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
     ->SetupCondition_("condition-id_column_type", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
-            param->set_value(NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()));
+            param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()));
         }
         return true;
     });
@@ -754,10 +754,10 @@ void Columns::Modify::A3(NAF::Functions::Action::Ptr action)
 Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/columns/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/columns/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify column existence
     auto action1 = function->AddAction_("a1");
@@ -776,7 +776,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2_0, action2, action3](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2_0, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute action 1
         if(!action1->Work_())
@@ -837,7 +837,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
     get_functions()->push_back(function);
 }
 
-void Columns::Delete::A1(NAF::Functions::Action::Ptr action)
+void Columns::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.id AS column_id, f.id AS form_id " \
@@ -846,7 +846,7 @@ void Columns::Delete::A1(NAF::Functions::Action::Ptr action)
         "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -882,12 +882,12 @@ void Columns::Delete::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Columns::Delete::A2(NAF::Functions::Action::Ptr)
+void Columns::Delete::A2(StructBX::Functions::Action::Ptr)
 {
     
 }
 
-void Columns::Delete::A3(NAF::Functions::Action::Ptr action)
+void Columns::Delete::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("DELETE FROM forms_columns WHERE id = ?");
 
@@ -903,7 +903,7 @@ void Columns::Delete::A3(NAF::Functions::Action::Ptr action)
     });
 }
 
-bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables& variables)
+bool Columns::ColumnSetup::Setup(StructBX::Functions::Function& self, ColumnVariables& variables)
 {
     // link_to parameter setup
     auto end = self.get_parameters().end();
@@ -913,7 +913,7 @@ bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables
         // Add null value link_to
         self.get_parameters().push_back(
             Query::Parameter::Ptr(
-                new Query::Parameter("link_to", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue()), false)
+                new Query::Parameter("link_to", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), false)
             )
         );
         auto end = self.get_parameters().end();
@@ -958,7 +958,7 @@ bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables
         variables.default_value = "DEFAULT " + default_value->get()->ToString_();
 
     // Link to
-    if(!link_to->get()->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kEmpty) && link_to->get()->ToString_() != "")
+    if(!link_to->get()->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kEmpty) && link_to->get()->ToString_() != "")
         variables.link_to = link_to->get()->ToString_();
 
     return true;

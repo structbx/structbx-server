@@ -20,17 +20,17 @@ Main::Main(Tools::FunctionData& function_data) :
 Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
     // Setup custom process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -48,7 +48,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
                 continue;
 
             // Action 2: COUNT
-            auto action2 = NAF::Functions::Action("a2");
+            auto action2 = StructBX::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
                 "FROM _structbx_space_" + space_id + "._structbx_form_" + id.get()->ToString_());
@@ -63,7 +63,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
             if(total->IsNull_())
                 continue;
 
-            row->AddField_("total", NAF::Tools::DValue::Ptr(new NAF::Tools::DValue(total->Int_())));
+            row->AddField_("total", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(total->Int_())));
 
         }
 
@@ -77,7 +77,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     get_functions()->push_back(function);
 }
 
-void Main::Read::A1(NAF::Functions::Action::Ptr action)
+void Main::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
@@ -92,8 +92,8 @@ void Main::Read::A1(NAF::Functions::Action::Ptr action)
 Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -101,8 +101,8 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::Fu
     get_functions()->push_back(function);
 
     // Function GET /api/forms/read/identifier
-    NAF::Functions::Function::Ptr function2 = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function2 = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
 
     auto action2 = function2->AddAction_("a2");
     A2(action2);
@@ -110,7 +110,7 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::Fu
     get_functions()->push_back(function2);
 }
 
-void Main::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT * FROM forms WHERE id = ? AND id_space = ?");
 
@@ -127,7 +127,7 @@ void Main::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Main::ReadSpecific::A2(NAF::Functions::Action::Ptr action)
+void Main::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT * FROM forms WHERE identifier = ? AND id_space = ?");
 
@@ -148,10 +148,10 @@ void Main::ReadSpecific::A2(NAF::Functions::Action::Ptr action)
 Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function POST /api/forms/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify that the form identifier don't exists in current space
     auto action1 = function->AddAction_("a1");
@@ -174,7 +174,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
     
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3, action3_1, action4](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2, action3, action3_1, action4](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -226,7 +226,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la tabla");
 
             // Delete form from table
-            NAF::Functions::Action action5("a5");
+            StructBX::Functions::Action action5("a5");
             action5.set_sql_code("DELETE FROM forms WHERE id = ?");
             action5.AddParameter_("id", std::to_string(form_id), false);
 
@@ -236,7 +236,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         // Create the directory to store files
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
+            auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + space_id + "/" + std::to_string(form_id);
             Poco::File file(directory);
             if(file.exists())
@@ -255,13 +255,13 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         }
         catch(Poco::FileException& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_(e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_(e.what());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
@@ -272,11 +272,11 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
     get_functions()->push_back(function);
 }
 
-void Main::Add::A1(NAF::Functions::Action::Ptr action)
+void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -301,7 +301,7 @@ void Main::Add::A1(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Main::Add::A2(NAF::Functions::Action::Ptr action)
+void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("INSERT INTO forms (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
 
@@ -309,7 +309,7 @@ void Main::Add::A2(NAF::Functions::Action::Ptr action)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         auto string_param = param->get_value()->ToString_();
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -335,7 +335,7 @@ void Main::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -358,7 +358,7 @@ void Main::Add::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Main::Add::A3(NAF::Functions::Action::Ptr action)
+void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO forms_columns (identifier, name, length, required, id_column_type, id_form) " \
@@ -379,7 +379,7 @@ void Main::Add::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("space_id", get_space_id(), false);
 }
 
-void Main::Add::A3_1(NAF::Functions::Action::Ptr action)
+void Main::Add::A3_1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_form, id_naf_user) " \
@@ -396,8 +396,8 @@ void Main::Add::A3_1(NAF::Functions::Action::Ptr action)
 Main::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function PUT /api/forms/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
@@ -414,11 +414,11 @@ Main::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(f
     get_functions()->push_back(function);
 }
 
-void Main::Modify::A1(NAF::Functions::Action::Ptr action)
+void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -441,11 +441,11 @@ void Main::Modify::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Main::Modify::A2(NAF::Functions::Action::Ptr action)
+void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
     action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -480,7 +480,7 @@ void Main::Modify::A2(NAF::Functions::Action::Ptr action)
     action->AddParameter_("space_id", get_space_id(), false);
 }
 
-void Main::Modify::A3(NAF::Functions::Action::Ptr action)
+void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "UPDATE forms " \
@@ -492,7 +492,7 @@ void Main::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El identificador debe ser una cadena de texto");
             return false;
@@ -518,7 +518,7 @@ void Main::Modify::A3(NAF::Functions::Action::Ptr action)
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
-        if(!param->get_value()->TypeIsIqual_(NAF::Tools::DValue::Type::kString))
+        if(!param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kString))
         {
             param->set_error("El nombre debe ser una cadena de texto");
             return false;
@@ -556,10 +556,10 @@ void Main::Modify::A3(NAF::Functions::Action::Ptr action)
 Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function DEL /api/forms/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    function->set_response_type(NAF::Functions::Function::ResponseType::kCustom);
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     // Action 1: Verify forms existence
     auto action1 = function->AddAction_("a1");
@@ -571,7 +571,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
     // Setup Custom Process
     auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2](NAF::Functions::Function& self)
+    function->SetupCustomProcess_([space_id, action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -608,7 +608,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
         // Delete form directory
         try
         {
-            auto directory = NAF::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
+            auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + space_id + "/" + id->get()->ToString_();
             Poco::File file(directory);
             if(file.exists())
@@ -623,13 +623,13 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
         }
         catch(Poco::FileException& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_(e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            NAF::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_(e.what());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }
@@ -640,11 +640,11 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
     get_functions()->push_back(function);
 }
 
-void Main::Delete::A1(NAF::Functions::Action::Ptr action)
+void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT identifier FROM forms WHERE id = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](NAF::Functions::Action& self)
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -667,7 +667,7 @@ void Main::Delete::A1(NAF::Functions::Action::Ptr action)
     });
 }
 
-void Main::Delete::A2(NAF::Functions::Action::Ptr action)
+void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
     action->AddParameter_("id", "", true);

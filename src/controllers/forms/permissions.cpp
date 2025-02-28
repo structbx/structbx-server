@@ -18,8 +18,8 @@ Permissions::Permissions(Tools::FunctionData& function_data) :
 Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -27,7 +27,7 @@ Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
     get_functions()->push_back(function);
 }
 
-void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fp.*, nu.username AS username, f.name AS form_name " \
@@ -53,8 +53,8 @@ void Permissions::Read::A1(NAF::Functions::Action::Ptr action)
 Permissions::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/read/id
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/read/id", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -62,7 +62,7 @@ Permissions::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
     get_functions()->push_back(function);
 }
 
-void Permissions::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
+void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fp.*, nu.username AS username, f.name AS form_name " \
@@ -98,8 +98,8 @@ void Permissions::ReadSpecific::A1(NAF::Functions::Action::Ptr action)
 Permissions::ReadUsersOut::ReadUsersOut(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/users/out/read
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/users/out/read", HTTP::EnumMethods::kHTTP_GET);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/users/out/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -107,7 +107,7 @@ Permissions::ReadUsersOut::ReadUsersOut(Tools::FunctionData& function_data) : To
     get_functions()->push_back(function);
 }
 
-void Permissions::ReadUsersOut::A1(NAF::Functions::Action::Ptr action)
+void Permissions::ReadUsersOut::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT nu.id, nu.username "
@@ -135,8 +135,8 @@ void Permissions::ReadUsersOut::A1(NAF::Functions::Action::Ptr action)
 Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/add
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/add", HTTP::EnumMethods::kHTTP_POST);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/add", HTTP::EnumMethods::kHTTP_POST);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -144,7 +144,7 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     get_functions()->push_back(function);
 }
 
-void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_naf_user, id_form) "
@@ -158,7 +158,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -167,7 +167,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -176,7 +176,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -185,7 +185,7 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -216,8 +216,8 @@ void Permissions::Add::A1(NAF::Functions::Action::Ptr action)
 Permissions::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/modify
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/modify", HTTP::EnumMethods::kHTTP_PUT);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -231,14 +231,14 @@ Permissions::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Permissions::Modify::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->AddParameter_("read", "", true)
     ->SetupCondition_("condition-read", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -247,7 +247,7 @@ void Permissions::Modify::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -256,7 +256,7 @@ void Permissions::Modify::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -265,7 +265,7 @@ void Permissions::Modify::A1(NAF::Functions::Action::Ptr action)
     {
         if(param->ToString_() != "0" && param->ToString_() != "1")
         {
-            param->set_value(std::make_shared<NAF::Tools::DValue>(1));
+            param->set_value(std::make_shared<StructBX::Tools::DValue>(1));
         }
         return true;
     });
@@ -295,8 +295,8 @@ void Permissions::Modify::A1(NAF::Functions::Action::Ptr action)
 Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/permissions/delete
-    NAF::Functions::Function::Ptr function = 
-        std::make_shared<NAF::Functions::Function>("/api/forms/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -308,7 +308,7 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Permissions::Delete::A1(NAF::Functions::Action::Ptr action)
+void Permissions::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)

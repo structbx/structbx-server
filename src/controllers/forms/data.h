@@ -23,7 +23,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Functions::Forms::Data : public Tools::FunctionData
 {
@@ -41,7 +40,7 @@ class StructBX::Functions::Forms::Data : public Tools::FunctionData
                 ,values(values)
                 ,id_space(id_space)
             {}
-            void Setup(NAF::Functions::Function& self, NAF::Query::Results::Ptr results, NAF::Query::Field::Ptr form_id, NAF::Query::Field::Ptr column_id, NAF::Functions::Action::Ptr action3);
+            void Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr form_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3);
 
             Type type;
             std::string& columns;
@@ -53,7 +52,7 @@ class StructBX::Functions::Forms::Data : public Tools::FunctionData
             bool Save();
             bool Delete();
 
-            NAF::Files::FileManager::Ptr file_manager;
+            StructBX::Files::FileManager::Ptr file_manager;
             std::string filepath = "";
             std::string name = "";
             std::string error = "";
@@ -89,74 +88,74 @@ class StructBX::Functions::Forms::Data : public Tools::FunctionData
         {
             VerifyPermissionsRead(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct VerifyPermissionsAdd : public Tools::FunctionData
         {
             VerifyPermissionsAdd(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct VerifyPermissionsModify : public Tools::FunctionData
         {
             VerifyPermissionsModify(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct VerifyPermissionsDelete : public Tools::FunctionData
         {
             VerifyPermissionsDelete(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct Read : public Tools::FunctionData
         {
             Read(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
         };
         struct ReadChangeInt : public Tools::FunctionData
         {
             ReadChangeInt(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct ReadSpecific : public Tools::FunctionData
         {
             ReadSpecific(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
-            void A3(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+            void A3(StructBX::Functions::Action::Ptr action);
         };
         struct ReadFile : public Tools::FunctionData
         {
             ReadFile(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
         };
         struct Add : public Tools::FunctionData
         {
             Add(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
         };
         struct Modify : public Tools::FunctionData
         {
             Modify(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
         };
         struct Delete : public Tools::FunctionData
         {
             Delete(Tools::FunctionData& function_data);
 
-            void A1(NAF::Functions::Action::Ptr action);
-            void A2(NAF::Functions::Action::Ptr action);
-            void A3(NAF::Functions::Action::Ptr action);
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+            void A3(StructBX::Functions::Action::Ptr action);
         };
 
     private:
