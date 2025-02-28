@@ -19,7 +19,7 @@
 #include "security/users_manager.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Functions
     {
@@ -28,7 +28,7 @@ namespace NAF
 }
 
 
-class NAF::Functions::Function : public HTTP::CommonResponses
+class StructBX::Functions::Function : public HTTP::CommonResponses
 {
     public:
         using Ptr = std::shared_ptr<Functions::Function>;

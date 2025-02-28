@@ -10,7 +10,7 @@
 #include "http/methods.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Functions
     {
@@ -19,7 +19,7 @@ namespace NAF
 }
 
 
-class NAF::Functions::FunctionsManager
+class StructBX::Functions::FunctionsManager
 {
     public:
         using FunctionsMap = std::map<std::string, Function::Ptr>;

@@ -1,7 +1,7 @@
 
 #include "functions/functions_manager.h"
 
-using namespace NAF::Functions;
+using namespace StructBX::Functions;
 
 FunctionsManager::FunctionsManager()
 {

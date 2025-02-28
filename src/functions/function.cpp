@@ -1,8 +1,7 @@
 
 #include "functions/function.h"
 
-using namespace NAF;
-using namespace NAF::Functions;
+using namespace StructBX::Functions;
 
 Function::Function() :
     endpoint_("")

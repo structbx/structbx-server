@@ -41,7 +41,7 @@
 #include "files/file_manager.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Functions
     {
@@ -55,7 +55,7 @@ using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 
 
-class NAF::Functions::Action
+class StructBX::Functions::Action
 {
     public:
         using Ptr = std::shared_ptr<Action>;

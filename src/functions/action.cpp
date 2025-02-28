@@ -2,8 +2,7 @@
 #include "functions/action.h"
 #include <Poco/Nullable.h>
 
-using namespace NAF;
-using namespace NAF::Functions;
+using namespace StructBX::Functions;
 
 Action::Action(std::string identifier) :
     async_(false)
