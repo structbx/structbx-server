@@ -32,7 +32,7 @@
 #include <Poco/Data/Statement.h>
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Query
     {
@@ -44,7 +44,7 @@ using namespace Poco;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 
-class NAF::Query::DatabaseManager
+class StructBX::Query::DatabaseManager
 {
     public:
         struct Credentials

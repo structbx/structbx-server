@@ -1,7 +1,7 @@
 
 #include "query/row.h"
 
-using namespace NAF::Query;
+using namespace StructBX::Query;
 
 Row::Row()
 {

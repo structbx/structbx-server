@@ -26,7 +26,7 @@
 #include "tools/dvalue.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Query
     {
@@ -35,7 +35,7 @@ namespace NAF
 }
 
 
-class NAF::Query::Row : public std::vector<Field::Ptr>
+class StructBX::Query::Row : public std::vector<Field::Ptr>
 {
     public:
         using Ptr = std::shared_ptr<Row>;

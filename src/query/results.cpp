@@ -1,7 +1,7 @@
 
 #include "query/results.h"
 
-using namespace NAF::Query;
+using namespace StructBX::Query;
 
 Results::Results()
 {

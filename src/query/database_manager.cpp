@@ -18,8 +18,7 @@
 
 #include "query/database_manager.h"
 
-using namespace NAF;
-using namespace NAF::Query;
+using namespace StructBX::Query;
 
 bool DatabaseManager::initialized_ = false;
 

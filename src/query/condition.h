@@ -24,7 +24,7 @@
 #include "tools/output_logger.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Query
     {
@@ -34,13 +34,13 @@ namespace NAF
 }
 
 
-enum class NAF::Query::ConditionType
+enum class StructBX::Query::ConditionType
 {
     kWarning
     ,kError
 };
 
-template <typename T> class NAF::Query::Condition
+template <typename T> class StructBX::Query::Condition
 {
     public:
         using Ptr = std::shared_ptr<Condition>;
@@ -68,7 +68,7 @@ template <typename T> class NAF::Query::Condition
         Functor functor_;
 };
 
-template <typename T> NAF::Query::Condition<T>::Condition(std::string identifier, ConditionType type, Functor functor) :
+template <typename T> StructBX::Query::Condition<T>::Condition(std::string identifier, ConditionType type, Functor functor) :
     identifier_(identifier)
     ,type_(type)
     ,functor_(functor)
@@ -76,7 +76,7 @@ template <typename T> NAF::Query::Condition<T>::Condition(std::string identifier
 
 }
 
-template <typename T> bool NAF::Query::Condition<T>::VerifyCondition_(T t)
+template <typename T> bool StructBX::Query::Condition<T>::VerifyCondition_(T t)
 {
     return functor_(t);
 }

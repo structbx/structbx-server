@@ -27,7 +27,7 @@
 #include "query/condition.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Query
     {
@@ -37,13 +37,13 @@ namespace NAF
 }
 
 
-enum class NAF::Query::ParameterType
+enum class StructBX::Query::ParameterType
 {
     kField
     ,kPosition
 };
 
-class NAF::Query::Parameter
+class StructBX::Query::Parameter
 {
     public:
         using Ptr = std::shared_ptr<Parameter>;

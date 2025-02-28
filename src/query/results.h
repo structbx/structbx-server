@@ -25,7 +25,7 @@
 #include "query/row.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Query
     {
@@ -34,7 +34,7 @@ namespace NAF
 }
 
 
-class NAF::Query::Results : public std::vector<Row::Ptr>
+class StructBX::Query::Results : public std::vector<Row::Ptr>
 {
     public:
         using Ptr = std::shared_ptr<Results>;

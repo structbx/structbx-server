@@ -2,8 +2,7 @@
 #include "field.h"
 #include "tools/dvalue.h"
 
-using namespace NAF;
-using namespace NAF::Query;
+using namespace StructBX::Query;
 
 Field::Field() :
     is_null_(true)

@@ -1,7 +1,7 @@
 
 #include "query/parameter.h"
 
-using namespace NAF::Query;
+using namespace StructBX::Query;
 
 Parameter::Parameter(std::string name, Tools::DValue::Ptr value, bool editable) :
     parameter_type_(ParameterType::kField)
