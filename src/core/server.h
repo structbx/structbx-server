@@ -1,22 +1,6 @@
-/*
-* Nebula Atom
 
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-#ifndef NAF_CORE_SERVER
-#define NAF_CORE_SERVER
+#ifndef STRUCTBX_CORE_SERVER
+#define STRUCTBX_CORE_SERVER
 
 
 #include <Poco/ThreadPool.h>
@@ -26,11 +10,11 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Poco/Exception.h"
-#include "Poco/Util/ServerApplication.h"
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/ServerSocket.h"
-#include "Poco/Net/SecureServerSocket.h"
+#include <Poco/Exception.h>
+#include <Poco/Util/ServerApplication.h>
+#include <Poco/Net/HTTPServer.h>
+#include <Poco/Net/ServerSocket.h>
+#include <Poco/Net/SecureServerSocket.h>
 
 #include "core/handler_factory.h"
 #include "tools/output_logger.h"
@@ -40,7 +24,7 @@ using namespace Poco;
 using namespace Poco::Net;
 using namespace Poco::Util;
 
-namespace NAF
+namespace StructBX
 {
     namespace Core
     {
@@ -49,7 +33,7 @@ namespace NAF
 }
 
 
-class NAF::Core::Server : public Util::ServerApplication
+class StructBX::Core::Server : public Util::ServerApplication
 {
     public:
         using Ptr = std::shared_ptr<Server>;
@@ -74,4 +58,4 @@ class NAF::Core::Server : public Util::ServerApplication
         std::unique_ptr<HTTPServer> http_server_;
 };
 
-#endif // NAF_CORE_SERVER
+#endif // STRUCTBX_CORE_SERVER

@@ -1,8 +1,5 @@
 
 #include "core/core.h"
-#include "query/database_manager.h"
-#include "security/permissions_manager.h"
-#include "tools/sessions_manager.h"
 
 using namespace StructBX::Core;
 
