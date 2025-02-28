@@ -24,7 +24,7 @@
 #include <string>
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Security
     {
@@ -33,7 +33,7 @@ namespace NAF
 }
 
 
-class NAF::Security::User
+class StructBX::Security::User
 {
     public:
         User();

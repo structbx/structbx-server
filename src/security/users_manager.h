@@ -31,7 +31,7 @@
 #include "query/database_manager.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Security
     {
@@ -40,7 +40,7 @@ namespace NAF
 }
 
 
-class NAF::Security::UsersManager
+class StructBX::Security::UsersManager
 {
     public:
         UsersManager();

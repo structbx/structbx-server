@@ -31,7 +31,7 @@
 #include "tools/output_logger.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Extras
     {
@@ -43,13 +43,13 @@ namespace NAF
 using namespace Poco;
 
 
-enum class NAF::Extras::SecurityType
+enum class StructBX::Extras::SecurityType
 {
     kDisableAll
     ,kEnableAll
 };
 
-class NAF::Extras::SecurityVerification
+class StructBX::Extras::SecurityVerification
 {
     public:
         SecurityVerification();

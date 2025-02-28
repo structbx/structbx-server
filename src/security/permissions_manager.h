@@ -32,7 +32,7 @@
 #include "tools/route.h"
 #include "tools/output_logger.h"
 
-namespace NAF
+namespace StructBX
 {
     namespace Security
     {
@@ -43,7 +43,7 @@ namespace NAF
 using namespace Poco;
 
 
-class NAF::Security::PermissionsManager
+class StructBX::Security::PermissionsManager
 {
     public:
         using PermissionToLoad = Poco::Tuple<std::string, std::string, std::string, int, std::string, bool, bool>;

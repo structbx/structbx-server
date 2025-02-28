@@ -18,7 +18,7 @@
 
 #include "security/user.h"
 
-using namespace NAF::Security;
+using namespace StructBX::Security;
 
 User::User() :
     id_(-1)

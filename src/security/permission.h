@@ -28,7 +28,7 @@
 #include "security/user.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Security
     {
@@ -38,7 +38,7 @@ namespace NAF
 }
 
 
-enum class NAF::Security::ActionType
+enum class StructBX::Security::ActionType
 {
     kCreate
     ,kRead
@@ -46,7 +46,7 @@ enum class NAF::Security::ActionType
     ,kDelete
 };
 
-class NAF::Security::Permission
+class StructBX::Security::Permission
 {
     public:
         Permission();

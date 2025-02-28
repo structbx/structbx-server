@@ -18,7 +18,7 @@
 
 #include "security/permission.h"
 
-using namespace NAF::Security;
+using namespace StructBX::Security;
 
 Permission::Permission() :
     route_()

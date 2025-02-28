@@ -18,7 +18,7 @@
 
 #include "security/users_manager.h"
 
-using namespace NAF::Security;
+using namespace StructBX::Security;
 
 UsersManager::UsersManager() :
     credentials_

@@ -18,13 +18,12 @@
 
 #include "security/permissions_manager.h"
 
-using namespace NAF;
-using namespace NAF::Security;
+using namespace StructBX::Security;
 
 std::mutex PermissionsManager::mutex_;
 std::list<Permission> PermissionsManager::permissions_ = {};
 std::map<std::string, ActionType> PermissionsManager::action_type_map_ = {};
-NAF::Query::DatabaseManager::Credentials PermissionsManager::credentials_ = Query::DatabaseManager::Credentials
+StructBX::Query::DatabaseManager::Credentials PermissionsManager::credentials_ = Query::DatabaseManager::Credentials
 (
     Tools::SettingsManager::GetSetting_("db_host", "localhost")
     ,Tools::SettingsManager::GetSetting_("db_port", "3306")

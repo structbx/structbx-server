@@ -18,7 +18,7 @@
 
 #include "security/security_verification.h"
 
-using namespace NAF::Extras;
+using namespace StructBX::Extras;
 
 SecurityVerification::SecurityVerification() :
     security_type_(SecurityType::kDisableAll)
