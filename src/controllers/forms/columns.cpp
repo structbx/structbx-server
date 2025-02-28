@@ -966,7 +966,7 @@ bool Columns::ColumnSetup::Setup(NAF::Functions::Function& self, ColumnVariables
 
 bool Columns::ColumnTypeSetup::Setup(std::string column_type_id, std::string& column_type, std::string& length_value)
 {
-    if(column_type_id == "1")
+    if(column_type_id == "1" || column_type_id == "10" || column_type_id == "11")
     {
         column_type = "VARCHAR";
         length_value = "(100)";
@@ -1006,6 +1006,12 @@ bool Columns::ColumnTypeSetup::Setup(std::string column_type_id, std::string& co
     {
         column_type = "INT";
         length_value = "(11)";
+        return true;
+    }
+    else if(column_type_id == "12" || column_type_id == "13")
+    {
+        column_type = "DATETIME";
+        length_value = "";
         return true;
     }
     else
