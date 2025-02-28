@@ -17,7 +17,7 @@
 
 #include "handlers/login_handler.h"
 
-using namespace NAF::Handlers;
+using namespace StructBX::Handlers;
 
 LoginHandler::~LoginHandler()
 {

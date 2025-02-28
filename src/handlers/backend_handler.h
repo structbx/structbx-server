@@ -22,7 +22,7 @@
 #include "handlers/root_handler.h"
 #include "query/results.h"
 
-namespace NAF
+namespace StructBX
 {
     namespace Handlers
     {
@@ -31,7 +31,7 @@ namespace NAF
 }
 
 
-class NAF::Handlers::BackendHandler : public RootHandler
+class StructBX::Handlers::BackendHandler : public RootHandler
 {
     public:
         using VectorShrResults = std::vector<Query::Results::Ptr>;

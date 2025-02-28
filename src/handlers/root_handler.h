@@ -72,7 +72,7 @@
 #include "http/body.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Handlers
     {
@@ -89,7 +89,7 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 
 
-class NAF::Handlers::RootHandler :
+class StructBX::Handlers::RootHandler :
     public HTTPRequestHandler
     ,public HTTP::CommonResponses
     ,public HTTP::Methods
@@ -113,7 +113,7 @@ class NAF::Handlers::RootHandler :
             auto& var = properties_;
             return var;
         }
-        std::shared_ptr<NAF::Tools::Route>& get_requested_route()
+        std::shared_ptr<StructBX::Tools::Route>& get_requested_route()
         {
             auto& var = requested_route_;
             return var;
@@ -151,7 +151,7 @@ class NAF::Handlers::RootHandler :
     private:
         struct Properties properties_;
         std::list<std::string> targets_;
-        std::shared_ptr<NAF::Tools::Route> requested_route_;
+        std::shared_ptr<StructBX::Tools::Route> requested_route_;
         Functions::FunctionsManager functions_manager_;
         Functions::Function::Ptr current_function_;
 };

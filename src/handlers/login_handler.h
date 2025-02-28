@@ -22,7 +22,7 @@
 #include "handlers/root_handler.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Handlers
     {
@@ -31,7 +31,7 @@ namespace NAF
 }
 
 
-class NAF::Handlers::LoginHandler :
+class StructBX::Handlers::LoginHandler :
     public RootHandler
 {
     public:

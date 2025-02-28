@@ -17,7 +17,7 @@
 
 #include "handlers/backend_handler.h"
 
-using namespace NAF::Handlers;
+using namespace StructBX::Handlers;
 
 BackendHandler::BackendHandler() :
     RootHandler::RootHandler()

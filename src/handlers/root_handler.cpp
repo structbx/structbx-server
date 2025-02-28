@@ -17,7 +17,7 @@
 
 #include "handlers/root_handler.h"
 
-using namespace NAF::Handlers;
+using namespace StructBX::Handlers;
 
 RootHandler::RootHandler() :
     current_function_()
@@ -121,7 +121,7 @@ bool RootHandler::SetupSSL_()
     return true;
 }
 
-NAF::Functions::Function::Ptr RootHandler::AddFunction_(std::string endpoint, HTTP::EnumMethods method)
+StructBX::Functions::Function::Ptr RootHandler::AddFunction_(std::string endpoint, HTTP::EnumMethods method)
 {
     return functions_manager_.AddFunction_(endpoint, method);
 }
