@@ -33,7 +33,7 @@
 #include "tools/output_logger.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -44,7 +44,7 @@ namespace NAF
 using namespace Poco;
 
 
-class NAF::Tools::DValue
+class StructBX::Tools::DValue
 {
     public:
         using Ptr = std::shared_ptr<DValue>;

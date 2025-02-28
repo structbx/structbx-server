@@ -18,7 +18,7 @@
 
 #include "tools/manage_json.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
 ManageJSON::ManageJSON() :
     json_array_(new JSON::Array())

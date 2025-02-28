@@ -35,7 +35,7 @@
 using namespace Poco;
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -44,7 +44,7 @@ namespace NAF
 }
 
 
-class NAF::Tools::ManageJSON
+class StructBX::Tools::ManageJSON
 {
     public:
         ManageJSON();

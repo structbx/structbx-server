@@ -4,7 +4,7 @@
 
 #include "tools/handler_connection.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
 HandlerConnection::HandlerConnection(Tools::Route route, HandlerFunctor handler) :
     current_route_(route)

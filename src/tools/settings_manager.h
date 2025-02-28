@@ -34,7 +34,7 @@
 
 #include "tools/dvalue.h"
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -45,7 +45,7 @@ namespace NAF
 using namespace Poco;
 
 
-class NAF::Tools::SettingsManager
+class StructBX::Tools::SettingsManager
 {
     public:
         struct Setting

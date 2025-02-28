@@ -13,7 +13,7 @@
 #include "handlers/backend_handler.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -21,15 +21,15 @@ namespace NAF
     }
 }
 
-class NAF::Tools::HandlerConnection
+class StructBX::Tools::HandlerConnection
 {
     public:
-        using HandlerFunctor = std::function<NAF::Handlers::RootHandler*()>;
+        using HandlerFunctor = std::function<StructBX::Handlers::RootHandler*()>;
 
-        HandlerConnection(NAF::Tools::Route route, HandlerFunctor handler);
+        HandlerConnection(StructBX::Tools::Route route, HandlerFunctor handler);
         ~HandlerConnection();
 
-        NAF::Tools::Route current_route_;
+        StructBX::Tools::Route current_route_;
         HandlerFunctor return_handler_;
 };
 

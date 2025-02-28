@@ -18,7 +18,7 @@
 
 #include "tools/output_logger.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
 std::mutex OutputLogger::mutex_;
 bool OutputLogger::log_to_file_ = false;

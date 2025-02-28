@@ -15,7 +15,6 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Tools::BaseAction : public Tools::FunctionData
 {

@@ -30,7 +30,7 @@
 #include <mutex>
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -40,7 +40,7 @@ namespace NAF
 }
 
 
-enum class NAF::Tools::LogType
+enum class StructBX::Tools::LogType
 {
     kInfo
     ,kWarning
@@ -48,7 +48,7 @@ enum class NAF::Tools::LogType
     ,kDebug
 };
 
-class NAF::Tools::OutputLogger
+class StructBX::Tools::OutputLogger
 {
     public:
         OutputLogger();

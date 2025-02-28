@@ -10,7 +10,7 @@
 #include "Poco/StreamCopier.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -18,8 +18,7 @@ namespace NAF
     }
 }
 
-using namespace NAF;
-class NAF::Tools::Base64Tool
+class StructBX::Tools::Base64Tool
 {
     public:
         Base64Tool();

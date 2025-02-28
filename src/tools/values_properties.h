@@ -24,7 +24,7 @@
 #include <map>
 #include <vector>
 
-namespace NAF
+namespace StructBX
 {
     namespace Extras
     {
@@ -32,7 +32,7 @@ namespace NAF
     }
 }
 
-class NAF::Extras::ValuesProperties
+class StructBX::Extras::ValuesProperties
 {
     public:
         ValuesProperties();

@@ -18,7 +18,7 @@
 
 #include "extras/values_properties.h"
 
-using namespace NAF::Extras;
+using namespace StructBX::Extras;
 
 ValuesProperties::ValuesProperties() :
     value_("")

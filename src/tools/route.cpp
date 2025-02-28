@@ -17,7 +17,7 @@
 
 #include "route.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
 Route::Route() :
     route_("")

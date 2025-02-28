@@ -23,18 +23,17 @@ namespace StructBX
 }
 
 using namespace StructBX;
-using namespace NAF;
 
 class StructBX::Tools::FunctionData
 {
     public:
-        using FunctionsList = std::shared_ptr<std::list<NAF::Functions::Function::Ptr>>;
+        using FunctionsList = std::shared_ptr<std::list<StructBX::Functions::Function::Ptr>>;
 
         FunctionData() :
             id_user_(-1)
             ,space_id_("")
         {
-            functions_ = std::make_shared<std::list<NAF::Functions::Function::Ptr>>();
+            functions_ = std::make_shared<std::list<StructBX::Functions::Function::Ptr>>();
         }
         FunctionData(FunctionData& function_data) :
             id_user_(function_data.get_id_user())

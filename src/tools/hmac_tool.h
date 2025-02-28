@@ -8,7 +8,7 @@
 #include "Poco/SHA1Engine.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -16,9 +16,8 @@ namespace NAF
     }
 }
 
-using namespace NAF;
 
-class NAF::Tools::HMACTool
+class StructBX::Tools::HMACTool
 {
     public:
         HMACTool();

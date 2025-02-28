@@ -18,7 +18,7 @@
 
 #include "tools/dvalue.h"
 
-using namespace NAF::Tools;
+using namespace StructBX::Tools;
 
 DValue::DValue() :
     type_(Type::kEmpty)

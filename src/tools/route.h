@@ -26,7 +26,7 @@
 #include "Poco/URI.h"
 
 
-namespace NAF
+namespace StructBX
 {
     namespace Tools
     {
@@ -38,14 +38,14 @@ namespace NAF
 using namespace Poco;
 
 
-enum class NAF::Tools::RouteType
+enum class StructBX::Tools::RouteType
 {
     kEntrypoint
     ,kEndpoint
 };
 
 
-class NAF::Tools::Route
+class StructBX::Tools::Route
 {
     public:
         Route();
