@@ -29,7 +29,6 @@
 #include <stdexcept>
 #include <memory>
 
-#include "functions/action.h"
 #include "yaml-cpp/yaml.h"
 #include "Poco/Exception.h"
 #include <Poco/Net/HTTPRequestHandler.h>
@@ -65,11 +64,14 @@
 #include "tools/manage_json.h"
 #include "security/user.h"
 #include "functions/functions_manager.h"
+#include "functions/action.h"
 #include "query/condition.h"
 #include "tools/settings_manager.h"
 #include "tools/output_logger.h"
 #include "http/methods.h"
 #include "http/body.h"
+#include "tools/hmac_tool.h"
+#include "tools/base64_tool.h"
 
 
 namespace StructBX
