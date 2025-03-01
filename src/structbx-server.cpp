@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     // Setup
         StructBX::Query::DatabaseManager::StartMySQL_();
         StructBX::Security::PermissionsManager::LoadPermissions_();
-        StructBX::Tools::SessionsManager::ReadSessions_();
+        StructBX::Sessions::SessionsManager::ReadSessions_();
 
     // Run
         auto code = app.Init_();
