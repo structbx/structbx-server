@@ -108,11 +108,6 @@ class StructBX::Functions::Action
             auto& var = query_;
             return var;
         }
-        Query::DatabaseManager::Credentials& get_credentials()
-        {
-            auto& var = credentials_;
-            return var;
-        }
 
         void set_identifier(std::string identifier) { identifier_ = identifier; };
         void set_status(std::string status) { status_ = status; };
@@ -169,7 +164,6 @@ class StructBX::Functions::Action
         int affected_rows_;
         std::shared_ptr<Data::Session> session_;
         std::shared_ptr<Data::Statement> query_;
-        Query::DatabaseManager::Credentials credentials_;
         std::mutex mutex_;
         
 };
