@@ -7,24 +7,9 @@
             ,"command": "${workspaceFolder}/init_envDev.sh"
         }
         ,{
-            "label": "Conan install Deps"
-            ,"type": "shell"
-            ,"command": "cd build/Debug && conan install ../../ --output-folder=./ --build=missing"
-        }
-        ,{
-            "label": "Generate Cert/Key"
-            ,"type": "shell"
-            ,"command": "cd build/Debug && openssl req -nodes -new -x509 -keyout key.pem -out cert.pem"
-        }
-        ,{
             "label": "Clean Build"
             ,"type": "shell"
             ,"command": "cd build/Debug && rm -r *"
-        }
-        ,{
-            "label": "Install"
-            ,"type": "shell"
-            ,"command": "cd build/Debug && sudo cmake --build . --target install"
         }
         ,{
             "label": "Create Docker Image"
@@ -37,9 +22,9 @@
             ,"command": "docker run -t -v ${workspaceFolder}/build/Debug/DockerVolume:/etc/structbx -v /var/www/structbx-web-uploaded:/var/www/structbx-web-uploaded --name test-structbx -p 3001:3001 --init --rm structbx:latest"
         }
         ,{
-            "label": "Copy conf"
+            "label": "Install"
             ,"type": "shell"
-            ,"command": "mkdir -p build/Debug/DockerVolume && cp conf/* build/Debug && cp conf/* build/Debug/DockerVolume"
+            ,"command": "cd build/Debug && sudo cmake --build . --target install"
         }
     ]
 }
