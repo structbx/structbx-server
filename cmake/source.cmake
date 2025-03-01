@@ -68,7 +68,6 @@ set(
     ${PROJECT_SOURCE_DIR}/src/sessions/session.cpp
     ${PROJECT_SOURCE_DIR}/src/sessions/sessions_manager.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/dvalue.cpp
-    ${PROJECT_SOURCE_DIR}/src/tools/handler_connection.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/hmac_tool.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/manage_json.cpp
