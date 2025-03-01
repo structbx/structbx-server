@@ -1,6 +1,6 @@
 
-#ifndef FUNCTIONS_ACTION
-#define FUNCTIONS_ACTION
+#ifndef STRUCTBX_FUNCTIONS_ACTION
+#define STRUCTBX_FUNCTIONS_ACTION
 
 
 #include <string>
@@ -174,4 +174,4 @@ class StructBX::Functions::Action
         
 };
 
-#endif // FUNCTIONS_ACTION
+#endif // STRUCTBX_FUNCTIONS_ACTION
