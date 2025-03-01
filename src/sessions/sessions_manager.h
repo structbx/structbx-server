@@ -38,11 +38,6 @@ class StructBX::Sessions::SessionsManager
             auto& var = sessions_;
             return var;
         }
-        static Query::DatabaseManager::Credentials& get_credentials()
-        {
-            auto& var = credentials_;
-            return var;
-        }
 
         static void ReadSessions_();
         static StructBX::Sessions::Session& CreateSession_(int id_user, std::string path, int max_age);
@@ -54,7 +49,6 @@ class StructBX::Sessions::SessionsManager
     private:
         static std::mutex mutex_;
         static std::map<std::string, StructBX::Sessions::Session> sessions_;
-        static Query::DatabaseManager::Credentials credentials_;
 };
 
 #endif // STRUCTBX_SESSIONS_SESSIONSMANAGER

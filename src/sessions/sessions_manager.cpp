@@ -5,14 +5,6 @@ using namespace StructBX::Sessions;
 
 std::map<std::string, StructBX::Sessions::Session> SessionsManager::sessions_ = {};
 std::mutex SessionsManager::mutex_;
-StructBX::Query::DatabaseManager::Credentials SessionsManager::credentials_ = Query::DatabaseManager::Credentials
-(
-    Tools::SettingsManager::GetSetting_("db_host", "localhost")
-    ,Tools::SettingsManager::GetSetting_("db_port", "3306")
-    ,Tools::SettingsManager::GetSetting_("db_name", "db")
-    ,Tools::SettingsManager::GetSetting_("db_user", "root")
-    ,Tools::SettingsManager::GetSetting_("db_password", "root")
-);
 
 SessionsManager::SessionsManager()
 {
@@ -30,16 +22,15 @@ void SessionsManager::ReadSessions_()
     {
         mutex_.lock();
         // Setting up the action
-            Functions::Action action{""};
-            action.get_credentials().Replace_(credentials_);
+            Functions::Action action{"SessionsManager::ReadSessions_"};
             action.set_custom_error("Sessions not found.");
-            action.set_sql_code("SELECT * FROM " + Tools::SettingsManager::GetSetting_("sessions_table", "_naf_sessions") + " WHERE NOW() < created_at + INTERVAL max_age SECOND");
+            action.set_sql_code("SELECT * FROM sessions WHERE NOW() < created_at + INTERVAL max_age SECOND");
 
         // Query process
             if(!action.Work_())
             {
                 mutex_.unlock();
-                Tools::OutputLogger::Error_("Error on sessions_manager.cpp on LoadPermissions_(): " + action.get_custom_error());
+                Tools::OutputLogger::Error_("Error on sessions_manager.cpp on ReadSessions_(): " + action.get_custom_error());
                 return;
             }
 
@@ -106,10 +97,9 @@ StructBX::Sessions::Session& SessionsManager::CreateSession_(int id_user, std::s
     {
         // Setting up the action
             Functions::Action action{""};
-            action.get_credentials().Replace_(credentials_);
             action.set_custom_error("Session not saved.");
             std::string sql_code =
-                "INSERT INTO " + Tools::SettingsManager::GetSetting_("sessions_table", "_naf_sessions") + " (identifier, path, max_age, id_naf_user) "
+                "INSERT INTO sessions (identifier, path, max_age, id_naf_user) "
                 "VALUES (?, ?, ?, ?)"
             ;
             action.set_sql_code(sql_code);
@@ -140,9 +130,8 @@ void SessionsManager::DeleteSession_(std::string id)
     {
         // Setting up the action
             Functions::Action action{""};
-            action.get_credentials().Replace_(credentials_);
             action.set_custom_error("Session not saved.");
-            action.set_sql_code("DELETE FROM " + Tools::SettingsManager::GetSetting_("sessions_table", "_naf_sessions") + " WHERE identifier = ?");
+            action.set_sql_code("DELETE FROM sessions WHERE identifier = ?");
             action.AddParameter_("identifier", id, false);
 
         // Query process
