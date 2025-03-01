@@ -1,6 +1,7 @@
 
 #include "functions/function.h"
 
+using namespace StructBX;
 using namespace StructBX::Functions;
 
 Function::Function() :

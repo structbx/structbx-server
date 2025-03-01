@@ -2,6 +2,7 @@
 #include "functions/action.h"
 #include <Poco/Nullable.h>
 
+using namespace StructBX;
 using namespace StructBX::Functions;
 
 Action::Action(std::string identifier) :

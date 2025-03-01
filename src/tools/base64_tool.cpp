@@ -1,6 +1,8 @@
 
 #include "tools/base64_tool.h"
 
+using namespace StructBX;
+
 Tools::Base64Tool::Base64Tool()
 {
 

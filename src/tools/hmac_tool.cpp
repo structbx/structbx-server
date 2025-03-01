@@ -1,6 +1,8 @@
 
 #include "tools/hmac_tool.h"
 
+using namespace StructBX;
+
 Tools::HMACTool::HMACTool()
 {
 

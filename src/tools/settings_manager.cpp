@@ -18,7 +18,8 @@
 
 #include "tools/settings_manager.h"
 
-using namespace Tools;
+using namespace StructBX;
+using namespace StructBX::Tools;
 
 std::mutex SettingsManager::mutex_;
 std::vector<Tools::SettingsManager::Setting> Tools::SettingsManager::settings_ = {};
