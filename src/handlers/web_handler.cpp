@@ -1,13 +1,16 @@
 
-#include "web_server.h"
+#include "handlers/web_handler.h"
 
-StructBX::Webserver::Webserver() : 
+using namespace StructBX;
+using namespace StructBX::Handlers;
+
+WebHandler::WebHandler() : 
     RootHandler()
 {
     
 }
 
-void StructBX::Webserver::Process_()
+void WebHandler::Process_()
 {
     SetupHeaders_();
     file_manager_.AddBasicSupportedFiles_();
@@ -29,7 +32,7 @@ void StructBX::Webserver::Process_()
     }
 }
 
-void StructBX::Webserver::DownloadProcess_()
+void WebHandler::DownloadProcess_()
 {
     // Manage the file
         auto& request = get_http_server_request().value();
