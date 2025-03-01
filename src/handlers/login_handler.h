@@ -26,10 +26,17 @@ namespace StructBX
 {
     namespace Handlers
     {
+        struct AuthRoutes;
         class LoginHandler;
     }
 }
 
+
+struct StructBX::Handlers::AuthRoutes
+{
+    static Tools::Route login_route;
+    static Tools::Route logout_route;
+};
 
 class StructBX::Handlers::LoginHandler :
     public RootHandler

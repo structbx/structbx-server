@@ -17,7 +17,11 @@
 
 #include "handlers/login_handler.h"
 
+using namespace StructBX;
 using namespace StructBX::Handlers;
+
+Tools::Route StructBX::Handlers::AuthRoutes::login_route("/api/auth/login");
+Tools::Route StructBX::Handlers::AuthRoutes::logout_route("/api/auth/logout");
 
 LoginHandler::~LoginHandler()
 {
@@ -46,14 +50,11 @@ void LoginHandler::Process_()
 
 void LoginHandler::Login_()
 {
-    std::vector<std::string> login_route({"api", "system", "login"});
-    std::vector<std::string> logout_route({"api", "system", "logout"});
-
-    if(get_requested_route()->get_segments() == login_route)
+    if(get_requested_route()->get_segments() == AuthRoutes::login_route.get_segments())
     {
         StartSession_();
     }
-    else if(get_requested_route()->get_segments() == logout_route)
+    else if(get_requested_route()->get_segments() == AuthRoutes::logout_route.get_segments())
     {
         EndSession_();
     }
@@ -78,6 +79,19 @@ void LoginHandler::StartSession_()
         IdentifyParameters_();
         get_current_function()->IdentifyParameters_(get_users_manager().get_action());
 
+        // Encode password
+        auto password = get_users_manager().get_action()->GetParameter("password");
+        if(password != get_users_manager().get_action()->get_parameters().end())
+        {
+            password->get()->SetupCondition_("condition-password", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
+            {
+                std::string password = param->ToString_();
+                std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
+                param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
+                return true;
+            });
+        }
+        
         if(!get_users_manager().AuthenticateUser_())
         {
             JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Unauthorized user or wrong user or password.");
