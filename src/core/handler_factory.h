@@ -24,7 +24,6 @@
 #include <Poco/Data/MySQL/MySQLException.h>
 #include <Poco/Data/Statement.h>
 
-#include "web_server.h"
 #include "sessions/sessions_manager.h"
 #include "query/database_manager.h"
 #include "tools/route.h"
@@ -32,6 +31,7 @@
 #include "handlers/root_handler.h"
 #include "handlers/null_handler.h"
 #include "handlers/backend_handler.h"
+#include "handlers/web_handler.h"
 #include "handlers/login_handler.h"
 #include "tools/output_logger.h"
 

@@ -1,19 +1,17 @@
 
-#include <Poco/Exception.h>
 #include <iostream>
+#include <memory>
 
 #include <Poco/File.h>
+#include <Poco/Exception.h>
 
 #include "core/core.h"
 #include "functions/action.h"
-#include "handlers/custom_handler.h"
-#include "handlers/root_handler.h"
 #include "tools/route.h"
-#include <memory>
-#include <query/parameter.h>
-#include <tools/dvalue.h>
-#include <tools/output_logger.h>
-#include <tools/hmac_tool.h>
+#include "query/parameter.h"
+#include "tools/dvalue.h"
+#include "tools/output_logger.h"
+#include "tools/hmac_tool.h"
 
 
 using namespace Poco;

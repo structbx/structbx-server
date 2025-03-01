@@ -22,7 +22,7 @@ HTTPRequestHandler* HandlerFactory::createRequestHandler(const HTTPServerRequest
             // Manage Frontend
             case StructBX::Tools::RouteType::kEntrypoint:
             {
-                handler = new StructBX::Webserver;
+                handler = new StructBX::Handlers::WebHandler;
                 break;
             }
 
