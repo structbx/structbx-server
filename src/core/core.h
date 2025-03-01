@@ -76,6 +76,8 @@ class StructBX::Core::Core
 
     protected:
         void AddBasicSettings_();
+        bool SetupOutputLog();
+        bool SetupUploadedDir();
 
     private:
         const bool use_ssl_;

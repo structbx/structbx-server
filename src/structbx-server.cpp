@@ -22,56 +22,6 @@ struct Parameters
     std::string properties_file = "";
 };
 
-bool SetupOutputLog()
-{
-    // File for output log
-    File file_output_log(StructBX::Tools::SettingsManager::GetSetting_("logger_output_file", "/var/log/structbx.log"));
-    if(!file_output_log.exists())
-    {
-        try
-        {
-            if (!file_output_log.createFile())
-            {
-                std::cerr << "The file could not be created: " << file_output_log.path() << std::endl;
-                return false;
-            }
-        }
-        catch (Poco::FileException& e)
-        {
-            std::cerr << "The file could not be created " << file_output_log.path() << ": " << e.what() << std::endl;
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool SetupUploadedDir()
-{
-    // Directory for uploaded files
-    File dir_uploaded_files(StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded"));
-    if(!dir_uploaded_files.exists())
-    {
-        try
-        {
-            dir_uploaded_files.createDirectories();
-        }
-        catch (Poco::FileException& e)
-        {
-            std::cerr << "The directory could not be created " << dir_uploaded_files.path() << ": " << e.what() << std::endl;
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void AddCustomSettings()
-{
-    StructBX::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("/var/www/structbx-web-uploaded"));
-    StructBX::Tools::SettingsManager::AddSetting_("space_id_cookie_name", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("1f3efd18688d2"));
-}
-
 Parameters SetupParameters(std::vector<std::string>& parameters)
 {
     Parameters params;
@@ -100,11 +50,8 @@ int main(int argc, char** argv)
 
     // Settings
         StructBX::Tools::SettingsManager::set_config_path(params.properties_file);
-        AddCustomSettings();
         StructBX::Tools::SettingsManager::ReadSettings_();
         app.SetupSettings_();
-        StructBX::Tools::OutputLogger::set_log_to_file(SetupOutputLog());
-        SetupUploadedDir();
 
     // Setup
         StructBX::Query::DatabaseManager::StartMySQL_();

@@ -11,7 +11,6 @@ StructBX::Core::Core::Core(bool use_ssl) :
         Net::initializeSSL();
 
     AddBasicSettings_();
-    SetupSettings_();
 }
 
 StructBX::Core::Core::~Core()
@@ -89,16 +88,20 @@ void StructBX::Core::Core::AddBasicSettings_()
     Tools::SettingsManager::AddSetting_("certificate", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("key", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("rootcert", Tools::DValue::Type::kString, Tools::DValue(""));
-    Tools::SettingsManager::AddSetting_("logger_output_file", Tools::DValue::Type::kString, Tools::DValue("Core.log"));
+    Tools::SettingsManager::AddSetting_("logger_output_file", Tools::DValue::Type::kString, Tools::DValue("structbx.log"));
     Tools::SettingsManager::AddSetting_("debug", Tools::DValue::Type::kBoolean, Tools::DValue(false));
     Tools::SettingsManager::AddSetting_("permissions_table", Tools::DValue::Type::kString, Tools::DValue("_naf_permissions"));
     Tools::SettingsManager::AddSetting_("users_table", Tools::DValue::Type::kString, Tools::DValue("_naf_users"));
     Tools::SettingsManager::AddSetting_("sessions_table", Tools::DValue::Type::kString, Tools::DValue("_naf_sessions"));
+    StructBX::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("/var/www/structbx-web-uploaded"));
+    StructBX::Tools::SettingsManager::AddSetting_("space_id_cookie_name", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("1f3efd18688d2"));
 }
 
 void StructBX::Core::Core::SetupSettings_()
 {
-    Tools::OutputLogger::set_output_file_address(Tools::SettingsManager::GetSetting_("logger_output_file", "Core.log"));
+    Tools::OutputLogger::set_log_to_file(SetupOutputLog());
+    SetupUploadedDir();
+    Tools::OutputLogger::set_output_file_address(Tools::SettingsManager::GetSetting_("logger_output_file", "structbx.log"));
     Tools::OutputLogger::set_print_debug(Tools::SettingsManager::GetSetting_("debug", true));
     Query::DatabaseManager::Credentials credentials(
         Tools::SettingsManager::GetSetting_("db_host", "localhost")
@@ -109,4 +112,48 @@ void StructBX::Core::Core::SetupSettings_()
     );
     Tools::SessionsManager::get_credentials().Replace_(credentials);
     Security::PermissionsManager::get_credentials().Replace_(credentials);
+}
+
+bool StructBX::Core::Core::SetupOutputLog()
+{
+    // File for output log
+    File file_output_log(StructBX::Tools::SettingsManager::GetSetting_("logger_output_file", "/var/log/structbx.log"));
+    if(!file_output_log.exists())
+    {
+        try
+        {
+            if (!file_output_log.createFile())
+            {
+                Tools::OutputLogger::Error_("Error on core/core.cpp on SetupOutputLog(): The output log file could not be created (" + file_output_log.path() + ")");
+                return false;
+            }
+        }
+        catch (Poco::FileException& e)
+        {
+            Tools::OutputLogger::Error_("Error on core/core.cpp on SetupOutputLog(): The output log file could not be created (" + file_output_log.path() + "): " + e.what());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool StructBX::Core::Core::SetupUploadedDir()
+{
+    // Directory for uploaded files
+    File dir_uploaded_files(StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded"));
+    if(!dir_uploaded_files.exists())
+    {
+        try
+        {
+            dir_uploaded_files.createDirectories();
+        }
+        catch (Poco::FileException& e)
+        {
+            Tools::OutputLogger::Error_("Error on core/core.cpp on SetupUploadedDir(): The directory could not be created (" + dir_uploaded_files.path() + "): " + e.what());
+            return false;
+        }
+    }
+
+    return true;
 }
