@@ -1,7 +1,7 @@
 
-#include "functions/general/permissions.h"
+#include "controllers/general/permissions.h"
 
-using namespace StructBX::Functions::General;
+using namespace StructBX::Controllers::General;
 
 Permissions::Permissions(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
