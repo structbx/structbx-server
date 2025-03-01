@@ -1,4 +1,4 @@
-FROM ghcr.io/nebulaatom/nebulaatom:latest AS build
+FROM debian:12 AS build
 
 RUN apt-get update && apt-get install -y \
     make \
@@ -21,13 +21,11 @@ RUN mkdir build && cd build && \
     cmake --build . --target install && \
     git clone https://github.com/structbx/structbx-web.git
 
-FROM ghcr.io/nebulaatom/nebulaatom:latest
+FROM debian:12
 
 COPY --from=build /structbx /
 
 COPY --from=build /usr/src/structbx/build/structbx-web /var/www/structbx-web
-
-COPY --from=build /usr/src/structbx/conf/* /etc/structbx/
 
 WORKDIR /
 
