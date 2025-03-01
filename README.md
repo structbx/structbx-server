@@ -13,18 +13,6 @@ Hello! Thank you for using this software, developed with a lot of effort and aff
 
 StructBX is a collaboration tool that combines the ease of use of a spreadsheet with the power of a database.
 
-## Features
-
-Support for
-- CMake
-- C++17
-- Docker
-- CppCheck
-- Conan
-- Doxygen
-- ccache
-- cpack
-
 ## Requeriments
 
 On Debian (12):
@@ -47,7 +35,7 @@ apt-get update && apt-get install -y \
 - Download the source code
 
 ```shell
-git clone https://github.com/structbx/structbx.git
+git clone https://github.com/structbx/structbx-server.git
 ```
 
 - Build and install
@@ -64,8 +52,8 @@ cmake --build . --target install
 
 ## Contact
 
-- **Github**: [@nebulacsf](https://github.com/structbx/structbx)
-- **Web**: [NebulaCSF](https://structbx.github.io/)
+- **Github**: [@structbx](https://github.com/structbx/)
+- **Web**: [StructBX](https://structbx.github.io/)
 
 ## License
 
