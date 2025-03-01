@@ -37,18 +37,12 @@ class StructBX::Security::UsersManager
             auto& var = action_;
             return var;
         }
-        Query::DatabaseManager::Credentials& get_credentials()
-        {
-            auto& var = credentials_;
-            return var;
-        }
 
         bool AuthenticateUser_();
 
     private:
         User current_user_;
         Functions::Action::Ptr action_;
-        Query::DatabaseManager::Credentials credentials_;
 };
 
 
