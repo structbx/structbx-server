@@ -7,15 +7,7 @@ RootHandler::RootHandler() :
     current_function_()
 {
     requested_route_ = std::make_shared<Tools::Route>(std::vector<std::string>{""});
-    set_security_type(Extras::SecurityType::kDisableAll);
-    Query::DatabaseManager::Credentials credentials(
-        Tools::SettingsManager::GetSetting_("db_host", "localhost")
-        ,Tools::SettingsManager::GetSetting_("db_port", "3306")
-        ,Tools::SettingsManager::GetSetting_("db_name", "db")
-        ,Tools::SettingsManager::GetSetting_("db_user", "root")
-        ,Tools::SettingsManager::GetSetting_("db_password", "root")
-    );
-    get_users_manager().get_credentials().Replace_(credentials);
+    set_security_type(Security::SecurityType::kDisableAll);
 }
 
 RootHandler::~RootHandler()
@@ -45,7 +37,7 @@ void RootHandler::handleRequest(HTTPServerRequest& request, HTTPServerResponse& 
             }
 
         // Add Server header
-            AddHeader_("server", "nebulaatom/" + std::string(PACKAGE_VERSION_COMPLETE));
+            AddHeader_("server", "structbx/" + std::string(PACKAGE_VERSION_COMPLETE));
 
         // Set requested route
             std::vector<std::string> segments;
@@ -117,8 +109,8 @@ bool RootHandler::VerifySession_()
         std::string session_id;
         Net::NameValueCollection cookies;
         request->getCookies(cookies);
-        auto cookie_session = cookies.find("nebula-atom-sid");
-        auto sessions = Tools::SessionsManager::get_sessions();
+        auto cookie_session = cookies.find("structbx-sid");
+        auto sessions = Sessions::SessionsManager::get_sessions();
 
     // Verify Cookie session and session
         if(cookie_session != cookies.end())
