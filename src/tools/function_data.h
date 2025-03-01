@@ -5,7 +5,6 @@
 
 #include <list>
 
-#include "handlers/backend_handler.h"
 #include "functions/function.h"
 #include "tools/dvalue.h"
 #include "tools/hmac_tool.h"

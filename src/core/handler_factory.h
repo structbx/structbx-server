@@ -25,7 +25,6 @@
 #include <Poco/Data/Statement.h>
 
 #include "web_server.h"
-#include "backend_server.h"
 #include "sessions/sessions_manager.h"
 #include "query/database_manager.h"
 #include "tools/route.h"

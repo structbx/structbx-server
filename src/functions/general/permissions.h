@@ -5,6 +5,7 @@
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
+#include "security/permissions_manager.h"
 
 namespace StructBX
 {

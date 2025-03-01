@@ -50,7 +50,7 @@ HTTPRequestHandler* HandlerFactory::createRequestHandler(const HTTPServerRequest
                     }
                 }
                 else
-                    handler = new StructBX::BackendServer;
+                    handler = new StructBX::Handlers::BackendHandler;
 
                 break;
             }
