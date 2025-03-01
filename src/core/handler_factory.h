@@ -44,11 +44,9 @@ namespace StructBX
 {
     namespace Core
     {
-        struct HTTPRequestInfo;
         class HandlerFactory;
     }
 }
-
 
 class StructBX::Core::HandlerFactory :
     public HTTPRequestHandlerFactory

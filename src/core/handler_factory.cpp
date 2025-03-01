@@ -31,24 +31,9 @@ HTTPRequestHandler* HandlerFactory::createRequestHandler(const HTTPServerRequest
             {
                 // Routes
                 StructBX::Tools::Route requested_route(request.getURI());
-                StructBX::Tools::Route login_route("/api/system/login");
-                StructBX::Tools::Route logout_route("/api/system/logout");
 
-                if(requested_route == login_route || requested_route == logout_route)
-                {
+                if(requested_route == Handlers::AuthRoutes::login_route || requested_route == Handlers::AuthRoutes::logout_route)
                     handler = new StructBX::Handlers::LoginHandler();
-                    auto password = handler->get_users_manager().get_action()->GetParameter("password");
-                    if(password != handler->get_users_manager().get_action()->get_parameters().end())
-                    {
-                        password->get()->SetupCondition_("condition-password", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
-                        {
-                            std::string password = param->ToString_();
-                            std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
-                            param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
-                            return true;
-                        });
-                    }
-                }
                 else
                     handler = new StructBX::Handlers::BackendHandler;
 
