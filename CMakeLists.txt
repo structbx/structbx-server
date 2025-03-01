@@ -69,7 +69,6 @@ set(HEADER
 set(
     SOURCES
     ${PROJECT_SOURCE_DIR}/src/structbx-server.cpp
-    ${PROJECT_SOURCE_DIR}/src/web_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/main.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/users.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/groups.cpp
@@ -96,7 +95,7 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/function.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/functions_manager.cpp
     ${PROJECT_SOURCE_DIR}/src/handlers/backend_handler.cpp
-    ${PROJECT_SOURCE_DIR}/src/handlers/custom_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/web_handler.cpp
     ${PROJECT_SOURCE_DIR}/src/handlers/login_handler.cpp
     ${PROJECT_SOURCE_DIR}/src/handlers/null_handler.cpp
     ${PROJECT_SOURCE_DIR}/src/handlers/root_handler.cpp
