@@ -6,14 +6,6 @@ using namespace StructBX::Security;
 std::mutex PermissionsManager::mutex_;
 std::list<Permission> PermissionsManager::permissions_ = {};
 std::map<std::string, ActionType> PermissionsManager::action_type_map_ = {};
-StructBX::Query::DatabaseManager::Credentials PermissionsManager::credentials_ = Query::DatabaseManager::Credentials
-(
-    Tools::SettingsManager::GetSetting_("db_host", "localhost")
-    ,Tools::SettingsManager::GetSetting_("db_port", "3306")
-    ,Tools::SettingsManager::GetSetting_("db_name", "db")
-    ,Tools::SettingsManager::GetSetting_("db_user", "root")
-    ,Tools::SettingsManager::GetSetting_("db_password", "root")
-);
 
 PermissionsManager::PermissionsManager()
 {
@@ -62,13 +54,12 @@ void PermissionsManager::LoadPermissions_()
         permissions_.clear();
 
         // Setting up the action
-            Functions::Action action{""};
-            action.get_credentials().Replace_(credentials_);
+            Functions::Action action{"PermissionsManager::LoadPermissions_"};
             action.set_custom_error("Permissions not found.");
             std::string sql_code =
                 "SELECT ap.endpoint AS endpoint, au.username AS username, au.id AS id_user, ap.action AS action, au.id_group AS id_group "
-                "FROM " + Tools::SettingsManager::GetSetting_("permissions_table", "_naf_permissions") + " ap "
-                "JOIN " + Tools::SettingsManager::GetSetting_("users_table", "_naf_users") + " au ON au.id_group = ap.id_group"
+                "FROM permissions ap "
+                "JOIN users au ON au.id_group = ap.id_group"
             ;
             action.set_sql_code(sql_code);
 

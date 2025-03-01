@@ -42,11 +42,6 @@ class StructBX::Security::PermissionsManager
             auto& var = action_type_map_;
             return var;
         }
-        static Query::DatabaseManager::Credentials& get_credentials()
-        {
-            auto& var = credentials_;
-            return var;
-        }
 
         static void LoadPermissions_();
         static std::_List_iterator<Permission> FindPermission_(Tools::Route& route, int id_user, std::string action_type);
@@ -59,7 +54,6 @@ class StructBX::Security::PermissionsManager
         static std::mutex mutex_;
         static std::list<Permission> permissions_;
         static std::map<std::string, ActionType> action_type_map_;
-        static Query::DatabaseManager::Credentials credentials_;
 };
 
 
