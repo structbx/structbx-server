@@ -70,7 +70,6 @@ set(
     SOURCES
     ${PROJECT_SOURCE_DIR}/src/structbx-server.cpp
     ${PROJECT_SOURCE_DIR}/src/web_server.cpp
-    ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/main.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/users.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/groups.cpp
