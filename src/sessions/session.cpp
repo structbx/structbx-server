@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "extras/session.h"
+#include "sessions/session.h"
 
-using namespace StructBX::Extras;
+using namespace StructBX::Sessions;
 
 Session::Session() :
     id_("")

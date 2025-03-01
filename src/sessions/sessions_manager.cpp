@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "tools/sessions_manager.h"
+#include "sessions/sessions_manager.h"
 
 using namespace StructBX::Tools;
 
-std::map<std::string, StructBX::Extras::Session> SessionsManager::sessions_ = {};
+std::map<std::string, StructBX::Sessions::Session> SessionsManager::sessions_ = {};
 std::mutex SessionsManager::mutex_;
 StructBX::Query::DatabaseManager::Credentials SessionsManager::credentials_ = Query::DatabaseManager::Credentials
 (
@@ -74,7 +74,7 @@ void SessionsManager::ReadSessions_()
                     return;
                 }
 
-                Extras::Session new_session;
+                Sessions::Session new_session;
                 new_session.set_id(identifier->String_());
                 new_session.set_id_user(id_user->Int_());
                 new_session.set_path(path->String_());
@@ -99,9 +99,9 @@ void SessionsManager::ReadSessions_()
     }
 }
 
-StructBX::Extras::Session& SessionsManager::CreateSession_(int id_user, std::string path, int max_age)
+StructBX::Sessions::Session& SessionsManager::CreateSession_(int id_user, std::string path, int max_age)
 {
-    Extras::Session new_session;
+    Sessions::Session new_session;
     new_session.set_id_user(id_user);
     new_session.set_path(path);
     new_session.set_max_age(max_age);

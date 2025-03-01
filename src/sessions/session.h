@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STRUCTBX_EXTRAS_SESSION
-#define STRUCTBX_EXTRAS_SESSION
+#ifndef STRUCTBX_SESSIONS_SESSION
+#define STRUCTBX_SESSIONS_SESSION
 
 
 #include <string>
@@ -31,7 +31,7 @@
 
 namespace StructBX
 {
-    namespace Extras
+    namespace Sessions
     {
         class Session;
     }
@@ -41,7 +41,7 @@ using namespace Poco;
 using namespace Poco::Net;
 
 
-class StructBX::Extras::Session
+class StructBX::Sessions::Session
 {
     public:
         Session();
@@ -95,4 +95,4 @@ class StructBX::Extras::Session
 };
 
 
-#endif // STRUCTBX_EXTRAS_SESSION
+#endif // STRUCTBX_SESSIONS_SESSION
