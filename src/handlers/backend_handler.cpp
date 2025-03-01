@@ -3,7 +3,7 @@
 
 using namespace StructBX;
 using namespace StructBX::Handlers;
-using namespace StructBX::Functions;
+using namespace StructBX::Controllers;
 
 BackendHandler::BackendHandler() :
     RootHandler::RootHandler()

@@ -6,9 +6,9 @@
 #include "handlers/root_handler.h"
 #include "query/results.h"
 #include "tools/function_data.h"
-#include "functions/general/main.h"
-#include "functions/spaces/main.h"
-#include "functions/forms/main.h"
+#include "controllers/general/main.h"
+#include "controllers/spaces/main.h"
+#include "controllers/forms/main.h"
 
 
 namespace StructBX
