@@ -13,14 +13,18 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -fstandalone-debug")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Add CMake files
+include(cmake/version.cmake) 
+
 # Add CMake modules
-include(GNUInstallDirs)
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_extra_modules)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 endif()
+
+# Config file
+configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.cmake structbxConfig.h)
 
 # Find libmysqlclient
 find_package(libmysqlclient REQUIRED)
@@ -43,13 +47,6 @@ if(NOT Poco_FOUND)
 endif()
 list(APPEND HEADER ${Poco_INCLUDE_DIRS})
 
-# Find NebulaAtom
-find_package(nebulaatom REQUIRED)
-if(NOT nebulaatom_FOUND)
-    message(FATAL_ERROR "nebulaatom not found")
-endif()
-list(APPEND HEADER ${nebulaatom_INCLUDE_DIRS})
-
 # Dependencies
 set(LIB_DEPENDECIES
     Poco::Foundation
@@ -60,7 +57,6 @@ set(LIB_DEPENDECIES
     Poco::DataMySQL
     Poco::JSON
     yaml-cpp::yaml-cpp
-    nebulaatom::nebulaatom
 )
 
 # Header
@@ -72,7 +68,7 @@ set(HEADER
 # Sources
 set(
     SOURCES
-    ${PROJECT_SOURCE_DIR}/src/server.cpp
+    ${PROJECT_SOURCE_DIR}/src/structbx-server.cpp
     ${PROJECT_SOURCE_DIR}/src/web_server.cpp
     ${PROJECT_SOURCE_DIR}/src/backend_server.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/general/main.cpp
@@ -86,6 +82,54 @@ set(
     ${PROJECT_SOURCE_DIR}/src/functions/forms/columns.cpp
     ${PROJECT_SOURCE_DIR}/src/functions/forms/permissions.cpp
     ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
+)
+
+set(
+    SOURCES
+    ${SOURCES}
+    ${PROJECT_SOURCE_DIR}/src/core/core.cpp
+    ${PROJECT_SOURCE_DIR}/src/core/handler_factory.cpp
+    ${PROJECT_SOURCE_DIR}/src/core/server.cpp
+    ${PROJECT_SOURCE_DIR}/src/files/file_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/files/file_properties.cpp
+    ${PROJECT_SOURCE_DIR}/src/files/file.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/action.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/function.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions/functions_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/backend_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/custom_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/login_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/null_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/handlers/root_handler.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/body.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/client.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/common_responses.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/methods.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/request.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/condition.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/database_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/field.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/parameter.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/results.cpp
+    ${PROJECT_SOURCE_DIR}/src/query/row.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/permission.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/permissions_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/security_verification.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/user.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/users_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/security/permission.cpp
+    ${PROJECT_SOURCE_DIR}/src/sessions/session.cpp
+    ${PROJECT_SOURCE_DIR}/src/sessions/sessions_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/dvalue.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/handler_connection.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/hmac_tool.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/id_checker.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/manage_json.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/output_logger.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/route.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/hmac_tool.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/base64_tool.cpp
+    ${PROJECT_SOURCE_DIR}/src/tools/settings_manager.cpp
 )
 
 # Executable
