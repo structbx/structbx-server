@@ -26,10 +26,3 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 # Setting up header
 set(HEADER ${PROJECT_SOURCE_DIR}/src)
 list(APPEND HEADER ${PROJECT_BINARY_DIR})
-
-# Copy properties file
-configure_file(
-    ${CMAKE_SOURCE_DIR}/conf/properties.yaml.template
-    ${CMAKE_BINARY_DIR}/properties.yaml
-  COPYONLY
-)
