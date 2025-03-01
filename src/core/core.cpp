@@ -29,37 +29,37 @@ int StructBX::Core::Core::Init_()
     }
     catch(Net::SSLException& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + error.displayText());
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + error.displayText());
         return 1;
     }
     catch(Net::NetException& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + error.displayText());
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + error.displayText());
         return 1;
     }
     catch(Poco::NullPointerException& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + error.displayText());
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + error.displayText());
         return 1;
     }
     catch(Poco::SystemException& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + error.displayText());
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + error.displayText());
         return 1;
     }
     catch(std::runtime_error& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + std::string(error.what()));
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + std::string(error.what()));
         return 1;
     }
     catch(std::exception& error)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): " + std::string(error.what()));
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): " + std::string(error.what()));
         return 1;
     }
     catch(...)
     {
-        Tools::OutputLogger::Error_("Error on nebula_atom.cpp on Init_(): Unhandled");
+        Tools::OutputLogger::Error_("Error on core.cpp on Init_(): Unhandled");
         return 1;
     }
 }
@@ -83,18 +83,15 @@ void StructBX::Core::Core::AddBasicSettings_()
     Tools::SettingsManager::AddSetting_("db_user", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("db_password", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("session_max_age", Tools::DValue::Type::kInteger, Tools::DValue(3600));
-    Tools::SettingsManager::AddSetting_("directory_base", Tools::DValue::Type::kString, Tools::DValue("/var/www"));
+    Tools::SettingsManager::AddSetting_("directory_base", Tools::DValue::Type::kString, Tools::DValue("/var/www/structbx-web"));
     Tools::SettingsManager::AddSetting_("directory_for_temp_files", Tools::DValue::Type::kString, Tools::DValue("/tmp"));
+    Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", Tools::DValue::Type::kString, Tools::DValue("/var/www/structbx-web-uploaded"));
     Tools::SettingsManager::AddSetting_("certificate", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("key", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("rootcert", Tools::DValue::Type::kString, Tools::DValue(""));
     Tools::SettingsManager::AddSetting_("logger_output_file", Tools::DValue::Type::kString, Tools::DValue("structbx.log"));
     Tools::SettingsManager::AddSetting_("debug", Tools::DValue::Type::kBoolean, Tools::DValue(false));
-    Tools::SettingsManager::AddSetting_("permissions_table", Tools::DValue::Type::kString, Tools::DValue("_naf_permissions"));
-    Tools::SettingsManager::AddSetting_("users_table", Tools::DValue::Type::kString, Tools::DValue("_naf_users"));
-    Tools::SettingsManager::AddSetting_("sessions_table", Tools::DValue::Type::kString, Tools::DValue("_naf_sessions"));
-    StructBX::Tools::SettingsManager::AddSetting_("directory_for_uploaded_files", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("/var/www/structbx-web-uploaded"));
-    StructBX::Tools::SettingsManager::AddSetting_("space_id_cookie_name", StructBX::Tools::DValue::Type::kString, StructBX::Tools::DValue("1f3efd18688d2"));
+    Tools::SettingsManager::AddSetting_("space_id_cookie_name", Tools::DValue::Type::kString, Tools::DValue("1f3efd18688d2"));
 }
 
 void StructBX::Core::Core::SetupSettings_()
@@ -103,15 +100,6 @@ void StructBX::Core::Core::SetupSettings_()
     SetupUploadedDir();
     Tools::OutputLogger::set_output_file_address(Tools::SettingsManager::GetSetting_("logger_output_file", "structbx.log"));
     Tools::OutputLogger::set_print_debug(Tools::SettingsManager::GetSetting_("debug", true));
-    Query::DatabaseManager::Credentials credentials(
-        Tools::SettingsManager::GetSetting_("db_host", "localhost")
-        ,Tools::SettingsManager::GetSetting_("db_port", "3306")
-        ,Tools::SettingsManager::GetSetting_("db_name", "db")
-        ,Tools::SettingsManager::GetSetting_("db_user", "root")
-        ,Tools::SettingsManager::GetSetting_("db_password", "root")
-    );
-    Tools::SessionsManager::get_credentials().Replace_(credentials);
-    Security::PermissionsManager::get_credentials().Replace_(credentials);
 }
 
 bool StructBX::Core::Core::SetupOutputLog()

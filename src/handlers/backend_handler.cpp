@@ -30,7 +30,7 @@ void BackendHandler::Process_()
     get_files_parameters()->set_directory_base(StructBX::Tools::SettingsManager::GetSetting_("directory_base", "/var/www"));
     
     // Set security type
-    set_security_type(Extras::SecurityType::kDisableAll);
+    set_security_type(Security::SecurityType::kDisableAll);
     
     // Process the request body
     ManageRequestBody_();
