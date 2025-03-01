@@ -25,7 +25,7 @@
 #include <Poco/Data/Statement.h>
 
 #include "tools/handler_connection.h"
-#include "tools/sessions_manager.h"
+#include "sessions/sessions_manager.h"
 #include "query/database_manager.h"
 #include "tools/route.h"
 #include "http/request.h"
@@ -33,7 +33,6 @@
 #include "handlers/null_handler.h"
 #include "handlers/backend_handler.h"
 #include "handlers/login_handler.h"
-#include "handlers/websocket_handler.h"
 #include "tools/output_logger.h"
 
 using namespace Poco;

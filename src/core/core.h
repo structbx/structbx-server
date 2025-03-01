@@ -35,7 +35,7 @@
 #include "query/database_manager.h"
 #include "tools/settings_manager.h"
 #include "tools/output_logger.h"
-#include "tools/sessions_manager.h"
+#include "sessions/sessions_manager.h"
 #include "security/permissions_manager.h"
 
 
@@ -58,7 +58,7 @@ class StructBX::Core::Core
         virtual ~Core();
 
         bool get_use_ssl() const { return use_ssl_; }
-        Core::Server::Ptr get_server() const { return server_; }
+        Server::Ptr get_server() const { return server_; }
         HandlerFactory* get_handler_factory()
         {
             auto& var = handler_factory_;
@@ -81,7 +81,7 @@ class StructBX::Core::Core
 
     private:
         const bool use_ssl_;
-        Core::Server::Ptr server_;
+        Server::Ptr server_;
         HandlerFactory* handler_factory_;
         std::vector<std::string> console_parameters_;
 };
