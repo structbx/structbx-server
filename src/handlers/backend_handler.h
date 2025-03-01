@@ -21,6 +21,11 @@
 
 #include "handlers/root_handler.h"
 #include "query/results.h"
+#include "tools/function_data.h"
+#include "functions/general/main.h"
+#include "functions/spaces/main.h"
+#include "functions/forms/main.h"
+
 
 namespace StructBX
 {
@@ -38,9 +43,18 @@ class StructBX::Handlers::BackendHandler : public RootHandler
 
         BackendHandler();
 
+        void AddFunctions_();
+
     protected:
         virtual void Process_() override;
         void ProcessActions_();
+        void SetupFunctionData_();
+        bool VerifyActiveUser_();
+
+    private:
+        Tools::FunctionData function_data_;
+        HTTP::Cookie space_id_cookie_;
+        bool add_space_id_cookie_;
 };
 
 #endif // STRUCTBX_HANDLERS_BACKENDHANDLER
