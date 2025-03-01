@@ -4,7 +4,7 @@ max_threads : 4096
 max_file_size: 5
 db_host : "127.0.0.1"
 db_port : "3306"
-db_name : "structbi"
+db_name : "db"
 db_user : "root"
 db_password : "pass"
 session_max_age : 2592000
@@ -15,8 +15,5 @@ key: "key.pem"
 rootcert: ""
 logger_output_file: "/var/log/structbx.log"
 debug: true
-permissions_table: "permissions"
-users_table: "users"
-sessions_table: "sessions"
 directory_for_uploaded_files : "/var/www/structbx-web-uploaded"
 space_id_cookie_name: "1f3efd18688d2b844f4fa1e800712c9b5750c0312"
