@@ -15,8 +15,6 @@
 #include <tools/output_logger.h>
 #include <tools/hmac_tool.h>
 
-#include "web_server.h"
-#include "backend_server.h"
 
 using namespace Poco;
 using namespace StructBX;
@@ -114,58 +112,6 @@ int main(int argc, char** argv)
         StructBX::Query::DatabaseManager::StartMySQL_();
         StructBX::Security::PermissionsManager::LoadPermissions_();
         StructBX::Tools::SessionsManager::ReadSessions_();
-
-    // Custom Handler Creator
-        app.CustomHandlerCreator_([&](Core::HTTPRequestInfo& info)
-        {
-            StructBX::Handlers::RootHandler* handler;
-
-            // Manage the route type
-            StructBX::Tools::Route route(info.uri);
-
-            switch(route.get_current_route_type())
-            {
-                // Manage Frontend
-                case StructBX::Tools::RouteType::kEntrypoint:
-                {
-                    handler = new StructBX::Webserver;
-                    break;
-                }
-
-                // Manage Backend
-                case StructBX::Tools::RouteType::kEndpoint:
-                {
-                    // Routes
-                    StructBX::Tools::Route requested_route(info.uri);
-                    StructBX::Tools::Route login_route("/api/system/login");
-                    StructBX::Tools::Route logout_route("/api/system/logout");
-
-                    if(requested_route == login_route || requested_route == logout_route)
-                    {
-                        handler = new StructBX::Handlers::LoginHandler();
-                        auto password = handler->get_users_manager().get_action()->GetParameter("password");
-                        if(password != handler->get_users_manager().get_action()->get_parameters().end())
-                        {
-                            password->get()->SetupCondition_("condition-password", Query::ConditionType::kWarning, [](Query::Parameter::Ptr param)
-                            {
-                                std::string password = param->ToString_();
-                                std::string password_encoded = StructBX::Tools::HMACTool().Encode_(password);
-                                param->set_value(StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue(password_encoded)));
-                                return true;
-                            });
-                        }
-                    }
-                    else
-                        handler = new StructBX::BackendServer;
-
-                    break;
-                }
-
-                return handler;
-            }
-
-            return handler;
-        });
 
     // Run
         auto code = app.Init_();
