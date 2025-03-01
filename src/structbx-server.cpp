@@ -4,7 +4,7 @@
 
 #include <Poco/File.h>
 
-#include "core/nebula_atom.h"
+#include "core/core.h"
 #include "functions/action.h"
 #include "handlers/custom_handler.h"
 #include "handlers/root_handler.h"
@@ -95,7 +95,7 @@ Parameters SetupParameters(std::vector<std::string>& parameters)
 int main(int argc, char** argv)
 {
     // Setup
-        Core::NebulaAtom app(true);
+        Core::Core app(true);
 
     // Parameters
         auto& parameters = app.get_console_parameters();

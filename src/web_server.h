@@ -3,7 +3,7 @@
 #ifndef STRUCTBX_WEBSERVER
 #define STRUCTBX_WEBSERVER
 
-#include "core/nebula_atom.h"
+#include "core/core.h"
 #include "handlers/root_handler.h"
 
 namespace StructBX
