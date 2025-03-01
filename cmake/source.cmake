@@ -24,16 +24,16 @@ set(HEADER
 set(
     SOURCES
     ${PROJECT_SOURCE_DIR}/src/structbx-server.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/general/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/general/users.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/general/groups.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/general/permissions.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/spaces/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/spaces/users.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/data.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/columns.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions/forms/permissions.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/general/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/general/users.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/general/groups.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/general/permissions.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/spaces/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/spaces/users.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/forms/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/forms/data.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/forms/columns.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/forms/permissions.cpp
     ${PROJECT_SOURCE_DIR}/src/core/core.cpp
     ${PROJECT_SOURCE_DIR}/src/core/handler_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/core/server.cpp
