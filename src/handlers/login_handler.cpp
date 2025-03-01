@@ -83,7 +83,7 @@ void LoginHandler::StartSession_()
         }
 
     // Create the session
-        auto session = Tools::SessionsManager::CreateSession_
+        auto session = Sessions::SessionsManager::CreateSession_
         (
             get_users_manager().get_current_user().get_id()
             ,"/"
@@ -91,7 +91,7 @@ void LoginHandler::StartSession_()
         );
 
     // Response
-        Poco::Net::HTTPCookie cookie("nebula-atom-sid", session.get_id());
+        Poco::Net::HTTPCookie cookie("structbx-sid", session.get_id());
         cookie.setPath(session.get_path());
         cookie.setMaxAge(session.get_max_age());
         cookie.setSameSite(Poco::Net::HTTPCookie::SAME_SITE_STRICT);
@@ -110,11 +110,11 @@ void LoginHandler::EndSession_()
         auto session_id = SessionExists_();
         if (session_id != "")
         {
-            Tools::SessionsManager::DeleteSession_(session_id);
+            Sessions::SessionsManager::DeleteSession_(session_id);
         }
 
     // Response
-        Poco::Net::HTTPCookie cookie("nebula-atom-sid", "");
+        Poco::Net::HTTPCookie cookie("structbx-sid", "");
         cookie.setPath("/");
         cookie.setMaxAge(-1);
 
@@ -130,8 +130,8 @@ std::string LoginHandler::SessionExists_()
         std::string session_id;
         Poco::Net::NameValueCollection cookies;
         get_http_server_request().value()->getCookies(cookies);
-        auto cookie_session = cookies.find("nebula-atom-sid");
-        auto sessions = Tools::SessionsManager::get_sessions();
+        auto cookie_session = cookies.find("structbx-sid");
+        auto sessions = Sessions::SessionsManager::get_sessions();
 
     // Session exists
         if(cookie_session == cookies.end())
