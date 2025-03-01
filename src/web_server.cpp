@@ -4,11 +4,7 @@
 StructBX::Webserver::Webserver() : 
     RootHandler()
 {
-    // Set headers
-    AddHeader_("Access-Control-Allow-Credentials", "true");
-    AddHeader_("Access-Control-Allow-Headers", "Content-Type");
-    AddHeader_("Access-Control-Allow-Methods", "*");
-    AddHeader_("Access-Control-Allow-Origin", "https://localhost:3000");
+    
 }
 
 void StructBX::Webserver::Process_()

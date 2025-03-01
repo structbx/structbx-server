@@ -72,8 +72,6 @@ class StructBX::Core::Core
 
         int Init_();
         int Init_(int argc, char** argv);
-        void CustomHandlerCreator_(HandlerFactory::FunctionHandlerCreator handler_creator);
-        void AddHandler_(std::string route, HandlerFactory::FunctionHandler handler);
         void SetupSettings_();
 
     protected:

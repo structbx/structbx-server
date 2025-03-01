@@ -2,7 +2,6 @@
 #ifndef STRUCTBX_BACKENDSERVER
 #define STRUCTBX_BACKENDSERVER
 
-#include "core/core.h"
 #include "handlers/backend_handler.h"
 
 #include "tools/function_data.h"

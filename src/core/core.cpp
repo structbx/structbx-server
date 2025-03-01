@@ -3,7 +3,7 @@
 
 using namespace StructBX::Core;
 
-Core::Core(bool use_ssl) :
+StructBX::Core::Core::Core(bool use_ssl) :
     use_ssl_(use_ssl)
     ,handler_factory_(new HandlerFactory())
 {
@@ -14,27 +14,13 @@ Core::Core(bool use_ssl) :
     SetupSettings_();
 }
 
-Core::~Core()
+StructBX::Core::Core::~Core()
 {
     if(use_ssl_)
         Net::uninitializeSSL();
 }
 
-void Core::CustomHandlerCreator_(HandlerFactory::FunctionHandlerCreator handler_creator)
-{
-    handler_factory_->set_handler_creator(std::move(handler_creator));
-}
-
-void Core::AddHandler_(std::string route, HandlerFactory::FunctionHandler handler)
-{
-    std::vector<std::string> segments;
-    URI(route).getPathSegments(segments);
-    Tools::Route requested_route(segments);
-
-    handler_factory_->get_connections().insert({route, Tools::HandlerConnection{requested_route, handler}});
-}
-
-int Core::Init_()
+int StructBX::Core::Core::Init_()
 {
     try
     {
@@ -79,14 +65,14 @@ int Core::Init_()
     }
 }
 
-int Core::Init_(int argc, char** argv)
+int StructBX::Core::Core::Init_(int argc, char** argv)
 {
     console_parameters_ = std::vector<std::string>(argv, argv + argc);
 
     return Init_();
 }
 
-void Core::AddBasicSettings_()
+void StructBX::Core::Core::AddBasicSettings_()
 {
     Tools::SettingsManager::AddSetting_("port", Tools::DValue::Type::kInteger, Tools::DValue(8080));
     Tools::SettingsManager::AddSetting_("max_queued", Tools::DValue::Type::kInteger, Tools::DValue(1000));
@@ -110,7 +96,7 @@ void Core::AddBasicSettings_()
     Tools::SettingsManager::AddSetting_("sessions_table", Tools::DValue::Type::kString, Tools::DValue("_naf_sessions"));
 }
 
-void Core::SetupSettings_()
+void StructBX::Core::Core::SetupSettings_()
 {
     Tools::OutputLogger::set_output_file_address(Tools::SettingsManager::GetSetting_("logger_output_file", "Core.log"));
     Tools::OutputLogger::set_print_debug(Tools::SettingsManager::GetSetting_("debug", true));

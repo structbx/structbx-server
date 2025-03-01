@@ -5,7 +5,6 @@
 
 #include <list>
 
-#include "core/core.h"
 #include "handlers/backend_handler.h"
 #include "functions/function.h"
 #include "tools/dvalue.h"
