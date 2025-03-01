@@ -27,15 +27,17 @@ void DatabaseManager::StopMySQL_()
         Data::MySQL::Connector::unregisterConnector();
 }
 
-std::shared_ptr<Data::Session> DatabaseManager::StartSessionMySQL_(Credentials& credentials)
+std::shared_ptr<Data::Session> DatabaseManager::StartSessionMySQL_()
 {
-    return std::make_shared<Data::Session>
+    auto dbconn = std::make_shared<Data::Session>
     (
         "MySQL"
-        ,"host=" + credentials.db_host
-            + ";port=" + credentials.db_port
-            + ";db=" + credentials.db_name
-            + ";user=" + credentials.db_user
-            + ";password=" + credentials.db_password + ";"
+        ,"host=" + Tools::SettingsManager::GetSetting_("db_host", "127.0.0.1")
+            + ";port=" + Tools::SettingsManager::GetSetting_("db_port", "3306")
+            + ";db=" + Tools::SettingsManager::GetSetting_("db_name", "")
+            + ";user=" + Tools::SettingsManager::GetSetting_("db_user", "")
+            + ";password=" + Tools::SettingsManager::GetSetting_("db_password", "") + ";"
     );
+
+    return dbconn;
 }
