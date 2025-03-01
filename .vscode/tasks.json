@@ -2,6 +2,11 @@
     "version": "2.0.0"
     ,"tasks": [
         {
+            "label": "Init"
+            ,"type": "shell"
+            ,"command": "${workspaceFolder}/init_envDev.sh"
+        }
+        ,{
             "label": "Conan install Deps"
             ,"type": "shell"
             ,"command": "cd build/Debug && conan install ../../ --output-folder=./ --build=missing"
