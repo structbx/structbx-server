@@ -23,6 +23,12 @@ RUN mkdir build && cd build && \
 
 FROM debian:12
 
+RUN apt-get update && apt-get install -y \
+      libssl-dev \
+      libpoco-dev \
+      libmariadb-dev \
+      libyaml-cpp-dev
+
 COPY --from=build /structbx /
 
 COPY --from=build /usr/src/structbx/build/structbx-web /var/www/structbx-web
