@@ -104,6 +104,7 @@ class StructBX::Files::FileManager: public Net::PartHandler
         Files::File CreateTempFileFromAddress_(std::string address);
         void ProcessContentLength_();
         bool VerifyMaxFileSize_();
+        bool VerifyMaxFileSize_(int max_file_size);
         bool ChangePathAndFilename_(Files::File& file, std::string directory, bool change_filename = true);
 
     protected:
