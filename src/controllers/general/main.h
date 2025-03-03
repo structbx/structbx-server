@@ -37,6 +37,10 @@ class StructBX::Controllers::General::Main : public Tools::FunctionData
         {
             ModifyInstanceName(Tools::FunctionData& function_data);
         };
+        struct ReadInstanceLogo : public Tools::FunctionData
+        {
+            ReadInstanceLogo(Tools::FunctionData& function_data);
+        };
 
     private:
         Users function_users_;
@@ -44,6 +48,7 @@ class StructBX::Controllers::General::Main : public Tools::FunctionData
         Permissions function_permissions_;
         ReadInstanceName struct_read_instance_name_;
         ModifyInstanceName struct_modify_instance_name_;
+        ReadInstanceLogo struct_read_instance_logo_;
 
 };
 

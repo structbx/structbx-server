@@ -10,6 +10,7 @@ Main::Main(Tools::FunctionData& function_data) :
     ,function_permissions_(function_data)
     ,struct_read_instance_name_(function_data)
     ,struct_modify_instance_name_(function_data)
+    ,struct_read_instance_logo_(function_data)
 {
     
 }
@@ -59,6 +60,23 @@ Main::ModifyInstanceName::ModifyInstanceName(Tools::FunctionData& function_data)
         }
         return true;
     });
+    
+    get_functions()->push_back(function);
+}
+
+Main::ReadInstanceLogo::ReadInstanceLogo(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+{
+    // Function GET /api/general/read
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/general/instanceLogo/read", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT * \
+        FROM settings \
+        WHERE name = 'instance_logo'"
+    );
     
     get_functions()->push_back(function);
 }
