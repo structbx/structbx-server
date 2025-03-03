@@ -145,7 +145,7 @@ Main::ModifyInstanceLogo::ModifyInstanceLogo(Tools::FunctionData& function_data)
         // Request logo path in DB
         Functions::Action a1("a1");
         a1.set_sql_code(
-            "SELECT * \
+            "SELECT value \
             FROM settings \
             WHERE name = 'instance_logo'"
         );
