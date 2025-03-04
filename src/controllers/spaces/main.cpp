@@ -274,13 +274,13 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/spaces/main.cpp on Add::Add(): " + e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
             return;
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
             return;
         }

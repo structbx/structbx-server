@@ -255,13 +255,13 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
@@ -623,13 +623,13 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.displayText());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Delete::Delete(): " + e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_(e.what());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Delete::Delete(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }

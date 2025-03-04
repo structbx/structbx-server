@@ -324,7 +324,7 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
                 offset = (std::stoi(page->get()->ToString_()) - 1) * 20;
                 limit_query += std::to_string(offset) + ", 20";
             }
-            catch(std::exception&){StructBX::Tools::OutputLogger::Error_("Page parameter is not an integer");}
+            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/data.cpp: Page parameter is not an integer");}
         }
         else if(limit != self.get_parameters().end())
         {
@@ -333,7 +333,7 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
                 // LIMIT N
                 limit_query += limit->get()->ToString_();
             }
-            catch(std::exception&){StructBX::Tools::OutputLogger::Error_("Limit parameter error");}
+            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/data.cpp: Limit parameter error");}
         }
         else
         {

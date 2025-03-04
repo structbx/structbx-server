@@ -98,7 +98,7 @@ void Function::Process_(HTTP::Request::HTTPServerRequestPtr request, HTTP::Reque
                     {
                         JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, error_message_);
                         json_sent = true;
-                        throw std::runtime_error("Error on function.cpp on Process_(): " + error_message_);
+                        Tools::OutputLogger::Debug_("Error on function.cpp on Process_(): " + error_message_);
                         return;
                     }
                 }
@@ -117,7 +117,7 @@ void Function::Process_(HTTP::Request::HTTPServerRequestPtr request, HTTP::Reque
                     {
                         JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, error_message_);
                         json_sent = true;
-                        throw std::runtime_error("Error on function.cpp on Process_(): " + error_message_);
+                        Tools::OutputLogger::Debug_("Error on function.cpp on Process_(): " + error_message_);
                         return;
                     }
                 }
