@@ -1,37 +1,22 @@
-/*
-* Nebula Atom
 
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-#include "http/common_responses.h"
+#include "http/response_manager.h"
 #include "files/file_manager.h"
+#include "http/html_message.h"
 #include "http/request.h"
 
 using namespace StructBX::HTTP;
 
-CommonResponses::CommonResponses()
+ResponseManager::ResponseManager()
 {
     FillResponses_();
 }
 
-CommonResponses::~CommonResponses()
+ResponseManager::~ResponseManager()
 {
 
 }
 
-void CommonResponses::CompoundResponse_(HTTP::Status status, JSON::Object::Ptr result_json)
+void ResponseManager::CompoundResponse_(HTTP::Status status, JSON::Object::Ptr result_json)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -42,7 +27,7 @@ void CommonResponses::CompoundResponse_(HTTP::Status status, JSON::Object::Ptr r
     std::ostream& out = get_http_server_response().value()->send();
     result_json->stringify(out);
 }
-void CommonResponses::CompoundFillResponse_(HTTP::Status status, JSON::Object::Ptr result_json, std::string message)
+void ResponseManager::CompoundFillResponse_(HTTP::Status status, JSON::Object::Ptr result_json, std::string message)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -55,7 +40,7 @@ void CommonResponses::CompoundFillResponse_(HTTP::Status status, JSON::Object::P
     result_json->stringify(out);
 }
 
-void CommonResponses::JSONResponse_(HTTP::Status status, std::string message)
+void ResponseManager::JSONResponse_(HTTP::Status status, std::string message)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -71,7 +56,7 @@ void CommonResponses::JSONResponse_(HTTP::Status status, std::string message)
     object_json->stringify(out);
 }
 
-void CommonResponses::HTMLResponse_(HTTP::Status status, std::string message)
+void ResponseManager::HTMLResponse_(HTTP::Status status, std::string message)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -84,29 +69,15 @@ void CommonResponses::HTMLResponse_(HTTP::Status status, std::string message)
     auto found = responses_.find(status);
     if(found != responses_.end())
     {
-        out << "<html>";
-        out << "<head><title>" << responses_.find(status)->second.status_int << " " << responses_.find(status)->second.message << " | Nebula Atom</title></head>";
-        out << "<body>";
-        out << "<center><h1>Status: " << responses_.find(status)->second.status_int << " " << responses_.find(status)->second.message << "</h1></center>";
-        out << "<center><h3>Message: " << message << "</h3></center>";
-        out << "<center><hr>Nebula Atom/" << PACKAGE_VERSION_COMPLETE << "</center>";
-        out << "</body>";
-        out << "</html>";
+        out << HTTP::HTMLMessage(std::to_string(responses_.find(status)->second.status_int), responses_.find(status)->second.message, message);
     }
     else
     {
-        out << "<html>";
-        out << "<head><title>" << responses_.find(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR)->second.message << " | Nebula Atom</title></head>";
-        out << "<body>";
-        out << "<center><h1>Status: 500 " << responses_.find(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR)->second.message << "</h1></center>";
-        out << "<center><h3>Message: " << "Error in HTTPStatus." << "</h3></center>";
-        out << "<center>Nebula Atom/" << PACKAGE_VERSION_COMPLETE << "</center>";
-        out << "</body>";
-        out << "</html>";
+        out << HTTP::HTMLMessage(std::to_string(responses_.find(status)->second.status_int), responses_.find(status)->second.message, message);
     }
 }
 
-void CommonResponses::CustomHTMLResponse_(HTTP::Status status, std::string html_message)
+void ResponseManager::CustomHTMLResponse_(HTTP::Status status, std::string html_message)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -118,7 +89,7 @@ void CommonResponses::CustomHTMLResponse_(HTTP::Status status, std::string html_
     out << html_message;
 }
 
-void CommonResponses::FileResponse_(HTTP::Status status, std::string address)
+void ResponseManager::FileResponse_(HTTP::Status status, std::string address)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -151,7 +122,7 @@ void CommonResponses::FileResponse_(HTTP::Status status, std::string address)
         file_manager.DownloadFile_(out_reponse);
 }
 
-void CommonResponses::FileResponse_(HTTP::Status status, std::string address, Files::FileManager& file_manager)
+void ResponseManager::FileResponse_(HTTP::Status status, std::string address, Files::FileManager& file_manager)
 {
     SetupHeaders_();
     SetupCookies_();
@@ -183,7 +154,7 @@ void CommonResponses::FileResponse_(HTTP::Status status, std::string address, Fi
         file_manager.DownloadFile_(out_reponse);
 }
 
-void CommonResponses::FillResponses_()
+void ResponseManager::FillResponses_()
 {
     responses_.emplace(std::make_pair(Status::kHTTP_OK, Attributes{HTTPResponse::HTTP_OK, 200,ResponseType::kSuccess, "Ok"}));
     responses_.emplace(std::make_pair(Status::kHTTP_BAD_REQUEST, Attributes{HTTPResponse::HTTP_BAD_REQUEST, 400, ResponseType::kWarning, "Client-side input fails validation"}));
@@ -195,7 +166,7 @@ void CommonResponses::FillResponses_()
     responses_.emplace(std::make_pair(Status::kHTTP_SERVICE_UNAVAILABLE, Attributes{HTTPResponse::HTTP_SERVICE_UNAVAILABLE, 503, ResponseType::kError, "Something unexpected happened on server side"}));
 }
 
-void CommonResponses::FillStatusMessage_(JSON::Object::Ptr json_object, HTTP::Status status, std::string message)
+void ResponseManager::FillStatusMessage_(JSON::Object::Ptr json_object, HTTP::Status status, std::string message)
 {
     auto found = responses_.find(status);
     if(found != responses_.end())

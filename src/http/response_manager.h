@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_HTTP_COMMONRESPONSES
-#define STRUCTBX_HTTP_COMMONRESPONSES
+#ifndef STRUCTBX_HTTP_RESPONSEMANAGER
+#define STRUCTBX_HTTP_RESPONSEMANAGER
 
 
 #include <string>
@@ -13,6 +13,7 @@
 #include "structbxConfig.h"
 #include "files/file_manager.h"
 #include "http/request.h"
+#include "http/html_message.h"
 
 
 namespace StructBX
@@ -21,7 +22,7 @@ namespace StructBX
     {
         enum class ResponseType;
         enum class Status;
-        class CommonResponses;
+        class ResponseManager;
     }
 }
 
@@ -49,7 +50,7 @@ enum class StructBX::HTTP::Status
     ,kHTTP_SERVICE_UNAVAILABLE = 503
 };
 
-class StructBX::HTTP::CommonResponses : public HTTP::Request
+class StructBX::HTTP::ResponseManager : public HTTP::Request
 {
     public:
         struct Attributes
@@ -60,8 +61,8 @@ class StructBX::HTTP::CommonResponses : public HTTP::Request
             std::string message;
         };
 
-        CommonResponses();
-        ~CommonResponses();
+        ResponseManager();
+        ~ResponseManager();
 
         std::map<HTTP::Status, Attributes>& get_responses_()
         {
@@ -85,4 +86,4 @@ class StructBX::HTTP::CommonResponses : public HTTP::Request
         std::map<HTTP::Status, Attributes> responses_;
 };
 
-#endif // STRUCTBX_HTTP_COMMONRESPONSES
+#endif // STRUCTBX_HTTP_RESPONSEMANAGER
