@@ -50,7 +50,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/handlers/root_handler.cpp
     ${PROJECT_SOURCE_DIR}/src/http/body.cpp
     ${PROJECT_SOURCE_DIR}/src/http/client.cpp
-    ${PROJECT_SOURCE_DIR}/src/http/common_responses.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/response_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/http/html_message.cpp
     ${PROJECT_SOURCE_DIR}/src/http/methods.cpp
     ${PROJECT_SOURCE_DIR}/src/http/request.cpp
     ${PROJECT_SOURCE_DIR}/src/query/condition.cpp
