@@ -1,5 +1,6 @@
 
 #include "handler_factory.h"
+#include "http/html_message.h"
 
 using namespace StructBX::Core;
 
@@ -67,12 +68,5 @@ void HandlerFactory::ErrorResponse_(const HTTPServerRequest& request, std::strin
 
     std::ostream& out = request.response().send();
 
-    out << "<html>";
-    out << "<head><title> 500 HTTP_INTERNAL_SERVER_ERROR | Nebula Atom</title></head>";
-    out << "<body>";
-    out << "<center><h1>Status: 500 HTTP_INTERNAL_SERVER_ERROR </h1></center>";
-    out << "<center><h3>Message: " << error << "</h3></center>";
-    out << "<center><hr>Nebula Atom/" << PACKAGE_VERSION_COMPLETE << "</center>";
-    out << "</body>";
-    out << "</html>";
+    out << HTTP::HTMLMessage("500", "HTTP_INTERNAL_SERVER_ERROR", error);
 }

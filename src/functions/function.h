@@ -14,7 +14,7 @@
 #include "http/methods.h"
 #include "query/parameter.h"
 #include "http/request.h"
-#include "http/common_responses.h"
+#include "http/response_manager.h"
 #include "security/user.h"
 #include "security/users_manager.h"
 
@@ -28,7 +28,7 @@ namespace StructBX
 }
 
 
-class StructBX::Functions::Function : public HTTP::CommonResponses
+class StructBX::Functions::Function : public HTTP::ResponseManager
 {
     public:
         using Ptr = std::shared_ptr<Functions::Function>;

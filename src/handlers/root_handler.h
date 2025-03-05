@@ -43,7 +43,7 @@
 #include "sessions/sessions_manager.h"
 #include "query/database_manager.h"
 #include "tools/route.h"
-#include "http/common_responses.h"
+#include "http/response_manager.h"
 #include "security/security_verification.h" 
 #include "tools/manage_json.h"
 #include "security/user.h"
@@ -77,7 +77,7 @@ using Poco::Data::Statement;
 
 class StructBX::Handlers::RootHandler :
     public HTTPRequestHandler
-    ,public HTTP::CommonResponses
+    ,public HTTP::ResponseManager
     ,public HTTP::Methods
     ,public Security::SecurityVerification
     ,public HTTP::Body

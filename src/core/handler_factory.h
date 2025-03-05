@@ -34,6 +34,7 @@
 #include "handlers/web_handler.h"
 #include "handlers/login_handler.h"
 #include "tools/output_logger.h"
+#include "http/html_message.h"
 
 using namespace Poco;
 using namespace Poco::Net;
