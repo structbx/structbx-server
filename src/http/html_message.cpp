@@ -7,6 +7,7 @@ std::string StructBX::HTTP::HTMLMessage(std::string code, std::string title, std
         "<head>" \
         "<meta charset=\"UTF-8\">" \
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" \
+        "<link rel=\"icon\" type=\"image/png\" href=\"/assets/images/logo-75x75.png\">" \
         "<title>" + title + " | StructBX</title>" \
         "<style>" \
         "body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center;}" \
