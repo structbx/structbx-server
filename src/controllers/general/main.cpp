@@ -215,10 +215,7 @@ Main::ModifyInstanceLogo::ModifyInstanceLogo(Tools::FunctionData& function_data)
                 file_manager.get_files().push_back(file_manager.CreateTempFile_("/" + logo_path));
 
                 if(file_manager.CheckFiles_())
-                {
                     file_manager.RemoveFile_();
-                    return;
-                }
             }
         }
 
