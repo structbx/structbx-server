@@ -45,9 +45,15 @@ class StructBX::Tools::ManageJSON
             auto& var = json_object_;
             return var;
         }
+        JSON::Array::Ptr& get_data()
+        {
+            auto& var = data_;
+            return var;
+        }
 
         void set_json_array(JSON::Array::Ptr json_array) { json_array_ = json_array; }
         void set_json_object(JSON::Object::Ptr json_object) { json_object_ = json_object; }
+        void set_data(JSON::Array::Ptr data) { data_ = data; }
 
         void Parse_(std::string& string_to_parse);
         JSON::Object::Ptr ExtractObject_(Dynamic::Var& object);
@@ -56,6 +62,7 @@ class StructBX::Tools::ManageJSON
     private:
         JSON::Array::Ptr json_array_;
         JSON::Object::Ptr json_object_;
+        JSON::Array::Ptr data_;
 };
 
 #endif // STRUCTBX_TOOLS_MANAGEJSON
