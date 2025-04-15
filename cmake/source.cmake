@@ -34,6 +34,7 @@ set(
     ${PROJECT_SOURCE_DIR}/src/controllers/forms/data.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/forms/columns.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/forms/permissions.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/forms/views.cpp
     ${PROJECT_SOURCE_DIR}/src/core/core.cpp
     ${PROJECT_SOURCE_DIR}/src/core/handler_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/core/server.cpp
