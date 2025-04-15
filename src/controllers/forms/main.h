@@ -8,6 +8,7 @@
 #include "controllers/forms/data.h"
 #include "controllers/forms/columns.h"
 #include "controllers/forms/permissions.h"
+#include "controllers/forms/views.h"
 
 namespace StructBX
 {
@@ -71,6 +72,7 @@ class StructBX::Controllers::Forms::Main : public Tools::FunctionData
         Data function_data_;
         Columns function_columns_;
         Permissions function_permissions_;
+        Views function_views_;
         Read struct_read_;
         ReadSpecific struct_read_specific_;
         Add struct_add_;
