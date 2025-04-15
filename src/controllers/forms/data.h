@@ -142,6 +142,13 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
             void A1(StructBX::Functions::Action::Ptr action);
             void A2(StructBX::Functions::Action::Ptr action);
         };
+        struct Import : public Tools::FunctionData
+        {
+            Import(Tools::FunctionData& function_data);
+
+            void A1(StructBX::Functions::Action::Ptr action);
+            void A2(StructBX::Functions::Action::Ptr action);
+        };
         struct Modify : public Tools::FunctionData
         {
             Modify(Tools::FunctionData& function_data);
@@ -164,6 +171,7 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
         ReadSpecific struct_read_specific_;
         ReadFile struct_read_file_;
         Add struct_add_;
+        Import struct_import_;
         Modify struct_modify_;
         Delete struct_delete_;
 };

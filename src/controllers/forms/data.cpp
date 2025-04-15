@@ -1,5 +1,7 @@
 
 #include "controllers/forms/data.h"
+#include "query/parameter.h"
+#include "tools/output_logger.h"
 
 using namespace StructBX::Controllers;
 using namespace StructBX::Controllers::Forms;
@@ -11,6 +13,7 @@ Forms::Data::Data(Tools::FunctionData& function_data) :
     ,struct_read_specific_(function_data)
     ,struct_read_file_(function_data)
     ,struct_add_(function_data)
+    ,struct_import_(function_data)
     ,struct_modify_(function_data)
     ,struct_delete_(function_data)
 {
@@ -946,6 +949,190 @@ void Forms::Data::Add::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
+Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+{
+    // Function GET /api/forms/data/add
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/forms/data/import", HTTP::EnumMethods::kHTTP_POST);
+
+    function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
+
+    // Action 1: Verify form existence
+    auto action1 = function->AddAction_("a1");
+    A1(action1);
+
+    // Action 2: Get form columns
+    auto action2 = function->AddAction_("a2");
+    A2(action2);
+
+    // Form permissions verifications
+    auto fpv = function->AddAction_("fpv");
+    VerifyPermissionsAdd(function_data).A1(fpv);
+
+    // Setup Custom Process
+    auto id_space = get_space_id();
+    function->SetupCustomProcess_([id_space, action1, action2, fpv](StructBX::Functions::Function& self)
+    {
+        // Execute actions
+        if(!action1->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action1->get_identifier() + ": UMKBSk3ntgzw");
+            return;
+        }
+        if(!action2->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action2->get_identifier() + ": 05U44IYhi8D8");
+            return;
+        }
+        if(!fpv->Work_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_UNAUTHORIZED, "Error " + fpv->get_identifier() + ": " + fpv->get_custom_error());
+            return;
+        }
+
+        // Get form ID
+        auto form_id = action1->get_results()->First_();
+        if(form_id->IsNull_())
+        {
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error SxsLDuqFXhi8");
+            return;
+        }
+
+        // Identify JSON Parameters
+        int saved = 0;
+        std::string error_lines = "";
+        for (std::size_t a = 0; a < self.get_data()->size(); a++)
+        {
+            // Action 3: Save new record
+            auto action3 = std::make_shared<Functions::Action>("a3");
+            
+            // Configure parameters
+            std::string columns = "";
+            std::string values = "";
+            ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_space);
+
+            // Setup parameters
+            pc.Setup(self, action2->get_results(), form_id, nullptr, action3);
+
+            // Verify that columns is not empty
+            if(columns == "")
+            {
+                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                continue;
+            }
+
+            // Set SQL Code to action 3
+            action3->set_sql_code(
+                "INSERT INTO _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                "(" + columns + ") VALUES (" + values + ") ");
+
+            // Get Parameter object
+            auto parameter_object = self.get_data()->getObject(a);
+            if(parameter_object == nullptr)
+            {
+                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                continue;
+            }
+            auto names = parameter_object->getNames();
+            if(names.size() == 0)
+            {
+                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                continue;
+            }
+            // Store row parameters
+            std::vector<Query::Parameter::Ptr> row_parameters;
+            for (std::size_t b = 0; b < names.size(); b++)
+            {
+                // Get name and value
+                auto name = names.at(b);
+                if(parameter_object->get(name).isEmpty())
+                {
+                    Tools::OutputLogger::Debug_("Parameter JSON object value is null, skipping.");
+                    continue;
+                }
+                auto value = parameter_object->get(name);
+                // Add parameter
+                auto new_parameter = std::make_shared<Query::Parameter>(name, Tools::DValue::Ptr(new Tools::DValue(value)), true);
+                row_parameters.push_back(new_parameter);
+            }
+            // Execute action 3
+            self.IdentifyParameters_(action3, row_parameters);
+            if(!action3->Work_())
+            {
+                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                continue;
+            }
+            saved++;
+        }
+
+        // ChangeInt
+        auto form_identifier = self.GetParameter_("form-identifier");
+        if(form_identifier != self.get_parameters().end())
+        {
+            auto changeInt = ChangeInt();
+            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+        }
+
+        // Send results
+        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok. Total registros guardados: " + std::to_string(saved) + ", errores en las filas: " + error_lines);
+    });
+
+    get_functions()->push_back(function);
+}
+
+void Forms::Data::Import::A1(StructBX::Functions::Action::Ptr action)
+{
+    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->set_final(false);
+    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    {
+        if(self.get_results()->size() != 1)
+        {
+            self.set_custom_error("El formulario solicitado no existe");
+            return false;
+        }
+
+        return true;
+    });
+
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+    action->AddParameter_("id_space", get_space_id(), false);
+
+}
+
+void Forms::Data::Import::A2(StructBX::Functions::Action::Ptr action)
+{
+    action->set_sql_code(
+        "SELECT fc.*, fct.identifier AS column_type " \
+        "FROM forms_columns fc " \
+        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN forms f ON f.id = fc.id_form " \
+        "WHERE f.identifier = ? AND f.id_space = ?"
+    );
+    action->set_final(false);
+    action->AddParameter_("form-identifier", "", true)
+    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->get_value()->ToString_() == "")
+        {
+            param->set_error("El identificador de formulario no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
+
+    action->AddParameter_("id_space", get_space_id(), false);
+}
+
 Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     // Function GET /api/forms/data/modify
@@ -1352,7 +1539,7 @@ bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
             if(default_value->ToString_() == "")
             {
                 // default value is empty
-                param->set_error("Este parámetro es obligatorio");
+                param->set_error("El parámetro " + param->get_name() + " es obligatorio");
                 return false;
             }
             else
@@ -1379,7 +1566,7 @@ bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
                 if(required->Int_() == 1)
                 {
                     // if value is required
-                    param->set_error("Este parámetro es obligatorio");
+                param->set_error("El parámetro " + param->get_name() + " es obligatorio");
                     return false;
                 }
                 else
