@@ -2,6 +2,7 @@
 #include "controllers/forms/data.h"
 #include "query/parameter.h"
 #include "tools/output_logger.h"
+#include <Poco/JSON/Object.h>
 
 using namespace StructBX::Controllers;
 using namespace StructBX::Controllers::Forms;
@@ -1000,7 +1001,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
 
         // Identify JSON Parameters
         int saved = 0;
-        std::string error_lines = "";
+        auto error_lines = JSON::Array::Ptr(new JSON::Array());
         for (std::size_t a = 0; a < self.get_data()->size(); a++)
         {
             // Action 3: Save new record
@@ -1017,7 +1018,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
             // Verify that columns is not empty
             if(columns == "")
             {
-                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                error_lines->set(error_lines->size(), a + 2);
                 continue;
             }
 
@@ -1030,13 +1031,13 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
             auto parameter_object = self.get_data()->getObject(a);
             if(parameter_object == nullptr)
             {
-                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                error_lines->set(error_lines->size(), a + 2);
                 continue;
             }
             auto names = parameter_object->getNames();
             if(names.size() == 0)
             {
-                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                error_lines->set(error_lines->size(), a + 2);
                 continue;
             }
             // Store row parameters
@@ -1059,7 +1060,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
             self.IdentifyParameters_(action3, row_parameters);
             if(!action3->Work_())
             {
-                error_lines += (error_lines == "" ? "" : ", ") + std::to_string(a);
+                error_lines->set(error_lines->size(), a + 2);
                 continue;
             }
             saved++;
@@ -1074,7 +1075,14 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
         }
 
         // Send results
-        self.JSONResponse_(HTTP::Status::kHTTP_OK, "Ok. Total registros guardados: " + std::to_string(saved) + ", errores en las filas: " + error_lines);
+        auto json_result = JSON::Object::Ptr(new JSON::Object());
+        json_result->set("status", "OK.");
+        json_result->set("message", "OK.");
+        json_result->set("saved", saved);
+        json_result->set("errors", error_lines->size());
+        json_result->set("error_lines", error_lines);
+        
+        self.CompoundResponse_(HTTP::Status::kHTTP_OK, json_result);
     });
 
     get_functions()->push_back(function);
