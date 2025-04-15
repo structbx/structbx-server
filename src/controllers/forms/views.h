@@ -30,9 +30,16 @@ class StructBX::Controllers::Forms::Views : public Tools::FunctionData
 
             void A1(StructBX::Functions::Action::Ptr action);
         };
+        struct ReadSpecific : public Tools::FunctionData
+        {
+            ReadSpecific(Tools::FunctionData& function_data);
+
+            void A1(StructBX::Functions::Action::Ptr action);
+        };
 
     private:
         Read struct_read_;
+        ReadSpecific struct_read_specific_;
 };
 
 #endif //STRUCTBX_CONTROLLERS_FORMS_VIEWS_H
