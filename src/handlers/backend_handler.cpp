@@ -85,6 +85,11 @@ void BackendHandler::ProcessActions_()
     // Set file parameters to current function
     get_current_function()->get_file_manager() = get_files_parameters();
 
+    // Set json array and object to current function
+    get_current_function()->set_json_array(get_json_array());
+    get_current_function()->set_json_object(get_json_object());
+    get_current_function()->set_data(get_data());
+
     // Set current user
     auto id = get_users_manager().get_current_user().get_id();
     auto username = get_users_manager().get_current_user().get_username();
