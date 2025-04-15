@@ -238,14 +238,22 @@ void RootHandler::IdentifyParameters_(JSON::Array::Ptr json_array)
             auto parameter_object = json_array->getObject(a);
             if(parameter_object == nullptr)
             {
-                Tools::OutputLogger::Warning_("Warning on root_handler.cpp on IdentifyParameters_(): Parameter JSON object is null.");
+                Tools::OutputLogger::Debug_("Parameter JSON object is null, skipping.");
                 continue;
             }
 
             // Get parameter name
             if(parameter_object->get("name").isEmpty())
             {
-                Tools::OutputLogger::Warning_("Warning on root_handler.cpp on IdentifyParameters_(): Parameter name is empty.");
+                // Get parameter data
+                if(!parameter_object->get("data").isEmpty())
+                {
+                    // Set json object
+                    auto data = parameter_object->get("data").extract<JSON::Array::Ptr>();
+                    set_data(data);
+                }
+
+                Tools::OutputLogger::Debug_("Parameter name is empty, skipping.");
                 continue;
             }
             auto parameter_name = parameter_object->get("name").toString();
@@ -253,7 +261,7 @@ void RootHandler::IdentifyParameters_(JSON::Array::Ptr json_array)
             // Get parameter value
             if(parameter_object->get("value").isEmpty())
             {
-                Tools::OutputLogger::Warning_("Warning on root_handler.cpp on IdentifyParameters_(): Parameter value is empty.");
+                Tools::OutputLogger::Debug_("Parameter value is empty, skipping.");
                 continue;
             }
             auto parameter_value = parameter_object->get("value").toString();
