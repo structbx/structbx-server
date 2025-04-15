@@ -14,6 +14,9 @@ Function::Function() :
     ,method_(HTTP::EnumMethods::kHTTP_GET)
     ,file_manager_(new Files::FileManager())
     ,custom_process_([](Function&){})
+    ,json_array_(new JSON::Array())
+    ,json_object_(new JSON::Object())
+    ,data_(new JSON::Array())
 {
     
 }
@@ -28,6 +31,9 @@ Function::Function(std::string endpoint, HTTP::EnumMethods method, ResponseType 
     ,method_(method)
     ,file_manager_(new Files::FileManager())
     ,custom_process_([](Function&){})
+    ,json_array_(new JSON::Array())
+    ,json_object_(new JSON::Object())
+    ,data_(new JSON::Array())
 {
     
 }
@@ -408,6 +414,23 @@ void Function::IdentifyParameters_(Functions::Action::Ptr action)
     {
         // Iterate over Function parameters
         for(auto it2 : parameters_)
+        {
+            if(it2->get_name() == it->get_name() && it->get_editable())
+            {
+                // Copy function parameter value to action parameter value (Shared)
+                it->set_value(it2->get_value());
+            }
+        }
+    }
+}
+
+void Function::IdentifyParameters_(Functions::Action::Ptr action, std::vector<Query::Parameter::Ptr> parameters)
+{
+    // Iterate over action parameters
+    for(auto it : action->get_parameters())
+    {
+        // Iterate over Function parameters
+        for(auto it2 : parameters)
         {
             if(it2->get_name() == it->get_name() && it->get_editable())
             {

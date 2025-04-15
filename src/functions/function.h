@@ -75,12 +75,30 @@ class StructBX::Functions::Function : public HTTP::ResponseManager
             auto& var = parameters_;
             return var;
         }
+        JSON::Array::Ptr& get_json_array()
+        {
+            auto& var = json_array_;
+            return var;
+        }
+        JSON::Object::Ptr& get_json_object()
+        {
+            auto& var = json_object_;
+            return var;
+        }
+        JSON::Array::Ptr& get_data()
+        {
+            auto& var = data_;
+            return var;
+        }
 
         void set_endpoint(std::string endpoint) { endpoint_ = endpoint; }
         void set_target(std::string target) { target_ = target; }
         void set_remove_file_on_modify(bool remove_file_on_modify) { remove_file_on_modify_ = remove_file_on_modify; }
         void set_method(HTTP::EnumMethods type) { method_ = type; }
         void set_response_type(ResponseType response_type) { response_type_ = response_type; }
+        void set_json_array(JSON::Array::Ptr json_array) { json_array_ = json_array; }
+        void set_json_object(JSON::Object::Ptr json_object) { json_object_ = json_object; }
+        void set_data(JSON::Array::Ptr data) { data_ = data; }
 
         std::vector<Query::Parameter::Ptr>::iterator  GetParameter_(std::string name);
         Action::Ptr AddAction_(std::string identifier);
@@ -95,6 +113,7 @@ class StructBX::Functions::Function : public HTTP::ResponseManager
         void RemoveProcess_(std::string& filepath);
         void SetupCustomProcess_(std::function<void(Function&)> custom_process);
         void IdentifyParameters_(Functions::Action::Ptr action);
+        void IdentifyParameters_(Functions::Action::Ptr action, std::vector<Query::Parameter::Ptr> parameters);
 
     protected:
         void Setup_(HTTP::Request::HTTPServerRequestPtr request, HTTP::Request::HTTPServerResponsePtr response);
@@ -113,6 +132,9 @@ class StructBX::Functions::Function : public HTTP::ResponseManager
         Files::FileManager::Ptr file_manager_;
         std::function<void(Function&)> custom_process_;
         std::vector<Query::Parameter::Ptr> parameters_;
+        JSON::Array::Ptr json_array_;
+        JSON::Object::Ptr json_object_;
+        JSON::Array::Ptr data_;
 };
 
 
