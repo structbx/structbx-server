@@ -524,11 +524,23 @@ Forms::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : 
 void Forms::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "SELECT f.change_int "
-        "FROM forms f "
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "SELECT id, row_id, operation, id_form "
+        "FROM changes "
+        "WHERE "
+            "id > ? "
+            "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
     );
 
+    action->AddParameter_("changeInt", "", true)
+    ->SetupCondition_("condition-changeInt", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    {
+        if(param->ToString_() == "")
+        {
+            param->set_error("El entero de cambio no puede estar vacío");
+            return false;
+        }
+        return true;
+    });
     action->AddParameter_("form-identifier", "", true)
     ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -626,11 +638,36 @@ Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
             return;
         }
 
-        // Action 2: Get Form data
-        action2->set_sql_code(
+        // SQL Code
+        std::string sql_code = 
             "SELECT " + columns + " " \
             "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
-            "WHERE _structbx_column_" + column_id->ToString_() + " = ?");
+            "WHERE _structbx_column_" + column_id->ToString_() + " = ?";
+
+        // Get conditions
+        auto conditions = self.GetParameter_("conditions");
+        if(conditions != self.get_parameters().end())
+        {
+            if(conditions->get()->ToString_() != "")
+            {
+                std::string conditions_decoded =  StructBX::Tools::Base64Tool().Decode_(conditions->get()->ToString_());
+                sql_code += " AND " + conditions_decoded;
+            }
+        }
+
+        // Get order
+        auto order = self.GetParameter_("order");
+        if(order != self.get_parameters().end())
+        {
+            if(order->get()->ToString_() != "")
+            {
+                std::string order_decoded =  StructBX::Tools::Base64Tool().Decode_(order->get()->ToString_());
+                sql_code += " ORDER BY " + order_decoded;
+            }
+        }
+
+        // Action 2: Get Form data
+        action2->set_sql_code(sql_code);
 
         // Identify parameters and work
         self.IdentifyParameters_(action2);
@@ -883,11 +920,12 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
         }
 
         // ChangeInt
+        std::string row_id = std::to_string(action3->get_last_insert_id());
         auto form_identifier = self.GetParameter_("form-identifier");
         if(form_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(row_id, "insert",form_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1071,7 +1109,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
         if(form_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+            changeInt.Change("", "import", form_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1240,11 +1278,12 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
         }
 
         // ChangeInt
+        auto id = action3->GetParameter("id");
         auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end())
+        if(form_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "update", form_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1450,11 +1489,12 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
         }
 
         // ChangeInt
+        auto id = action2->GetParameter("id");
         auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end())
+        if(form_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "delete", form_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1815,16 +1855,17 @@ bool Forms::Data::FileProcessing::Delete()
     return true;
 }
 
-void Forms::Data::ChangeInt::Change(std::string form_identifier, std::string space_id)
+void Forms::Data::ChangeInt::Change(std::string row_id, std::string operation, std::string form_identifier, std::string space_id)
 {
     // Action 1: Get Change int
     auto action1 = StructBX::Functions::Action("a1");
     action1.set_sql_code(
-        "UPDATE forms "
-        "SET change_int = change_int + 1 "
-        "WHERE identifier = ? AND id_space = ?"
+        "INSERT INTO changes (row_id, operation, id_form) "
+        "VALUES (?, ?, (SELECT id FROM forms WHERE identifier = ? AND id_space = ?))"
     );
 
+    action1.AddParameter_("row_id", row_id, false);
+    action1.AddParameter_("operation", operation, false);
     action1.AddParameter_("form-identifier", form_identifier, false);
     action1.AddParameter_("id_space", space_id, false);
 

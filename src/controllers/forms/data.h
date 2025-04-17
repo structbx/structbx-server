@@ -81,7 +81,7 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
         };
         struct ChangeInt
         {
-            void Change(std::string form_identifier, std::string space_id);
+            void Change(std::string row_id, std::string operation, std::string form_identifier, std::string space_id);
         };
 
         struct VerifyPermissionsRead : public Tools::FunctionData
