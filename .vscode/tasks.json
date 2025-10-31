@@ -26,5 +26,10 @@
             ,"type": "shell"
             ,"command": "cd build/Debug && sudo cmake --build . --target install"
         }
+        ,{
+            "label": "Doxygen Documentation"
+            ,"type": "shell"
+            ,"command": "cd build/Debug && doxygen"
+        }
     ]
 }
