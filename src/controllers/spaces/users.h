@@ -29,6 +29,10 @@ class StructBX::Controllers::Spaces::Users : public Tools::FunctionData
         {
             Read(Tools::FunctionData& function_data);
         };
+        struct ReadCurrent : public Tools::FunctionData
+        {
+            ReadCurrent(Tools::FunctionData& function_data);
+        };
         struct ReadUserOutSpace : public Tools::FunctionData
         {
             ReadUserOutSpace(Tools::FunctionData& function_data);
@@ -44,6 +48,7 @@ class StructBX::Controllers::Spaces::Users : public Tools::FunctionData
 
     private:
         Read struct_read_;
+        ReadCurrent struct_read_current_;
         ReadUserOutSpace struct_read_user_out_space_;
         Add struct_add_;
         Delete struct_delete_;

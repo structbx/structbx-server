@@ -6,6 +6,7 @@ using namespace StructBX::Controllers::Spaces;
 Users::Users(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
     ,struct_read_(function_data)
+    ,struct_read_current_(function_data)
     ,struct_read_user_out_space_(function_data)
     ,struct_add_(function_data)
     ,struct_delete_(function_data)
@@ -37,6 +38,25 @@ Users::Read::Read(Tools::FunctionData& function_data) :
         }
         return true;
     });
+
+    get_functions()->push_back(function);
+}
+
+Users::ReadCurrent::ReadCurrent(Tools::FunctionData& function_data) :
+    Tools::FunctionData(function_data)
+{
+    // Function GET /api/spaces/users/current/read
+    StructBX::Functions::Function::Ptr function = 
+        std::make_shared<StructBX::Functions::Function>("/api/spaces/users/current/read", HTTP::EnumMethods::kHTTP_GET);
+    
+    auto action1 = function->AddAction_("a1");
+    action1->set_sql_code(
+        "SELECT nu.id, nu.username, sp.created_at " \
+        "FROM users nu " \
+        "JOIN spaces_users sp ON sp.id_naf_user = nu.id " \
+        "WHERE sp.id_space = ?"
+    );
+    action1->AddParameter_("id_space", get_space_id(), false);
 
     get_functions()->push_back(function);
 }
