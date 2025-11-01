@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_CONTROLLERS_FORMS_DATA_H
-#define STRUCTBX_CONTROLLERS_FORMS_DATA_H
+#ifndef STRUCTBX_CONTROLLERS_TABLES_DATA_H
+#define STRUCTBX_CONTROLLERS_TABLES_DATA_H
 
 #include <fstream>
 
@@ -15,7 +15,7 @@ namespace StructBX
 {
     namespace Controllers
     {
-        namespace Forms
+        namespace Tables
         {
             class Data;
         }
@@ -24,7 +24,7 @@ namespace StructBX
 
 using namespace StructBX;
 
-class StructBX::Controllers::Forms::Data : public Tools::FunctionData
+class StructBX::Controllers::Tables::Data : public Tools::FunctionData
 {
     public:
         Data(FunctionData& function_data);
@@ -40,7 +40,7 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
                 ,values(values)
                 ,id_space(id_space)
             {}
-            void Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr form_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3);
+            void Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr table_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3);
 
             Type type;
             std::string& columns;
@@ -81,7 +81,7 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
         };
         struct ChangeInt
         {
-            void Change(std::string row_id, std::string operation, std::string form_identifier, std::string space_id);
+            void Change(std::string row_id, std::string operation, std::string table_identifier, std::string space_id);
         };
 
         struct VerifyPermissionsRead : public Tools::FunctionData
@@ -176,4 +176,4 @@ class StructBX::Controllers::Forms::Data : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_FORMS_DATA_H
+#endif //STRUCTBX_CONTROLLERS_TABLES_DATA_H

@@ -1,13 +1,13 @@
 
-#include "controllers/forms/data.h"
+#include "controllers/tables/data.h"
 #include "query/parameter.h"
 #include "tools/output_logger.h"
 #include <Poco/JSON/Object.h>
 
 using namespace StructBX::Controllers;
-using namespace StructBX::Controllers::Forms;
+using namespace StructBX::Controllers::Tables;
 
-Forms::Data::Data(Tools::FunctionData& function_data) :
+Tables::Data::Data(Tools::FunctionData& function_data) :
     FunctionData(function_data)
     ,struct_read_(function_data)
     ,struct_read_change_int_(function_data)
@@ -21,17 +21,17 @@ Forms::Data::Data(Tools::FunctionData& function_data) :
     
 }
 
-Forms::Data::VerifyPermissionsRead::VerifyPermissionsRead(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::VerifyPermissionsRead::VerifyPermissionsRead(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
 
 }
 
-void Forms::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.read = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
@@ -44,8 +44,8 @@ void Forms::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr act
 
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -59,17 +59,17 @@ void Forms::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr act
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
-Forms::Data::VerifyPermissionsAdd::VerifyPermissionsAdd(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::VerifyPermissionsAdd::VerifyPermissionsAdd(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     
 }
 
-void Forms::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.add = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
@@ -82,8 +82,8 @@ void Forms::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr acti
 
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -97,17 +97,17 @@ void Forms::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr acti
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
-Forms::Data::VerifyPermissionsModify::VerifyPermissionsModify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::VerifyPermissionsModify::VerifyPermissionsModify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     
 }
 
-void Forms::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.modify = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
@@ -120,8 +120,8 @@ void Forms::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr a
 
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -135,17 +135,17 @@ void Forms::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr a
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
-Forms::Data::VerifyPermissionsDelete::VerifyPermissionsDelete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::VerifyPermissionsDelete::VerifyPermissionsDelete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
     
 }
 
-void Forms::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fp.delete = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
@@ -158,8 +158,8 @@ void Forms::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr a
 
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -173,23 +173,23 @@ void Forms::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr a
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
-Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/read
+    // Function GET /api/tables/data/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/read", HTTP::EnumMethods::kHTTP_GET);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1_0: Get form id
+    // Action 1_0: Get table id
     auto action1_0 = function->AddAction_("a1_0");
     A1(action1_0);
 
-    // Action 1: Get form columns
+    // Action 1: Get table columns
     auto action1 = function->AddAction_("a1");
     A2(action1);
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsRead struct_verify_permissions_read(function_data);
     struct_verify_permissions_read.A1(fpv);
@@ -215,9 +215,9 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
             return;
         }
 
-        // Get form ID
-        auto form_id = action1_0->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1_0->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error EqLiZk1pm7");
             return;
@@ -244,7 +244,7 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
 
                 // Get table columns (link)
                 auto action1_2 = self.AddAction_("a1_2");
-                action1_2->set_sql_code("SELECT * FROM forms_columns WHERE id_form = ?");
+                action1_2->set_sql_code("SELECT * FROM tables_columns WHERE id_table = ?");
                 action1_2->AddParameter_("id", link_to->Int_(), false);
                 if(!action1_2->Work_())
                 {
@@ -272,9 +272,9 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
                 column = "_" + link_to->ToString_() + "._structbx_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
 
                 // Setup new join
-                joins += " LEFT JOIN _structbx_space_" + id_space + "._structbx_form_" + link_to->ToString_() +
+                joins += " LEFT JOIN _structbx_space_" + id_space + "._structbx_table_" + link_to->ToString_() +
                 " AS _" + link_to->ToString_() + " ON _" + link_to->ToString_() + "._structbx_column_" + column2_id->ToString_() + 
-                " = _" + form_id->ToString_() + "._structbx_column_" + id->ToString_();
+                " = _" + table_id->ToString_() + "._structbx_column_" + id->ToString_();
             }
 
             // Set column
@@ -328,7 +328,7 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
                 offset = (std::stoi(page->get()->ToString_()) - 1) * 20;
                 limit_query += std::to_string(offset) + ", 20";
             }
-            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/data.cpp: Page parameter is not an integer");}
+            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/data.cpp: Page parameter is not an integer");}
         }
         else if(limit != self.get_parameters().end())
         {
@@ -337,7 +337,7 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
                 // LIMIT N
                 limit_query += limit->get()->ToString_();
             }
-            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/data.cpp: Limit parameter error");}
+            catch(std::exception&){StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/data.cpp: Limit parameter error");}
         }
         else
         {
@@ -347,12 +347,12 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
         // Export param
         auto export_param = self.GetParameter_("export");
 
-        // Action 2: Get Form data
+        // Action 2: Get Table data
         auto action2 = self.AddAction_("a2");
         std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + 
-                " AS _" + form_id->ToString_()
+            "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + 
+                " AS _" + table_id->ToString_()
         ;
 
         // Prepare JOIN if there is a link
@@ -457,17 +457,17 @@ Forms::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Read::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_columns fc ON fc.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -480,22 +480,22 @@ void Forms::Data::Read::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::Read::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Read::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS table_id " \
+            ",(SELECT identifier FROM tables WHERE id = fc.link_to) AS link_to_table " \
+            ",(SELECT name FROM tables WHERE id = fc.link_to) AS link_to_table_name " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ? " \
         "ORDER BY fc.position ASC"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -508,11 +508,11 @@ void Forms::Data::Read::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/read/changeInt
+    // Function GET /api/tables/data/read/changeInt
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/read/changeInt", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/read/changeInt", HTTP::EnumMethods::kHTTP_GET);
 
     // Action 1: Get Change int
     auto action1 = function->AddAction_("a1");
@@ -521,14 +521,14 @@ Forms::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : 
     get_functions()->push_back(function);
 }
 
-void Forms::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "SELECT id, row_id, operation, id_form "
+        "SELECT id, row_id, operation, id_table "
         "FROM changes "
         "WHERE "
             "id > ? "
-            "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
     );
 
     action->AddParameter_("changeInt", "", true)
@@ -541,8 +541,8 @@ void Forms::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
@@ -554,27 +554,27 @@ void Forms::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/read/id
+    // Function GET /api/tables/data/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1_0: Get form id
+    // Action 1_0: Get table id
     auto action1_0 = function->AddAction_("a1_0");
     A1(action1_0);
 
-    // Action 1: Get form columns
+    // Action 1: Get table columns
     auto action1 = function->AddAction_("a1");
     A2(action1);
 
-    // Action 2: Get Form data
+    // Action 2: Get Table data
     auto action2 = function->AddAction_("a2");
     A3(action2);
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsRead struct_verify_permissions_read(function_data);
     struct_verify_permissions_read.A1(fpv);
@@ -600,9 +600,9 @@ Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
             return;
         }
 
-        // Get form ID
-        auto form_id = action1_0->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1_0->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error HPqWlZkEbk");
             return;
@@ -641,7 +641,7 @@ Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
         // SQL Code
         std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+            "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
             "WHERE _structbx_column_" + column_id->ToString_() + " = ?";
 
         // Get conditions
@@ -666,7 +666,7 @@ Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
             }
         }
 
-        // Action 2: Get Form data
+        // Action 2: Get Table data
         action2->set_sql_code(sql_code);
 
         // Identify parameters and work
@@ -691,17 +691,17 @@ Forms::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
     get_functions()->push_back(function);
 }
 
-void Forms::Data::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_columns fc ON fc.id_table = f.id " \
         "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -714,22 +714,22 @@ void Forms::Data::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS table_id " \
+            ",(SELECT identifier FROM tables WHERE id = fc.link_to) AS link_to_table " \
+            ",(SELECT name FROM tables WHERE id = fc.link_to) AS link_to_table_name " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ? " \
         "ORDER BY fc.position ASC"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -742,7 +742,7 @@ void Forms::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::ReadSpecific::A3(StructBX::Functions::Action::Ptr action)
+void Tables::Data::ReadSpecific::A3(StructBX::Functions::Action::Ptr action)
 {
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -756,19 +756,19 @@ void Forms::Data::ReadSpecific::A3(StructBX::Functions::Action::Ptr action)
     });
 }
 
-Forms::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/file/read
+    // Function GET /api/tables/data/file/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/file/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/file/read", HTTP::EnumMethods::kHTTP_GET);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Get form id
+    // Action 1: Get table id
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsRead struct_verify_permissions_read(function_data);
     struct_verify_permissions_read.A1(fpv);
@@ -797,9 +797,9 @@ Forms::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::Fun
             return;
         }
 
-        // Get form_id
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table_id
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.HTMLResponse_(HTTP::Status::kHTTP_NOT_FOUND, "Archivo no encontrado en el formulario actual");
             return;
@@ -808,7 +808,7 @@ Forms::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::Fun
         // Setup file manager
         self.get_file_manager()->AddBasicSupportedFiles_();
         self.get_file_manager()->set_directory_base(
-            StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+            StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
         );
 
         // Download process
@@ -819,16 +819,16 @@ Forms::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::Fun
     get_functions()->push_back(function);
 }
 
-void Forms::Data::ReadFile::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::ReadFile::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id " \
-        "FROM forms f " \
+        "FROM tables f " \
         "WHERE f.identifier = ? AND f.id_space = ? "
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -841,26 +841,26 @@ void Forms::Data::ReadFile::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/add
+    // Function GET /api/tables/data/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/add", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify form existence
+    // Action 1: Verify table existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Get form columns
+    // Action 2: Get table columns
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
     // Action 3: Save new record
     auto action3 = function->AddAction_("a3");
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsAdd(function_data).A1(fpv);
 
@@ -885,9 +885,9 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
             return;
@@ -897,7 +897,7 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
         std::string columns = "";
         std::string values = "";
         ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_space);
-        pc.Setup(self, action2->get_results(), form_id, nullptr, action3);
+        pc.Setup(self, action2->get_results(), table_id, nullptr, action3);
 
         // Verify that columns is not empty
         if(columns == "")
@@ -908,7 +908,7 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "INSERT INTO _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+            "INSERT INTO _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
@@ -921,11 +921,11 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
 
         // ChangeInt
         std::string row_id = std::to_string(action3->get_last_insert_id());
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end())
+        auto table_identifier = self.GetParameter_("table-identifier");
+        if(table_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(row_id, "insert",form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(row_id, "insert",table_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -935,11 +935,11 @@ Forms::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Add::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Add::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -950,8 +950,8 @@ void Forms::Data::Add::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-identifier-table", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -964,18 +964,18 @@ void Forms::Data::Add::A1(StructBX::Functions::Action::Ptr action)
 
 }
 
-void Forms::Data::Add::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -988,23 +988,23 @@ void Forms::Data::Add::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/add
+    // Function GET /api/tables/data/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/import", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/import", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify form existence
+    // Action 1: Verify table existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Get form columns
+    // Action 2: Get table columns
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsAdd(function_data).A1(fpv);
 
@@ -1029,9 +1029,9 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error SxsLDuqFXhi8");
             return;
@@ -1051,7 +1051,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
             ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_space);
 
             // Setup parameters
-            pc.Setup(self, action2->get_results(), form_id, nullptr, action3);
+            pc.Setup(self, action2->get_results(), table_id, nullptr, action3);
 
             // Verify that columns is not empty
             if(columns == "")
@@ -1062,7 +1062,7 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
 
             // Set SQL Code to action 3
             action3->set_sql_code(
-                "INSERT INTO _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                "INSERT INTO _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
                 "(" + columns + ") VALUES (" + values + ") ");
 
             // Get Parameter object
@@ -1105,11 +1105,11 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
         }
 
         // ChangeInt
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end())
+        auto table_identifier = self.GetParameter_("table-identifier");
+        if(table_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change("", "import", form_identifier->get()->ToString_(), id_space);
+            changeInt.Change("", "import", table_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1126,11 +1126,11 @@ Forms::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Import::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Import::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -1141,8 +1141,8 @@ void Forms::Data::Import::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-identifier-table", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1155,18 +1155,18 @@ void Forms::Data::Import::A1(StructBX::Functions::Action::Ptr action)
 
 }
 
-void Forms::Data::Import::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Import::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1179,26 +1179,26 @@ void Forms::Data::Import::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/modify
+    // Function GET /api/tables/data/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify form existence
+    // Action 1: Verify table existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Get form columns
+    // Action 2: Get table columns
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
     // Action 3: Update record
     auto action3 = function->AddAction_("a3");
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsModify(function_data).A1(fpv);
 
@@ -1223,9 +1223,9 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
             return;
@@ -1243,7 +1243,7 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
         std::string columns = "";
         std::string values = "";
         ParameterConfiguration pc(ParameterConfiguration::Type::kModify, columns, values, id_space);
-        pc.Setup(self, action2->get_results(), form_id, column_id, action3);
+        pc.Setup(self, action2->get_results(), table_id, column_id, action3);
 
         // Verify that columns is not empty
         if(columns == "")
@@ -1266,7 +1266,7 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "UPDATE _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+            "UPDATE _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
             "SET " + columns + " WHERE _structbx_column_" + column_id->ToString_() + " = ?");
 
         // Execute action 3
@@ -1279,11 +1279,11 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
 
         // ChangeInt
         auto id = action3->GetParameter("id");
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end() && id != self.get_parameters().end())
+        auto table_identifier = self.GetParameter_("table-identifier");
+        if(table_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(id->get()->ToString_(), "update", form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "update", table_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1293,16 +1293,16 @@ Forms::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_columns fc ON fc.id_table = f.id " \
         "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -1313,8 +1313,8 @@ void Forms::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-identifier-table", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1327,18 +1327,18 @@ void Forms::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1351,19 +1351,19 @@ void Forms::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
+Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/data/delete
+    // Function GET /api/tables/data/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/data/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/data/delete", HTTP::EnumMethods::kHTTP_DEL);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify form existence
+    // Action 1: Verify table existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2_0: Get form columns
+    // Action 2_0: Get table columns
     auto action2_0 = function->AddAction_("a2_0");
     A2(action2_0);
 
@@ -1371,7 +1371,7 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     auto action2 = function->AddAction_("a2");
     A3(action2);
 
-    // Form permissions verifications
+    // Table permissions verifications
     auto fpv = function->AddAction_("fpv");
     VerifyPermissionsDelete(function_data).A1(fpv);
 
@@ -1396,9 +1396,9 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error PPM2dLq5wk");
             return;
@@ -1436,14 +1436,14 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
             // Get file manager
             auto file_manager = self.get_file_manager();
             file_manager->set_directory_base(
-                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
             );
 
             // Request filepath
             auto action2_2 = self.AddAction_("a2_2");
             action2_2->set_sql_code(
                 "SELECT _structbx_column_" + id->ToString_() + " "
-                "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
                 "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
             );
             action2_2->AddParameter_("id", "", true)
@@ -1476,7 +1476,7 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
 
         // Action 2: Delete record from table
         action2->set_sql_code(
-            "DELETE FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + 
+            "DELETE FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + 
             " WHERE _structbx_column_" + column_id->ToString_() + " = ?"
         );
 
@@ -1490,11 +1490,11 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
 
         // ChangeInt
         auto id = action2->GetParameter("id");
-        auto form_identifier = self.GetParameter_("form-identifier");
-        if(form_identifier != self.get_parameters().end() && id != self.get_parameters().end())
+        auto table_identifier = self.GetParameter_("table-identifier");
+        if(table_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(id->get()->ToString_(), "delete", form_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "delete", table_identifier->get()->ToString_(), id_space);
         }
 
         // Send results
@@ -1504,16 +1504,16 @@ Forms::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     get_functions()->push_back(function);
 }
 
-void Forms::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT f.id, fc.id AS column_id " \
-        "FROM forms f " \
-        "JOIN forms_columns fc ON fc.id_form = f.id " \
+        "FROM tables f " \
+        "JOIN tables_columns fc ON fc.id_table = f.id " \
         "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -1524,8 +1524,8 @@ void Forms::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-identifier-table", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1538,18 +1538,18 @@ void Forms::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.*, fct.identifier AS column_type " \
-        "FROM forms_columns fc " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -1562,7 +1562,7 @@ void Forms::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("id_space", get_space_id(), false);
 }
 
-void Forms::Data::Delete::A3(StructBX::Functions::Action::Ptr action)
+void Tables::Data::Delete::A3(StructBX::Functions::Action::Ptr action)
 {
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -1576,7 +1576,7 @@ void Forms::Data::Delete::A3(StructBX::Functions::Action::Ptr action)
     });
 }
 
-bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
+bool Tables::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
 {
     if(param->get_value()->TypeIsIqual_(StructBX::Tools::DValue::Type::kEmpty))
     {
@@ -1628,7 +1628,7 @@ bool Forms::Data::ParameterVerification::Verify(Query::Parameter::Ptr param)
     return true;
 }
 
-void Forms::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr form_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3)
+void Tables::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr table_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3)
 {
     // Setp 1: Iterate over columns
     for(auto it : *results)
@@ -1657,7 +1657,7 @@ void Forms::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& s
             auto file_manager = self.get_file_manager();
             auto new_file_manager = std::make_shared<StructBX::Files::FileManager>();
             file_manager->set_directory_base(
-                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + form_id->ToString_()
+                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
             );
             new_file_manager->set_directory_base(file_manager->get_directory_base());
 
@@ -1707,7 +1707,7 @@ void Forms::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& s
                 auto action2_1 = StructBX::Functions::Action::Ptr(new StructBX::Functions::Action("a2_1"));
                 action2_1->set_sql_code(
                     "SELECT _structbx_column_" + id->ToString_() + " "
-                    "FROM _structbx_space_" + id_space + "._structbx_form_" + form_id->ToString_() + " " \
+                    "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
                     "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
                 );
                 action2_1->AddParameter_("id", "", true)
@@ -1805,7 +1805,7 @@ void Forms::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& s
     }
 }
 
-bool Forms::Data::FileProcessing::Save()
+bool Tables::Data::FileProcessing::Save()
 {
     filepath = "";
 
@@ -1837,7 +1837,7 @@ bool Forms::Data::FileProcessing::Save()
     return true; 
 }
 
-bool Forms::Data::FileProcessing::Delete()
+bool Tables::Data::FileProcessing::Delete()
 {
     // Verify logo exists and remove it
     Files::FileManager file_manager;
@@ -1855,18 +1855,18 @@ bool Forms::Data::FileProcessing::Delete()
     return true;
 }
 
-void Forms::Data::ChangeInt::Change(std::string row_id, std::string operation, std::string form_identifier, std::string space_id)
+void Tables::Data::ChangeInt::Change(std::string row_id, std::string operation, std::string table_identifier, std::string space_id)
 {
     // Action 1: Get Change int
     auto action1 = StructBX::Functions::Action("a1");
     action1.set_sql_code(
-        "INSERT INTO changes (row_id, operation, id_form) "
-        "VALUES (?, ?, (SELECT id FROM forms WHERE identifier = ? AND id_space = ?))"
+        "INSERT INTO changes (row_id, operation, id_table) "
+        "VALUES (?, ?, (SELECT id FROM tables WHERE identifier = ? AND id_space = ?))"
     );
 
     action1.AddParameter_("row_id", row_id, false);
     action1.AddParameter_("operation", operation, false);
-    action1.AddParameter_("form-identifier", form_identifier, false);
+    action1.AddParameter_("table-identifier", table_identifier, false);
     action1.AddParameter_("id_space", space_id, false);
 
     // Execute action
