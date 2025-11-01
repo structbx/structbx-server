@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_CONTROLLERS_SPACES_MAIN_H
-#define STRUCTBX_CONTROLLERS_SPACES_MAIN_H
+#ifndef STRUCTBX_CONTROLLERS_DATABASES_MAIN_H
+#define STRUCTBX_CONTROLLERS_DATABASES_MAIN_H
 
 #include "Poco/DirectoryIterator.h"
 
@@ -8,13 +8,13 @@
 #include "tools/base64_tool.h"
 
 #include "tools/base_action.h"
-#include "controllers/spaces/users.h"
+#include "controllers/databases/users.h"
 
 namespace StructBX
 {
     namespace Controllers
     {
-        namespace Spaces
+        namespace Databases
         {
             class Main;
         }
@@ -24,7 +24,7 @@ namespace StructBX
 using namespace StructBX;
 
 
-class StructBX::Controllers::Spaces::Main : public Tools::FunctionData
+class StructBX::Controllers::Databases::Main : public Tools::FunctionData
 {
     public:
         Main(Tools::FunctionData& function_data);
@@ -83,4 +83,4 @@ class StructBX::Controllers::Spaces::Main : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_SPACES_MAIN_H
+#endif //STRUCTBX_CONTROLLERS_DATABASES_MAIN_H

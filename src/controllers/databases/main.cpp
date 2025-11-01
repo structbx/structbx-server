@@ -1,7 +1,7 @@
 
-#include "controllers/spaces/main.h"
+#include "controllers/databases/main.h"
 
-using namespace StructBX::Controllers::Spaces;
+using namespace StructBX::Controllers::Databases;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
@@ -19,9 +19,9 @@ Main::Main(Tools::FunctionData& function_data) :
 Main::Read::Read(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/spaces/read
+    // Function GET /api/databases/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/read", HTTP::EnumMethods::kHTTP_GET);
     
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
@@ -29,8 +29,8 @@ Main::Read::Read(Tools::FunctionData& function_data) :
     A1(action);
 
     // Setup custom process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action->Work_())
@@ -52,7 +52,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
             action2.set_sql_code(
                 "SELECT ROUND(SUM((DATA_LENGTH + INDEX_LENGTH)) / 1024 / 1024, 2) AS 'size' " \
                 "FROM information_schema.TABLES " \
-                "WHERE TABLE_SCHEMA = '_structbx_space_" + id->ToString_() + "'"
+                "WHERE TABLE_SCHEMA = '_structbx_database_" + id->ToString_() + "'"
             );
             if(!action2.Work_())
             {
@@ -60,7 +60,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
                 return;
             }
 
-            // Size of space directory
+            // Size of database directory
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
             directory += "/" + id->ToString_();
             float directory_size = 0;
@@ -116,8 +116,8 @@ void Main::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.* " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "FROM `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "WHERE su.id_naf_user = ?"
     );
     action->AddParameter_("id_naf_user", get_id_user(), false);
@@ -126,17 +126,17 @@ void Main::Read::A1(StructBX::Functions::Action::Ptr action)
 Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/spaces/read/id
+    // Function GET /api/databases/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/read/id", HTTP::EnumMethods::kHTTP_GET);
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
     auto action = function->AddAction_("a1");
     A1(action);
 
-    auto space_id = get_space_id();
+    auto database_id = get_database_id();
     auto id_user = get_id_user();
-    function->SetupCustomProcess_([space_id, id_user, action](StructBX::Functions::Function& self)
+    function->SetupCustomProcess_([database_id, id_user, action](StructBX::Functions::Function& self)
     {
         // Get identifier
         auto identifier = self.GetParameter_("identifier");
@@ -145,8 +145,8 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
             action->get_parameters().clear();
             action->set_sql_code(
                 "SELECT s.* " \
-                "FROM spaces s " \
-                "JOIN spaces_users su ON su.id_space = s.id " \
+                "FROM `databases` s " \
+                "JOIN databases_users su ON su.id_database = s.id " \
                 "WHERE su.id_naf_user = ? AND s.identifier = ?"
             );
             action->AddParameter_("id_naf_user", id_user, false);
@@ -155,7 +155,7 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) :
             {
                 if(param->ToString_() == "")
                 {
-                    param->set_error("El identificador de espacio no puede estar vacío");
+                    param->set_error("El identificador de base de datos no puede estar vacío");
                     return false;
                 }
                 return true;
@@ -178,32 +178,32 @@ void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.* " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "FROM `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
     action->AddParameter_("id_naf_user", get_id_user(), false);
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Main::Add::Add(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/spaces/add
+    // Function GET /api/databases/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/add", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action1: Verify space if exists
+    // Action1: Verify database if exists
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action2: Add space
+    // Action2: Add database
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
-    // Action3: Add current user to the new space
+    // Action3: Add current user to the new database
     auto action3 = function->AddAction_("a3");
     A3(action3);
 
@@ -230,24 +230,24 @@ Main::Add::Add(Tools::FunctionData& function_data) :
             return;
         }
 
-        // Get space ID
-        auto space_id = action2->get_last_insert_id();
-        if(space_id == 0)
+        // Get database ID
+        auto database_id = action2->get_last_insert_id();
+        if(database_id == 0)
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error bq0fyWtqeP");
             return;
         }
 
         // Create database
-        action4->set_sql_code("CREATE DATABASE _structbx_space_" + std::to_string(space_id));
+        action4->set_sql_code("CREATE DATABASE _structbx_database_" + std::to_string(database_id));
         if(!action4->Work_())
         {
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la DB de espacio");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la DB de base de datos");
 
-            // Delete space from table
+            // Delete database from table
             StructBX::Functions::Action action5("a5");
-            action5.set_sql_code("DELETE FROM spaces WHERE id = ?");
-            action5.AddParameter_("id", std::to_string(space_id), false);
+            action5.set_sql_code("DELETE FROM `databases` WHERE id = ?");
+            action5.AddParameter_("id", std::to_string(database_id), false);
 
             return;
         }
@@ -256,7 +256,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         try
         {
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
-            directory += "/" + std::to_string(space_id);
+            directory += "/" + std::to_string(database_id);
             Poco::File file(directory);
             if(file.exists())
             {
@@ -265,7 +265,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
             }
             if(!file.createDirectory())
             {
-                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+                self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos de la base de datos");
                 return;
             }
 
@@ -274,14 +274,14 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/spaces/main.cpp on Add::Add(): " + e.displayText());
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/databases/main.cpp on Add::Add(): " + e.displayText());
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos de la base de datos");
             return;
         }
         catch(std::exception& e)
         {
             StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Add::Add(): " + std::string(e.what()));
-            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
+            self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos de la base de datos");
             return;
         }
     });
@@ -291,12 +291,12 @@ Main::Add::Add(Tools::FunctionData& function_data) :
 
 void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
+    action->set_sql_code("SELECT s.id FROM `databases` s WHERE s.identifier = ?");
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un espacio con este identificador ya existe");
+            self.set_custom_error("Una base de datos con este identificador ya existe");
             return false;
         }
 
@@ -308,7 +308,7 @@ void Main::Add::A1(StructBX::Functions::Action::Ptr action)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El identificador de espacio no puede estar vacío");
+            param->set_error("El identificador de base de datos no puede estar vacío");
             return false;
         }
         return true;
@@ -318,14 +318,14 @@ void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO spaces (identifier, name, description) VALUES (?, ?, ?)"
+        "INSERT INTO `databases` (identifier, name, description) VALUES (?, ?, ?)"
     );
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El identificador del espacio no puede estar vacío");
+            param->set_error("El identificador de la base de datos no puede estar vacío");
             return false;
         }
         if(param->ToString_().size() <= 3)
@@ -346,12 +346,12 @@ void Main::Add::A2(StructBX::Functions::Action::Ptr action)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El nombre del espacio no puede estar vacío");
+            param->set_error("El nombre de la base de datos no puede estar vacío");
             return false;
         }
         if(param->ToString_().size() <= 3)
         {
-            param->set_error("El nombre del espacio debe tener más de 3 caracteres");
+            param->set_error("El nombre de la base de datos debe tener más de 3 caracteres");
             return false;
         }
         return true;
@@ -362,8 +362,8 @@ void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO spaces_users (id_naf_user, id_space) " \
-        "SELECT ?, s.id FROM spaces s WHERE identifier = ?"
+        "INSERT INTO databases_users (id_naf_user, id_database) " \
+        "SELECT ?, s.id FROM `databases` s WHERE identifier = ?"
     );
     action->AddParameter_("id_naf_user", get_id_user(), false);
     action->AddParameter_("identifier", "", true);
@@ -372,9 +372,9 @@ void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 Main::Change::Change(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/spaces/change
+    // Function GET /api/databases/change
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/change", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/change", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
@@ -399,13 +399,13 @@ Main::Change::Change(Tools::FunctionData& function_data) :
         }
         auto result = action->get_json_result();
 
-        // Set Space ID Cookie to the client
+        // Set Database ID Cookie to the client
         auto field = action->get_results()->First_();
         if(!field->IsNull_())
         {
-            // Set Cookie Space ID
-            auto space_id_encoded = StructBX::Tools::Base64Tool().Encode_(field->ToString_());
-            Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
+            // Set Cookie Database ID
+            auto database_id_encoded = StructBX::Tools::Base64Tool().Encode_(field->ToString_());
+            Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("database_id_cookie_name", "1f3efd18688d2"), database_id_encoded);
             cookie.setPath("/");
             cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
             cookie.setSecure(true);
@@ -418,7 +418,7 @@ Main::Change::Change(Tools::FunctionData& function_data) :
             self.CompoundResponse_(HTTP::Status::kHTTP_OK, result);
         }
         else
-            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;n espacio.");
+            self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "El usuario no est&aacute; en alg&uacute;na base de datos.");
     });
 
     get_functions()->push_back(function);
@@ -428,17 +428,17 @@ void Main::Change::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id, s.name, s.state, s.logo, s.description, s.created_at " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "FROM `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
     action->AddParameter_("id_naf_user", get_id_user(), false);
-    action->AddParameter_("id_space", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
-    ->SetupCondition_("condition-id_space", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("id_database", StructBX::Tools::DValue::Ptr(new StructBX::Tools::DValue()), true)
+    ->SetupCondition_("condition-id_database", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El identificador de cambio de espacio no puede estar vacío");
+            param->set_error("El identificador de cambio de base de datos no puede estar vacío");
             return false;
         }
         return true;
@@ -448,19 +448,19 @@ void Main::Change::A1(StructBX::Functions::Action::Ptr action)
 Main::Modify::Modify(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function PUT /api/spaces/modify
+    // Function PUT /api/databases/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    // Action 1: Verify that current user is in the space
+    // Action 1: Verify that current user is in the database
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Verify space identifier
+    // Action 2: Verify database identifier
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
-    // Action 3: Modify space
+    // Action 3: Modify database
     auto action3 = function->AddAction_("a3");
     A3(action3);
 
@@ -471,15 +471,15 @@ void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "FROM `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "WHERE su.id_naf_user = ?"
     );
-    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-user-in-database", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
-            self.set_custom_error("El usuario actual no pertenece al espacio que intenta modificar");
+            self.set_custom_error("El usuario actual no pertenece a la base de datos que intenta modificar");
             return false;
         }
 
@@ -492,12 +492,12 @@ void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM spaces WHERE identifier = ? AND id != ?");
-    action->SetupCondition_("verify-space-identifier", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->set_sql_code("SELECT id FROM `databases` WHERE identifier = ? AND id != ?");
+    action->SetupCondition_("verify-database-identifier", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un espacio con este identificador ya existe");
+            self.set_custom_error("Una base de datos con este identificador ya existe");
             return false;
         }
 
@@ -530,8 +530,8 @@ void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "UPDATE `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "SET s.identifier = ?, s.name = ?, s.description = ? " \
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
@@ -599,19 +599,19 @@ void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 Main::Delete::Delete(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
 {
-    // Function GET /api/spaces/delete
+    // Function GET /api/databases/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/spaces/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/databases/delete", HTTP::EnumMethods::kHTTP_DEL);
 
-    // Action 1: Verify that current user is in the space
+    // Action 1: Verify that current user is in the database
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Mark space like "deleted"
+    // Action 2: Mark database like "deleted"
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
-    // Action 3: Delete users from space
+    // Action 3: Delete users from database
     auto action3 = function->AddAction_("a3");
     A3(action3);
 
@@ -622,15 +622,15 @@ void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT s.id " \
-        "FROM spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "FROM `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "WHERE su.id_naf_user = ?"
     );
-    action->SetupCondition_("verify-user-in-space", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-user-in-database", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
-            self.set_custom_error("El usuario actual no pertenece al espacio que intenta eliminar");
+            self.set_custom_error("El usuario actual no pertenece a la base de datos que intenta eliminar");
             return false;
         }
 
@@ -643,8 +643,8 @@ void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE spaces s " \
-        "JOIN spaces_users su ON su.id_space = s.id " \
+        "UPDATE `databases` s " \
+        "JOIN databases_users su ON su.id_database = s.id " \
         "SET s.state = 'DELETED' " \
         "WHERE su.id_naf_user = ? AND s.id = ?"
     );
@@ -655,7 +655,7 @@ void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El id de espacio no puede estar vacío");
+            param->set_error("El id de base de datos no puede estar vacío");
             return false;
         }
         return true;
@@ -664,14 +664,14 @@ void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 
 void Main::Delete::A3(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM spaces_users WHERE id_space = ?");
+    action->set_sql_code("DELETE FROM databases_users WHERE id_database = ?");
 
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
-            param->set_error("El id de espacio no puede estar vacío");
+            param->set_error("El id de base de datos no puede estar vacío");
             return false;
         }
         return true;
