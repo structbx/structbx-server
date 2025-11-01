@@ -86,7 +86,7 @@ Groups::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     auto action3 = function->AddAction_("a3");
 
     // Setup Custom Process
-    auto id_space = get_space_id();
+    auto id_database = get_database_id();
     function->SetupCustomProcess_([action1, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute actions
