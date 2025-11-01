@@ -1,7 +1,7 @@
 
-#include "controllers/forms/permissions.h"
+#include "controllers/tables/permissions.h"
 
-using namespace StructBX::Controllers::Forms;
+using namespace StructBX::Controllers::Tables;
 
 Permissions::Permissions(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
@@ -17,9 +17,9 @@ Permissions::Permissions(Tools::FunctionData& function_data) :
 
 Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/read
+    // Function GET /api/tables/permissions/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -30,14 +30,14 @@ Permissions::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDat
 void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "SELECT fp.*, nu.username AS username, f.name AS form_name " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "SELECT fp.*, nu.username AS username, f.name AS table_name " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "JOIN users nu ON nu.id = fp.id_naf_user "
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
 
-    action->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -52,9 +52,9 @@ void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
 
 Permissions::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/read/id
+    // Function GET /api/tables/permissions/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -65,9 +65,9 @@ Permissions::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : To
 void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "SELECT fp.*, nu.username AS username, f.name AS form_name " \
-        "FROM forms f " \
-        "JOIN forms_permissions fp ON fp.id_form = f.id " \
+        "SELECT fp.*, nu.username AS username, f.name AS table_name " \
+        "FROM tables f " \
+        "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "JOIN users nu ON nu.id = fp.id_naf_user "
         "WHERE fp.id = ? AND f.identifier = ? AND f.id_space = ?"
     );
@@ -82,7 +82,7 @@ void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
@@ -97,9 +97,9 @@ void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 
 Permissions::ReadUsersOut::ReadUsersOut(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/users/out/read
+    // Function GET /api/tables/permissions/users/out/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/users/out/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/users/out/read", HTTP::EnumMethods::kHTTP_GET);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -112,15 +112,15 @@ void Permissions::ReadUsersOut::A1(StructBX::Functions::Action::Ptr action)
     action->set_sql_code(
         "SELECT nu.id, nu.username "
         "FROM users nu "
-        "LEFT JOIN forms_permissions su ON "
+        "LEFT JOIN tables_permissions su ON "
             "su.id_naf_user = nu.id AND "
-            "su.id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            "su.id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
         "WHERE "
             "su.id_naf_user IS NULL "
     );
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -134,9 +134,9 @@ void Permissions::ReadUsersOut::A1(StructBX::Functions::Action::Ptr action)
 
 Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/add
+    // Function GET /api/tables/permissions/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/add", HTTP::EnumMethods::kHTTP_POST);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -147,11 +147,11 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
 void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_naf_user, id_form) "
+        "INSERT INTO tables_permissions (`read`, `add`, `modify`, `delete`, id_naf_user, id_table) "
         "SELECT "
             "?, ?, ?, ? "
             ",(SELECT id_naf_user FROM spaces_users WHERE id_naf_user = ? AND id_space = ?) "
-            ",(SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            ",(SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
     );
     action->AddParameter_("read", "", true)
     ->SetupCondition_("condition-read", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -200,8 +200,8 @@ void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
     action->AddParameter_("id_space", get_space_id(), false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
@@ -215,17 +215,17 @@ void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
 
 Permissions::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/modify
+    // Function GET /api/tables/permissions/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "UPDATE forms_permissions "
+        "UPDATE tables_permissions "
         "SET `read` = ?, `add` = ?, `modify` = ?, `delete` = ? "
         "WHERE "
             "id = ? "
-            "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
     );
     A1(action1);
     get_functions()->push_back(function);
@@ -279,8 +279,8 @@ void Permissions::Modify::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
@@ -294,14 +294,14 @@ void Permissions::Modify::A1(StructBX::Functions::Action::Ptr action)
 
 Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/permissions/delete
+    // Function GET /api/tables/permissions/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/permissions/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
-        "DELETE FROM forms_permissions " \
-        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
+        "DELETE FROM tables_permissions " \
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?)"
     );
     A1(action1);
 
@@ -320,7 +320,7 @@ void Permissions::Delete::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")

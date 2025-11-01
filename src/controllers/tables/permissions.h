@@ -1,18 +1,18 @@
 
-#ifndef STRUCTBX_CONTROLLERS_FORMS_PERMISSIONS_H
-#define STRUCTBX_CONTROLLERS_FORMS_PERMISSIONS_H
+#ifndef STRUCTBX_CONTROLLERS_TABLES_PERMISSIONS_H
+#define STRUCTBX_CONTROLLERS_TABLES_PERMISSIONS_H
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
 
-#include "controllers/forms/data.h"
-#include "controllers/forms/columns.h"
+#include "controllers/tables/data.h"
+#include "controllers/tables/columns.h"
 
 namespace StructBX
 {
     namespace Controllers
     {
-        namespace Forms
+        namespace Tables
         {
             class Permissions;
         }
@@ -21,7 +21,7 @@ namespace StructBX
 
 using namespace StructBX;
 
-class StructBX::Controllers::Forms::Permissions : public Tools::FunctionData
+class StructBX::Controllers::Tables::Permissions : public Tools::FunctionData
 {
     public:
         Permissions(Tools::FunctionData& function_data);
@@ -73,4 +73,4 @@ class StructBX::Controllers::Forms::Permissions : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_FORMS_PERMISSIONS_H
+#endif //STRUCTBX_CONTROLLERS_TABLES_PERMISSIONS_H
