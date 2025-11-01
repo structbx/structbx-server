@@ -1,20 +1,20 @@
 
-#ifndef STRUCTBX_CONTROLLERS_FORMS_MAIN_H
-#define STRUCTBX_CONTROLLERS_FORMS_MAIN_H
+#ifndef STRUCTBX_CONTROLLERS_TABLES_MAIN_H
+#define STRUCTBX_CONTROLLERS_TABLES_MAIN_H
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
 
-#include "controllers/forms/data.h"
-#include "controllers/forms/columns.h"
-#include "controllers/forms/permissions.h"
-#include "controllers/forms/views.h"
+#include "controllers/tables/data.h"
+#include "controllers/tables/columns.h"
+#include "controllers/tables/permissions.h"
+#include "controllers/tables/views.h"
 
 namespace StructBX
 {
     namespace Controllers
     {
-        namespace Forms
+        namespace Tables
         {
             class Main;
         }
@@ -24,7 +24,7 @@ namespace StructBX
 using namespace StructBX;
 
 
-class StructBX::Controllers::Forms::Main : public Tools::FunctionData
+class StructBX::Controllers::Tables::Main : public Tools::FunctionData
 {
     public:
         Main(Tools::FunctionData& function_data);
@@ -80,4 +80,4 @@ class StructBX::Controllers::Forms::Main : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_FORMS_MAIN_H
+#endif //STRUCTBX_CONTROLLERS_TABLES_MAIN_H

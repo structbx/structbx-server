@@ -1,7 +1,7 @@
 
-#include "controllers/forms/main.h"
+#include "controllers/tables/main.h"
 
-using namespace StructBX::Controllers::Forms;
+using namespace StructBX::Controllers::Tables;
 
 Main::Main(Tools::FunctionData& function_data) :
     Tools::FunctionData(function_data)
@@ -20,9 +20,9 @@ Main::Main(Tools::FunctionData& function_data) :
 
 Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/read
+    // Function GET /api/tables/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/read", HTTP::EnumMethods::kHTTP_GET);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
@@ -43,7 +43,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
         // Iterate over results
         for(auto row : *action1->get_results())
         {
-            // Get form id
+            // Get table id
             auto id = row->ExtractField_("id");
             if(id->IsNull_())
                 continue;
@@ -52,7 +52,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
             auto action2 = StructBX::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
-                "FROM _structbx_space_" + space_id + "._structbx_form_" + id.get()->ToString_());
+                "FROM _structbx_space_" + space_id + "._structbx_table_" + id.get()->ToString_());
             if(!action2.Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error JNt2Std2sh");
@@ -83,7 +83,7 @@ void Main::Read::A1(StructBX::Functions::Action::Ptr action)
     action->set_sql_code(
         "SELECT " \
             "f.* " \
-        "FROM forms f " \
+        "FROM tables f " \
         "WHERE " \
             "id_space = ? "
     );
@@ -92,18 +92,18 @@ void Main::Read::A1(StructBX::Functions::Action::Ptr action)
 
 Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/read/id
+    // Function GET /api/tables/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
 
     get_functions()->push_back(function);
 
-    // Function GET /api/forms/read/identifier
+    // Function GET /api/tables/read/identifier
     StructBX::Functions::Function::Ptr function2 = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/read/identifier", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/read/identifier", HTTP::EnumMethods::kHTTP_GET);
 
     auto action2 = function2->AddAction_("a2");
     A2(action2);
@@ -113,7 +113,7 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::Fu
 
 void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT * FROM forms WHERE id = ? AND id_space = ?");
+    action->set_sql_code("SELECT * FROM tables WHERE id = ? AND id_space = ?");
 
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -130,7 +130,7 @@ void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 
 void Main::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT * FROM forms WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT * FROM tables WHERE identifier = ? AND id_space = ?");
 
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -148,25 +148,25 @@ void Main::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
 
 Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function POST /api/forms/add
+    // Function POST /api/tables/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/add", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the form identifier don't exists in current space
+    // Action 1: Verify that the table identifier don't exists in current space
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Add the new form
+    // Action 2: Add the new table
     auto action2 = function->AddAction_("a2");
     A2(action2);
     
-    // Action 3: Add the ID Column to the form
+    // Action 3: Add the ID Column to the table
     auto action3 = function->AddAction_("a3");
     A3(action3);
 
-    // Action 3_1: Add form permissions to current user
+    // Action 3_1: Add table permissions to current user
     auto action3_1 = function->AddAction_("a3_1");
     A3_1(action3_1);
 
@@ -199,9 +199,9 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
             return;
         }
 
-        // Form ID
-        int form_id = action2->get_last_insert_id();
-        if(form_id == 0)
+        // Table ID
+        int table_id = action2->get_last_insert_id();
+        if(table_id == 0)
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error MVm2IlbSnm");
             return;
@@ -217,7 +217,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
 
         // Action 4: Create the table
         action4->set_sql_code(
-            "CREATE TABLE _structbx_space_" + space_id + "._structbx_form_" + std::to_string(form_id) + " " \
+            "CREATE TABLE _structbx_space_" + space_id + "._structbx_table_" + std::to_string(table_id) + " " \
             "(" \
                 "_structbx_column_" + std::to_string(column_id) + " INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
@@ -226,10 +226,10 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         {
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error " + action4->get_identifier() + ": No se pudo crear la tabla");
 
-            // Delete form from table
+            // Delete table from table
             StructBX::Functions::Action action5("a5");
-            action5.set_sql_code("DELETE FROM forms WHERE id = ?");
-            action5.AddParameter_("id", std::to_string(form_id), false);
+            action5.set_sql_code("DELETE FROM tables WHERE id = ?");
+            action5.AddParameter_("id", std::to_string(table_id), false);
 
             return;
         }
@@ -238,7 +238,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         try
         {
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
-            directory += "/" + space_id + "/" + std::to_string(form_id);
+            directory += "/" + space_id + "/" + std::to_string(table_id);
             Poco::File file(directory);
             if(file.exists())
             {
@@ -256,13 +256,13 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + e.displayText());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Add::Add(): " + e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + std::string(e.what()));
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Add::Add(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos del formulario");
             return;
         }
@@ -276,8 +276,8 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
 void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -304,7 +304,7 @@ void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 
 void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("INSERT INTO forms (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
+    action->set_sql_code("INSERT INTO tables (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
 
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -362,14 +362,14 @@ void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, length, required, id_column_type, id_form) " \
+        "INSERT INTO tables_columns (identifier, name, length, required, id_column_type, id_table) " \
         "SELECT " \
             "? " \
             ",? " \
             ",? " \
             ",? " \
-            ",(SELECT id FROM forms_columns_types WHERE identifier = 'int-number') " \
-            ",(SELECT id FROM forms WHERE identifier = ? and id_space = ?) "
+            ",(SELECT id FROM tables_columns_types WHERE identifier = 'int-number') " \
+            ",(SELECT id FROM tables WHERE identifier = ? and id_space = ?) "
     );
 
     action->AddParameter_("identifier", "id", false);
@@ -383,9 +383,9 @@ void Main::Add::A3(StructBX::Functions::Action::Ptr action)
 void Main::Add::A3_1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO forms_permissions (`read`, `add`, `modify`, `delete`, id_form, id_naf_user) " \
+        "INSERT INTO tables_permissions (`read`, `add`, `modify`, `delete`, id_table, id_naf_user) " \
         "SELECT 1, 1, 1, 1 " \
-            ",(SELECT id FROM forms WHERE identifier = ? and id_space = ?) " \
+            ",(SELECT id FROM tables WHERE identifier = ? and id_space = ?) " \
             ",? "
     );
 
@@ -396,19 +396,19 @@ void Main::Add::A3_1(StructBX::Functions::Action::Ptr action)
 
 Main::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function PUT /api/forms/modify
+    // Function PUT /api/tables/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/modify", HTTP::EnumMethods::kHTTP_PUT);
 
-    // Action 1: Verify forms existence
+    // Action 1: Verify tables existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Verify that the form identifier don't exists
+    // Action 2: Verify that the table identifier don't exists
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
-    // Action 3: Modify form
+    // Action 3: Modify table
     auto action3 = function->AddAction_("a3");
     A3(action3);
 
@@ -417,9 +417,9 @@ Main::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
 void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT identifier, id_space FROM forms WHERE id = ?");
+    action->set_sql_code("SELECT identifier, id_space FROM tables WHERE id = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -445,8 +445,8 @@ void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id != ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id != ? AND id_space = ?");
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
@@ -484,7 +484,7 @@ void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE forms " \
+        "UPDATE tables " \
         "SET identifier = ?, name = ?, state = ?, privacity = ?, description = ? " \
         "WHERE id = ? AND id_space = ?"
     );
@@ -556,17 +556,17 @@ void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
 
 Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function DEL /api/forms/delete
+    // Function DEL /api/tables/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/delete", HTTP::EnumMethods::kHTTP_DEL);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify forms existence
+    // Action 1: Verify tables existence
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Delete form from table
+    // Action 2: Delete table from table
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
@@ -591,14 +591,14 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
         // Action 3: Drop table
         auto action3 = self.AddAction_("a3");
-        action3->set_sql_code("DROP TABLE IF EXISTS _structbx_space_" + space_id + "._structbx_form_" + id->get()->ToString_());
+        action3->set_sql_code("DROP TABLE IF EXISTS _structbx_space_" + space_id + "._structbx_table_" + id->get()->ToString_());
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
             return;
         }
 
-        // Action 2: Delete form record
+        // Action 2: Delete table record
         self.IdentifyParameters_(action2);
         if(!action2->Work_())
         {
@@ -606,7 +606,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
             return;
         }
 
-        // Delete form directory
+        // Delete table directory
         try
         {
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
@@ -624,13 +624,13 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
         }
         catch(Poco::FileException& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Delete::Delete(): " + e.displayText());
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Delete::Delete(): " + e.displayText());
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Delete::Delete(): " + std::string(e.what()));
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Delete::Delete(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo borrar el directorio de archivos del formulario");
             return;
         }
@@ -643,9 +643,9 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
 void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT identifier FROM forms WHERE id = ?");
+    action->set_sql_code("SELECT identifier FROM tables WHERE id = ?");
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -670,7 +670,7 @@ void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 
 void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM forms WHERE id = ? AND id_space = ?");
+    action->set_sql_code("DELETE FROM tables WHERE id = ? AND id_space = ?");
     action->AddParameter_("id", "", true);
     action->AddParameter_("id_space", get_space_id(), false);
 }
