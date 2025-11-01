@@ -1,7 +1,7 @@
 
-#include "controllers/forms/columns.h"
+#include "controllers/tables/columns.h"
 
-using namespace StructBX::Controllers::Forms;
+using namespace StructBX::Controllers::Tables;
 
 Columns::Columns(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -17,9 +17,9 @@ Columns::Columns(Tools::FunctionData& function_data) :
 
 Columns::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/columns/read
+    // Function GET /api/tables/columns/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -31,12 +31,12 @@ void Columns::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS table_id " \
+            ",(SELECT identifier FROM tables WHERE id = fc.link_to) AS link_to_table " \
+            ",(SELECT name FROM tables WHERE id = fc.link_to) AS link_to_table_name " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
             "id_space = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
@@ -44,8 +44,8 @@ void Columns::Read::A1(StructBX::Functions::Action::Ptr action)
 
     action->AddParameter_("id_space", get_space_id(), false);
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -58,9 +58,9 @@ void Columns::Read::A1(StructBX::Functions::Action::Ptr action)
 
 Columns::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/columns/read/id
+    // Function GET /api/tables/columns/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -72,12 +72,12 @@ void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS form_id " \
-            ",(SELECT identifier FROM forms WHERE id = fc.link_to) AS link_to_form " \
-            ",(SELECT name FROM forms WHERE id = fc.link_to) AS link_to_form_name " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
-        "JOIN forms_columns_types fct ON fct.id = fc.id_column_type " \
+            "fc.*, fct.identifier AS column_type, fct.name AS column_type_name, f.id AS table_id " \
+            ",(SELECT identifier FROM tables WHERE id = fc.link_to) AS link_to_table " \
+            ",(SELECT name FROM tables WHERE id = fc.link_to) AS link_to_table_name " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
+        "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
             "fc.id = ? AND id_space = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
@@ -93,8 +93,8 @@ void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
     action->AddParameter_("id_space", get_space_id(), false);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -107,9 +107,9 @@ void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 
 Columns::ReadTypes::ReadTypes(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/columns/types/read
+    // Function GET /api/tables/columns/types/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/types/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -119,22 +119,22 @@ Columns::ReadTypes::ReadTypes(Tools::FunctionData& function_data) : Tools::Funct
 
 void Columns::ReadTypes::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT * FROM forms_columns_types ");
+    action->set_sql_code("SELECT * FROM tables_columns_types ");
 }
 
 Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function POST /api/forms/columns/add
+    // Function POST /api/tables/columns/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/add", HTTP::EnumMethods::kHTTP_POST);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the form exists
+    // Action 1: Verify that the table exists
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Verify that the columns don't exists in the form
+    // Action 2: Verify that the columns don't exists in the table
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
@@ -160,7 +160,7 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
         {
             // Delete space from table
             StructBX::Functions::Action action("action_delete_column");
-            action.set_sql_code("DELETE FROM forms_columns WHERE id = ?");
+            action.set_sql_code("DELETE FROM tables_columns WHERE id = ?");
             action.AddParameter_("id", column_id, false);
             action.Work_();
         };
@@ -182,9 +182,9 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error nh39HIiJkd");
             return;
@@ -208,12 +208,12 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
             return;
         }
         std::string space_db = "_structbx_space_" + space_id;
-        std::string form_table = "_structbx_form_" + form_id->ToString_();
+        std::string table_table = "_structbx_table_" + table_id->ToString_();
         std::string column = "_structbx_column_" + std::to_string(column_id);
 
         // Action 4: Add the column in the table
         action4->set_sql_code(
-            "ALTER TABLE " + space_db + "." + form_table + " " +
+            "ALTER TABLE " + space_db + "." + table_table + " " +
             "ADD " + column + " " + variables.column_type + variables.length + " " +
             variables.required + " " + variables.default_value
         );
@@ -230,11 +230,11 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
             // Get column id from link to
             action5->set_sql_code(
                 "SELECT fc.id " \
-                "FROM forms_columns fc " \
-                "JOIN forms f ON f.id = fc.id_form " \
+                "FROM tables_columns fc " \
+                "JOIN tables f ON f.id = fc.id_table " \
                 "WHERE f.id = ? AND f.id_space = ?"
             );
-            action5->AddParameter_("id_form", variables.link_to, false);
+            action5->AddParameter_("id_table", variables.link_to, false);
             action5->AddParameter_("id_space", space_id, false);
             if(!action5->Work_())
             {
@@ -251,10 +251,10 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
 
             // Create the foreign key
             action6->set_sql_code(
-                "ALTER TABLE " + space_db + "." + form_table + " " +
+                "ALTER TABLE " + space_db + "." + table_table + " " +
                 "ADD CONSTRAINT _IDX" + column + " " + 
                 "FOREIGN KEY (" + column + ") " +
-                "REFERENCES " + space_db + "._structbx_form_" + variables.link_to + 
+                "REFERENCES " + space_db + "._structbx_table_" + variables.link_to + 
                     "(_structbx_column_" + column_id_link->ToString_() + ") " + 
                     variables.cascade_key_condition
             );
@@ -274,8 +274,8 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
 void Columns::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -286,8 +286,8 @@ void Columns::Add::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -304,8 +304,8 @@ void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
     );
 
@@ -331,8 +331,8 @@ void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -347,14 +347,14 @@ void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
 void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO forms_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_form) " \
+        "INSERT INTO tables_columns (identifier, name, position, length, required, default_value, description, id_column_type, link_to, id_table) " \
         "SELECT " \
             "?, ? " \
             ",MAX(fc.position) + 1 " \
             ",?, ?, ?, ?, ?, ? " \
             ",f.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE f.identifier = ? AND f.id_space = ?"
     );
 
@@ -442,8 +442,8 @@ void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -457,17 +457,17 @@ void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
 
 Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function POST /api/forms/columns/modify
+    // Function POST /api/tables/columns/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/modify", HTTP::EnumMethods::kHTTP_PUT);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the form exists
+    // Action 1: Verify that the table exists
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
-    // Action 2: Verify that the columns don't exists in the form
+    // Action 2: Verify that the columns don't exists in the table
     auto action2 = function->AddAction_("a2");
     A2(action2);
 
@@ -491,9 +491,9 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
             return;
         }
 
-        // Get form ID
-        auto form_id = action1->get_results()->First_();
-        if(form_id->IsNull_())
+        // Get table ID
+        auto table_id = action1->get_results()->First_();
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error KOBE4bH6qL");
             return;
@@ -516,13 +516,13 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
             return;
         }
         std::string space_db = "_structbx_space_" + space_id;
-        std::string form_table = "_structbx_form_" + form_id->ToString_();
+        std::string table_table = "_structbx_table_" + table_id->ToString_();
         std::string column = "_structbx_column_" + column_id->get()->ToString_();
 
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE " + space_db + "." + form_table + " " +
+            "ALTER TABLE " + space_db + "." + table_table + " " +
             "CHANGE COLUMN `" + column + "` " + column + 
             " " + variables.column_type + variables.length + " " + variables.required +
             " " + variables.default_value
@@ -547,8 +547,8 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
 void Columns::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM forms WHERE identifier = ? AND id_space = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
         {
@@ -559,8 +559,8 @@ void Columns::Modify::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -577,8 +577,8 @@ void Columns::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT fc.identifier, fc.id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE fc.id != ? AND fc.identifier = ? AND f.identifier = ?"
     );
 
@@ -614,8 +614,8 @@ void Columns::Modify::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -629,10 +629,10 @@ void Columns::Modify::A2(StructBX::Functions::Action::Ptr action)
 void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "UPDATE forms_columns SET " \
+        "UPDATE tables_columns SET " \
             "identifier = ?, name = ?, length = ?, required = ? " \
             ",default_value = ?, description = ?, id_column_type = ?, link_to = ?, position = ? " \
-        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ? LIMIT 1)"
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ? LIMIT 1)"
     );
 
     action->AddParameter_("identifier", "", true)
@@ -738,8 +738,8 @@ void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -753,9 +753,9 @@ void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
 
 Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/columns/delete
+    // Function GET /api/tables/columns/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/columns/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/columns/delete", HTTP::EnumMethods::kHTTP_DEL);
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
@@ -785,9 +785,9 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
             return;
         }
 
-        // Get Form ID
-        auto form_id = action1->get_results()->front()->ExtractField_("form_id");
-        if(form_id->IsNull_())
+        // Get Table ID
+        auto table_id = action1->get_results()->front()->ExtractField_("table_id");
+        if(table_id->IsNull_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error UOEraAIHjM");
             return;
@@ -803,7 +803,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 
         // Action 2_0: Delete foreign key if exists
         action2_0->set_sql_code(
-            "ALTER TABLE _structbx_space_" + space_id + "._structbx_form_" + form_id->ToString_() + " " +
+            "ALTER TABLE _structbx_space_" + space_id + "._structbx_table_" + table_id->ToString_() + " " +
             "DROP FOREIGN KEY IF EXISTS _IDX_structbx_column_" + column_id->ToString_());
 
         // Execute actions
@@ -815,7 +815,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 
         // Action 2: Delete columns
         action2->set_sql_code(
-            "ALTER TABLE _structbx_space_" + space_id + "._structbx_form_" + form_id->ToString_() + " " +
+            "ALTER TABLE _structbx_space_" + space_id + "._structbx_table_" + table_id->ToString_() + " " +
             "DROP COLUMN IF EXISTS _structbx_column_" + column_id->ToString_());
 
         // Execute actions
@@ -840,13 +840,13 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 void Columns::Delete::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "SELECT fc.id AS column_id, f.id AS form_id " \
-        "FROM forms_columns fc " \
-        "JOIN forms f ON f.id = fc.id_form " \
+        "SELECT fc.id AS column_id, f.id AS table_id " \
+        "FROM tables_columns fc " \
+        "JOIN tables f ON f.id = fc.id_table " \
         "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
     );
     action->set_final(false);
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() != 1)
         {
@@ -868,8 +868,8 @@ void Columns::Delete::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-identifier-form", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-identifier-table", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -889,7 +889,7 @@ void Columns::Delete::A2(StructBX::Functions::Action::Ptr)
 
 void Columns::Delete::A3(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM forms_columns WHERE id = ?");
+    action->set_sql_code("DELETE FROM tables_columns WHERE id = ?");
 
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -929,10 +929,10 @@ bool Columns::ColumnSetup::Setup(StructBX::Functions::Function& self, ColumnVari
     auto required = self.GetParameter_("required");
     auto default_value = self.GetParameter_("default_value");
     auto id_column_type = self.GetParameter_("id_column_type");
-    auto form_identifier = self.GetParameter_("form-identifier");
+    auto table_identifier = self.GetParameter_("table-identifier");
     if(
         identifier == end || name == end || length == end || required == end ||
-        default_value == end || id_column_type == end || form_identifier == end
+        default_value == end || id_column_type == end || table_identifier == end
     )
         return false;
 

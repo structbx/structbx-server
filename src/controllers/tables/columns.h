@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_CONTROLLERS_FORMS_COLUMNS_H
-#define STRUCTBX_CONTROLLERS_FORMS_COLUMNS_H
+#ifndef STRUCTBX_CONTROLLERS_TABLES_COLUMNS_H
+#define STRUCTBX_CONTROLLERS_TABLES_COLUMNS_H
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
@@ -9,7 +9,7 @@ namespace StructBX
 {
     namespace Controllers
     {
-        namespace Forms
+        namespace Tables
         {
             class Columns;
         }
@@ -18,7 +18,7 @@ namespace StructBX
 
 using namespace StructBX;
 
-class StructBX::Controllers::Forms::Columns : public Tools::FunctionData
+class StructBX::Controllers::Tables::Columns : public Tools::FunctionData
 {
     public:
         struct ColumnVariables
@@ -100,4 +100,4 @@ class StructBX::Controllers::Forms::Columns : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_FORMS_COLUMNS_H
+#endif //STRUCTBX_CONTROLLERS_TABLES_COLUMNS_H
