@@ -28,8 +28,8 @@ set(
     ${PROJECT_SOURCE_DIR}/src/controllers/general/users.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/general/groups.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/general/permissions.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/spaces/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/spaces/users.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/databases/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/databases/users.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/tables/main.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/tables/data.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/tables/columns.cpp
