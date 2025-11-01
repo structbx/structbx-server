@@ -34,7 +34,7 @@ void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "JOIN users nu ON nu.id = fp.id_naf_user "
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
 
     action->AddParameter_("table-identifier", "", true)
@@ -47,7 +47,7 @@ void Permissions::Read::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Permissions::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -69,7 +69,7 @@ void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
         "JOIN users nu ON nu.id = fp.id_naf_user "
-        "WHERE fp.id = ? AND f.identifier = ? AND f.id_space = ?"
+        "WHERE fp.id = ? AND f.identifier = ? AND f.id_database = ?"
     );
 
     action->AddParameter_("id", "", true)
@@ -92,7 +92,7 @@ void Permissions::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Permissions::ReadUsersOut::ReadUsersOut(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -114,7 +114,7 @@ void Permissions::ReadUsersOut::A1(StructBX::Functions::Action::Ptr action)
         "FROM users nu "
         "LEFT JOIN tables_permissions su ON "
             "su.id_naf_user = nu.id AND "
-            "su.id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            "su.id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
         "WHERE "
             "su.id_naf_user IS NULL "
     );
@@ -129,7 +129,7 @@ void Permissions::ReadUsersOut::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("space_id", get_space_id(), false);
+    action->AddParameter_("database_id", get_database_id(), false);
 }
 
 Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -150,8 +150,8 @@ void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
         "INSERT INTO tables_permissions (`read`, `add`, `modify`, `delete`, id_naf_user, id_table) "
         "SELECT "
             "?, ?, ?, ? "
-            ",(SELECT id_naf_user FROM spaces_users WHERE id_naf_user = ? AND id_space = ?) "
-            ",(SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            ",(SELECT id_naf_user FROM databases_users WHERE id_naf_user = ? AND id_database = ?) "
+            ",(SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
     );
     action->AddParameter_("read", "", true)
     ->SetupCondition_("condition-read", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -199,7 +199,7 @@ void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -210,7 +210,7 @@ void Permissions::Add::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Permissions::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -225,7 +225,7 @@ Permissions::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functio
         "SET `read` = ?, `add` = ?, `modify` = ?, `delete` = ? "
         "WHERE "
             "id = ? "
-            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
     );
     A1(action1);
     get_functions()->push_back(function);
@@ -289,7 +289,7 @@ void Permissions::Modify::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -301,7 +301,7 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "DELETE FROM tables_permissions " \
-        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?)"
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?)"
     );
     A1(action1);
 
@@ -330,5 +330,5 @@ void Permissions::Delete::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
