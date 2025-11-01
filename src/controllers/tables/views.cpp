@@ -34,10 +34,10 @@ void Views::Read::A1(StructBX::Functions::Action::Ptr action)
         "FROM views v " \
         "JOIN tables f ON f.id = v.id_table " \
         "WHERE " \
-            "f.id_space = ? AND f.identifier = ? "
+            "f.id_database = ? AND f.identifier = ? "
     );
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
     action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -71,10 +71,10 @@ void Views::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         "FROM views v " \
         "JOIN tables f ON f.id = v.id_table " \
         "WHERE " \
-            "f.id_space = ? AND f.identifier = ? AND v.id = ?"
+            "f.id_database = ? AND f.identifier = ? AND v.id = ?"
     );
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
     action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -116,7 +116,7 @@ void Views::Add::A1(StructBX::Functions::Action::Ptr action)
         "INSERT INTO views (name, conditions, `order`, id_table) "
         "SELECT "
             "?, ?, ? "
-            ",(SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            ",(SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
     );
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -140,7 +140,7 @@ void Views::Add::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Views::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -155,7 +155,7 @@ Views::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(
         "SET name = ?, conditions = ?, `order` = ? "
         "WHERE "
             "id = ? "
-            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
     );
     A1(action1);
     get_functions()->push_back(function);
@@ -195,7 +195,7 @@ void Views::Modify::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Views::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -207,7 +207,7 @@ Views::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "DELETE FROM views " \
-        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?)"
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?)"
     );
     A1(action1);
 
@@ -236,5 +236,5 @@ void Views::Delete::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
