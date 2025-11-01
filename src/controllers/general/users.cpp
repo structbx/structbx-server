@@ -182,8 +182,8 @@ Users::ModifyCurrentPassword::ModifyCurrentPassword(Tools::FunctionData& functio
     A2(action2);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, action2](StructBX::Functions::Function& self)
     {
         auto new_password = self.GetParameter_("new_password");
         auto new_password2 = self.GetParameter_("new_password2");
