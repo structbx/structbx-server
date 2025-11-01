@@ -96,7 +96,7 @@ Permissions::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(
     A2(action2);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
+    auto id_database = get_database_id();
     function->SetupCustomProcess_([action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
@@ -189,7 +189,7 @@ Permissions::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functio
     A2(action2);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
+    auto id_database = get_database_id();
     function->SetupCustomProcess_([action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
