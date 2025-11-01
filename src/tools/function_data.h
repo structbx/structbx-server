@@ -29,20 +29,20 @@ class StructBX::Tools::FunctionData
 
         FunctionData() :
             id_user_(-1)
-            ,space_id_("")
+            ,database_id_("")
         {
             functions_ = std::make_shared<std::list<StructBX::Functions::Function::Ptr>>();
         }
         FunctionData(FunctionData& function_data) :
             id_user_(function_data.get_id_user())
-            ,space_id_(function_data.get_space_id())
+            ,database_id_(function_data.get_database_id())
             ,functions_(function_data.get_functions())
         {
             
         }
 
         int get_id_user(){ return id_user_; }
-        std::string get_space_id(){ return space_id_; }
+        std::string get_database_id(){ return database_id_; }
         FunctionsList& get_functions()
         {
             auto& var = functions_;
@@ -50,12 +50,12 @@ class StructBX::Tools::FunctionData
         }
 
         void set_id_user(int id_user){ id_user_ = id_user; }
-        void set_space_id(std::string space_id){ space_id_ = space_id; }
+        void set_database_id(std::string database_id){ database_id_ = database_id; }
         void set_functions(FunctionsList functions){ functions_ = functions; }
 
     private:
         int id_user_;
-        std::string space_id_;
+        std::string database_id_;
         FunctionsList functions_;
 };
 
