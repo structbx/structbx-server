@@ -30,8 +30,8 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
     A1(action1);
 
     // Setup custom process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -52,7 +52,7 @@ Main::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(funct
             auto action2 = StructBX::Functions::Action("a2");
             action2.set_sql_code(
                 "SELECT COUNT(1) AS total " \
-                "FROM _structbx_space_" + space_id + "._structbx_table_" + id.get()->ToString_());
+                "FROM _structbx_database_" + database_id + "._structbx_table_" + id.get()->ToString_());
             if(!action2.Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error JNt2Std2sh");
@@ -85,9 +85,9 @@ void Main::Read::A1(StructBX::Functions::Action::Ptr action)
             "f.* " \
         "FROM tables f " \
         "WHERE " \
-            "id_space = ? "
+            "id_database = ? "
     );
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -113,7 +113,7 @@ Main::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::Fu
 
 void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT * FROM tables WHERE id = ? AND id_space = ?");
+    action->set_sql_code("SELECT * FROM tables WHERE id = ? AND id_database = ?");
 
     action->AddParameter_("id", "", true)
     ->SetupCondition_("condition-id", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -125,12 +125,12 @@ void Main::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Main::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT * FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT * FROM tables WHERE identifier = ? AND id_database = ?");
 
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -142,7 +142,7 @@ void Main::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
 }
 
@@ -154,7 +154,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
 
     function->set_response_type(StructBX::Functions::Function::ResponseType::kCustom);
 
-    // Action 1: Verify that the table identifier don't exists in current space
+    // Action 1: Verify that the table identifier don't exists in current database
     auto action1 = function->AddAction_("a1");
     A1(action1);
 
@@ -174,8 +174,8 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
     auto action4 = function->AddAction_("a4");
     
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3, action3_1, action4](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1, action2, action3, action3_1, action4](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -217,7 +217,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
 
         // Action 4: Create the table
         action4->set_sql_code(
-            "CREATE TABLE _structbx_space_" + space_id + "._structbx_table_" + std::to_string(table_id) + " " \
+            "CREATE TABLE _structbx_database_" + database_id + "._structbx_table_" + std::to_string(table_id) + " " \
             "(" \
                 "_structbx_column_" + std::to_string(column_id) + " INT NOT NULL AUTO_INCREMENT PRIMARY KEY " \
             ")"
@@ -238,7 +238,7 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
         try
         {
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
-            directory += "/" + space_id + "/" + std::to_string(table_id);
+            directory += "/" + database_id + "/" + std::to_string(table_id);
             Poco::File file(directory);
             if(file.exists())
             {
@@ -276,12 +276,12 @@ Main::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functio
 void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_database = ?");
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un formulario con este identificador para este espacio ya existe");
+            self.set_custom_error("Un formulario con este identificador para esta base de datos ya existe");
             return false;
         }
 
@@ -299,12 +299,12 @@ void Main::Add::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Main::Add::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("INSERT INTO tables (identifier, name, state, privacity, description, id_space) VALUES (?, ?, ?, ?, ?, ?)");
+    action->set_sql_code("INSERT INTO tables (identifier, name, state, privacity, description, id_database) VALUES (?, ?, ?, ?, ?, ?)");
 
     action->AddParameter_("identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -356,7 +356,7 @@ void Main::Add::A2(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("state", "", true);
     action->AddParameter_("privacity", "", true);
     action->AddParameter_("description", "", true);
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Main::Add::A3(StructBX::Functions::Action::Ptr action)
@@ -369,7 +369,7 @@ void Main::Add::A3(StructBX::Functions::Action::Ptr action)
             ",? " \
             ",? " \
             ",(SELECT id FROM tables_columns_types WHERE identifier = 'int-number') " \
-            ",(SELECT id FROM tables WHERE identifier = ? and id_space = ?) "
+            ",(SELECT id FROM tables WHERE identifier = ? and id_database = ?) "
     );
 
     action->AddParameter_("identifier", "id", false);
@@ -377,7 +377,7 @@ void Main::Add::A3(StructBX::Functions::Action::Ptr action)
     action->AddParameter_("length", "11", false);
     action->AddParameter_("required", 1, false);
     action->AddParameter_("identifier", "", true);
-    action->AddParameter_("space_id", get_space_id(), false);
+    action->AddParameter_("database_id", get_database_id(), false);
 }
 
 void Main::Add::A3_1(StructBX::Functions::Action::Ptr action)
@@ -385,12 +385,12 @@ void Main::Add::A3_1(StructBX::Functions::Action::Ptr action)
     action->set_sql_code(
         "INSERT INTO tables_permissions (`read`, `add`, `modify`, `delete`, id_table, id_naf_user) " \
         "SELECT 1, 1, 1, 1 " \
-            ",(SELECT id FROM tables WHERE identifier = ? and id_space = ?) " \
+            ",(SELECT id FROM tables WHERE identifier = ? and id_database = ?) " \
             ",? "
     );
 
     action->AddParameter_("identifier", "", true);
-    action->AddParameter_("space_id", get_space_id(), false);
+    action->AddParameter_("database_id", get_database_id(), false);
     action->AddParameter_("user_id", get_id_user(), false);
 }
 
@@ -417,7 +417,7 @@ Main::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
 void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT identifier, id_space FROM tables WHERE id = ?");
+    action->set_sql_code("SELECT identifier, id_database FROM tables WHERE id = ?");
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
@@ -445,12 +445,12 @@ void Main::Modify::A1(StructBX::Functions::Action::Ptr action)
 void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id != ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id != ? AND id_database = ?");
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
-            self.set_custom_error("Un formulario con este identificador en este espacio ya existe");
+            self.set_custom_error("Un formulario con este identificador en esta base de datos ya existe");
             return false;
         }
 
@@ -478,7 +478,7 @@ void Main::Modify::A2(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("space_id", get_space_id(), false);
+    action->AddParameter_("database_id", get_database_id(), false);
 }
 
 void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
@@ -486,7 +486,7 @@ void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
     action->set_sql_code(
         "UPDATE tables " \
         "SET identifier = ?, name = ?, state = ?, privacity = ?, description = ? " \
-        "WHERE id = ? AND id_space = ?"
+        "WHERE id = ? AND id_database = ?"
     );
 
     // Parameters and conditions
@@ -550,7 +550,7 @@ void Main::Modify::A3(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
 }
 
@@ -571,8 +571,8 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
     A2(action2);
 
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1, action2](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -591,7 +591,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
 
         // Action 3: Drop table
         auto action3 = self.AddAction_("a3");
-        action3->set_sql_code("DROP TABLE IF EXISTS _structbx_space_" + space_id + "._structbx_table_" + id->get()->ToString_());
+        action3->set_sql_code("DROP TABLE IF EXISTS _structbx_database_" + database_id + "._structbx_table_" + id->get()->ToString_());
         if(!action3->Work_())
         {
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error lOuU13kOu6, asegúrese que no hayan enlaces creados hacia su formulario");
@@ -610,7 +610,7 @@ Main::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(f
         try
         {
             auto directory = StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded");
-            directory += "/" + space_id + "/" + id->get()->ToString_();
+            directory += "/" + database_id + "/" + id->get()->ToString_();
             Poco::File file(directory);
             if(file.exists())
             {
@@ -670,7 +670,7 @@ void Main::Delete::A1(StructBX::Functions::Action::Ptr action)
 
 void Main::Delete::A2(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("DELETE FROM tables WHERE id = ? AND id_space = ?");
+    action->set_sql_code("DELETE FROM tables WHERE id = ? AND id_database = ?");
     action->AddParameter_("id", "", true);
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
