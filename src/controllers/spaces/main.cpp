@@ -42,7 +42,7 @@ Main::Read::Read(Tools::FunctionData& function_data) :
         // Iterate over results
         for(auto row : *action->get_results())
         {
-            // Get form id
+            // Get table id
             auto id = row->ExtractField_("id");
             if(id->IsNull_())
                 continue;
@@ -280,7 +280,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
         }
         catch(std::exception& e)
         {
-            StructBX::Tools::OutputLogger::Debug_("Error on controllers/forms/main.cpp on Add::Add(): " + std::string(e.what()));
+            StructBX::Tools::OutputLogger::Debug_("Error on controllers/tables/main.cpp on Add::Add(): " + std::string(e.what()));
             self.JSONResponse_(HTTP::Status::kHTTP_INTERNAL_SERVER_ERROR, "Error: No se pudo crear el directorio de archivos espacio");
             return;
         }
@@ -292,7 +292,7 @@ Main::Add::Add(Tools::FunctionData& function_data) :
 void Main::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code("SELECT s.id FROM spaces s WHERE s.identifier = ?");
-    action->SetupCondition_("verify-form-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
+    action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() > 0)
         {
