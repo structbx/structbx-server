@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_CONTROLLERS_SPACES_USERS_H
-#define STRUCTBX_CONTROLLERS_SPACES_USERS_H
+#ifndef STRUCTBX_CONTROLLERS_DATABASES_USERS_H
+#define STRUCTBX_CONTROLLERS_DATABASES_USERS_H
 
 
 #include "tools/base_action.h"
@@ -10,7 +10,7 @@ namespace StructBX
 {
     namespace Controllers
     {
-        namespace Spaces
+        namespace Databases
         {
             class Users;
         }
@@ -19,7 +19,7 @@ namespace StructBX
 
 using namespace StructBX;
 
-class StructBX::Controllers::Spaces::Users : public Tools::FunctionData
+class StructBX::Controllers::Databases::Users : public Tools::FunctionData
 {
     public:
         Users(Tools::FunctionData& function_data);
@@ -33,9 +33,9 @@ class StructBX::Controllers::Spaces::Users : public Tools::FunctionData
         {
             ReadCurrent(Tools::FunctionData& function_data);
         };
-        struct ReadUserOutSpace : public Tools::FunctionData
+        struct ReadUserOutDatabase : public Tools::FunctionData
         {
-            ReadUserOutSpace(Tools::FunctionData& function_data);
+            ReadUserOutDatabase(Tools::FunctionData& function_data);
         };
         struct Add : public Tools::FunctionData
         {
@@ -49,9 +49,9 @@ class StructBX::Controllers::Spaces::Users : public Tools::FunctionData
     private:
         Read struct_read_;
         ReadCurrent struct_read_current_;
-        ReadUserOutSpace struct_read_user_out_space_;
+        ReadUserOutDatabase struct_read_user_out_database_;
         Add struct_add_;
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_SPACES_USERS_H
+#endif //STRUCTBX_CONTROLLERS_DATABASES_USERS_H
