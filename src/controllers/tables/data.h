@@ -34,18 +34,18 @@ class StructBX::Controllers::Tables::Data : public Tools::FunctionData
         {
             enum class Type {kAdd, kModify};
 
-            ParameterConfiguration(Type type, std::string& columns, std::string& values, std::string id_space) :
+            ParameterConfiguration(Type type, std::string& columns, std::string& values, std::string id_database) :
                 type(type)
                 ,columns(columns)
                 ,values(values)
-                ,id_space(id_space)
+                ,id_database(id_database)
             {}
             void Setup(StructBX::Functions::Function& self, StructBX::Query::Results::Ptr results, StructBX::Query::Field::Ptr table_id, StructBX::Query::Field::Ptr column_id, StructBX::Functions::Action::Ptr action3);
 
             Type type;
             std::string& columns;
             std::string& values;
-            std::string id_space;
+            std::string id_database;
         };
         struct FileProcessing
         {
@@ -81,7 +81,7 @@ class StructBX::Controllers::Tables::Data : public Tools::FunctionData
         };
         struct ChangeInt
         {
-            void Change(std::string row_id, std::string operation, std::string table_identifier, std::string space_id);
+            void Change(std::string row_id, std::string operation, std::string table_identifier, std::string database_id);
         };
 
         struct VerifyPermissionsRead : public Tools::FunctionData

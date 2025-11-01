@@ -32,7 +32,7 @@ void Tables::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr ac
         "SELECT f.id " \
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fp.read = 1 AND fp.id_naf_user = ?"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fp.read = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
     {
@@ -55,7 +55,7 @@ void Tables::Data::VerifyPermissionsRead::A1(StructBX::Functions::Action::Ptr ac
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
@@ -70,7 +70,7 @@ void Tables::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr act
         "SELECT f.id " \
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fp.add = 1 AND fp.id_naf_user = ?"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fp.add = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
     {
@@ -93,7 +93,7 @@ void Tables::Data::VerifyPermissionsAdd::A1(StructBX::Functions::Action::Ptr act
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
@@ -108,7 +108,7 @@ void Tables::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr 
         "SELECT f.id " \
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fp.modify = 1 AND fp.id_naf_user = ?"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fp.modify = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
     {
@@ -131,7 +131,7 @@ void Tables::Data::VerifyPermissionsModify::A1(StructBX::Functions::Action::Ptr 
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
@@ -146,7 +146,7 @@ void Tables::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr 
         "SELECT f.id " \
         "FROM tables f " \
         "JOIN tables_permissions fp ON fp.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fp.delete = 1 AND fp.id_naf_user = ?"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fp.delete = 1 AND fp.id_naf_user = ?"
     );
     action->SetupCondition_("verify-permissions", Query::ConditionType::kError, [](StructBX::Functions::Action& action)
     {
@@ -169,7 +169,7 @@ void Tables::Data::VerifyPermissionsDelete::A1(StructBX::Functions::Action::Ptr 
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("id_user", get_id_user(), false);
 }
 
@@ -195,8 +195,8 @@ Tables::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDa
     struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1_0, action1, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1_0, action1, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1_0->Work_())
@@ -272,7 +272,7 @@ Tables::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDa
                 column = "_" + link_to->ToString_() + "._structbx_column_" + column2_visualization->ToString_() + " AS '" + name->ToString_() + "'";
 
                 // Setup new join
-                joins += " LEFT JOIN _structbx_space_" + id_space + "._structbx_table_" + link_to->ToString_() +
+                joins += " LEFT JOIN _structbx_database_" + id_database + "._structbx_table_" + link_to->ToString_() +
                 " AS _" + link_to->ToString_() + " ON _" + link_to->ToString_() + "._structbx_column_" + column2_id->ToString_() + 
                 " = _" + table_id->ToString_() + "._structbx_column_" + id->ToString_();
             }
@@ -351,7 +351,7 @@ Tables::Data::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionDa
         auto action2 = self.AddAction_("a2");
         std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + 
+            "FROM _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + 
                 " AS _" + table_id->ToString_()
         ;
 
@@ -463,7 +463,7 @@ void Tables::Data::Read::A1(StructBX::Functions::Action::Ptr action)
         "SELECT f.id, fc.id AS column_id " \
         "FROM tables f " \
         "JOIN tables_columns fc ON fc.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -477,7 +477,7 @@ void Tables::Data::Read::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::Read::A2(StructBX::Functions::Action::Ptr action)
@@ -490,7 +490,7 @@ void Tables::Data::Read::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "WHERE f.identifier = ? AND f.id_database = ? " \
         "ORDER BY fc.position ASC"
     );
     action->set_final(false);
@@ -505,7 +505,7 @@ void Tables::Data::Read::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::ReadChangeInt::ReadChangeInt(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -528,7 +528,7 @@ void Tables::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
         "FROM changes "
         "WHERE "
             "id > ? "
-            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ?) "
     );
 
     action->AddParameter_("changeInt", "", true)
@@ -551,7 +551,7 @@ void Tables::Data::ReadChangeInt::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -580,8 +580,8 @@ Tables::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : T
     struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1_0,action1, action2, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1_0,action1, action2, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1_0->Work_())
@@ -641,7 +641,7 @@ Tables::Data::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : T
         // SQL Code
         std::string sql_code = 
             "SELECT " + columns + " " \
-            "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+            "FROM _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
             "WHERE _structbx_column_" + column_id->ToString_() + " = ?";
 
         // Get conditions
@@ -697,7 +697,7 @@ void Tables::Data::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         "SELECT f.id, fc.id AS column_id " \
         "FROM tables f " \
         "JOIN tables_columns fc ON fc.id_table = f.id " \
-        "WHERE f.identifier = ? AND f.id_space = ? AND fc.identifier = 'id'"
+        "WHERE f.identifier = ? AND f.id_database = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -711,7 +711,7 @@ void Tables::Data::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
@@ -724,7 +724,7 @@ void Tables::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ? " \
+        "WHERE f.identifier = ? AND f.id_database = ? " \
         "ORDER BY fc.position ASC"
     );
     action->set_final(false);
@@ -739,7 +739,7 @@ void Tables::Data::ReadSpecific::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::ReadSpecific::A3(StructBX::Functions::Action::Ptr action)
@@ -774,8 +774,8 @@ Tables::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::Fu
     struct_verify_permissions_read.A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -808,7 +808,7 @@ Tables::Data::ReadFile::ReadFile(Tools::FunctionData& function_data) : Tools::Fu
         // Setup file manager
         self.get_file_manager()->AddBasicSupportedFiles_();
         self.get_file_manager()->set_directory_base(
-            StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
+            StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_database) + "/" + table_id->ToString_()
         );
 
         // Download process
@@ -824,7 +824,7 @@ void Tables::Data::ReadFile::A1(StructBX::Functions::Action::Ptr action)
     action->set_sql_code(
         "SELECT f.id " \
         "FROM tables f " \
-        "WHERE f.identifier = ? AND f.id_space = ? "
+        "WHERE f.identifier = ? AND f.id_database = ? "
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -838,7 +838,7 @@ void Tables::Data::ReadFile::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -865,8 +865,8 @@ Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData
     VerifyPermissionsAdd(function_data).A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, action2, action3, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -896,7 +896,7 @@ Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData
         // Configure parameters
         std::string columns = "";
         std::string values = "";
-        ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_space);
+        ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_database);
         pc.Setup(self, action2->get_results(), table_id, nullptr, action3);
 
         // Verify that columns is not empty
@@ -908,7 +908,7 @@ Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "INSERT INTO _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+            "INSERT INTO _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
             "(" + columns + ") VALUES (" + values + ") ");
 
         // Execute action 3
@@ -925,7 +925,7 @@ Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData
         if(table_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(row_id, "insert",table_identifier->get()->ToString_(), id_space);
+            changeInt.Change(row_id, "insert",table_identifier->get()->ToString_(), id_database);
         }
 
         // Send results
@@ -937,7 +937,7 @@ Tables::Data::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData
 
 void Tables::Data::Add::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_database = ?");
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
@@ -960,7 +960,7 @@ void Tables::Data::Add::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
 }
 
@@ -971,7 +971,7 @@ void Tables::Data::Add::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -985,7 +985,7 @@ void Tables::Data::Add::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -1009,8 +1009,8 @@ Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functi
     VerifyPermissionsAdd(function_data).A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, action2, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -1048,7 +1048,7 @@ Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functi
             // Configure parameters
             std::string columns = "";
             std::string values = "";
-            ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_space);
+            ParameterConfiguration pc(ParameterConfiguration::Type::kAdd, columns, values, id_database);
 
             // Setup parameters
             pc.Setup(self, action2->get_results(), table_id, nullptr, action3);
@@ -1062,7 +1062,7 @@ Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functi
 
             // Set SQL Code to action 3
             action3->set_sql_code(
-                "INSERT INTO _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+                "INSERT INTO _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
                 "(" + columns + ") VALUES (" + values + ") ");
 
             // Get Parameter object
@@ -1109,7 +1109,7 @@ Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functi
         if(table_identifier != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change("", "import", table_identifier->get()->ToString_(), id_space);
+            changeInt.Change("", "import", table_identifier->get()->ToString_(), id_database);
         }
 
         // Send results
@@ -1128,7 +1128,7 @@ Tables::Data::Import::Import(Tools::FunctionData& function_data) : Tools::Functi
 
 void Tables::Data::Import::A1(StructBX::Functions::Action::Ptr action)
 {
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_database = ?");
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
@@ -1151,7 +1151,7 @@ void Tables::Data::Import::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
 }
 
@@ -1162,7 +1162,7 @@ void Tables::Data::Import::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -1176,7 +1176,7 @@ void Tables::Data::Import::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -1203,8 +1203,8 @@ Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functi
     VerifyPermissionsModify(function_data).A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2, action3, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, action2, action3, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -1242,7 +1242,7 @@ Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functi
         // Configure parameters
         std::string columns = "";
         std::string values = "";
-        ParameterConfiguration pc(ParameterConfiguration::Type::kModify, columns, values, id_space);
+        ParameterConfiguration pc(ParameterConfiguration::Type::kModify, columns, values, id_database);
         pc.Setup(self, action2->get_results(), table_id, column_id, action3);
 
         // Verify that columns is not empty
@@ -1266,7 +1266,7 @@ Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functi
 
         // Set SQL Code to action 3
         action3->set_sql_code(
-            "UPDATE _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+            "UPDATE _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
             "SET " + columns + " WHERE _structbx_column_" + column_id->ToString_() + " = ?");
 
         // Execute action 3
@@ -1283,7 +1283,7 @@ Tables::Data::Modify::Modify(Tools::FunctionData& function_data) : Tools::Functi
         if(table_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(id->get()->ToString_(), "update", table_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "update", table_identifier->get()->ToString_(), id_database);
         }
 
         // Send results
@@ -1299,7 +1299,7 @@ void Tables::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
         "SELECT f.id, fc.id AS column_id " \
         "FROM tables f " \
         "JOIN tables_columns fc ON fc.id_table = f.id " \
-        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+        "WHERE f.identifier = ? AND id_database = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
@@ -1324,7 +1324,7 @@ void Tables::Data::Modify::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
@@ -1334,7 +1334,7 @@ void Tables::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -1348,7 +1348,7 @@ void Tables::Data::Modify::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -1376,8 +1376,8 @@ Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functi
     VerifyPermissionsDelete(function_data).A1(fpv);
 
     // Setup Custom Process
-    auto id_space = get_space_id();
-    function->SetupCustomProcess_([id_space, action1, action2_0, action2, fpv](StructBX::Functions::Function& self)
+    auto id_database = get_database_id();
+    function->SetupCustomProcess_([id_database, action1, action2_0, action2, fpv](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -1436,14 +1436,14 @@ Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functi
             // Get file manager
             auto file_manager = self.get_file_manager();
             file_manager->set_directory_base(
-                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
+                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_database) + "/" + table_id->ToString_()
             );
 
             // Request filepath
             auto action2_2 = self.AddAction_("a2_2");
             action2_2->set_sql_code(
                 "SELECT _structbx_column_" + id->ToString_() + " "
-                "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+                "FROM _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
                 "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
             );
             action2_2->AddParameter_("id", "", true)
@@ -1476,7 +1476,7 @@ Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functi
 
         // Action 2: Delete record from table
         action2->set_sql_code(
-            "DELETE FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + 
+            "DELETE FROM _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + 
             " WHERE _structbx_column_" + column_id->ToString_() + " = ?"
         );
 
@@ -1494,7 +1494,7 @@ Tables::Data::Delete::Delete(Tools::FunctionData& function_data) : Tools::Functi
         if(table_identifier != self.get_parameters().end() && id != self.get_parameters().end())
         {
             auto changeInt = ChangeInt();
-            changeInt.Change(id->get()->ToString_(), "delete", table_identifier->get()->ToString_(), id_space);
+            changeInt.Change(id->get()->ToString_(), "delete", table_identifier->get()->ToString_(), id_database);
         }
 
         // Send results
@@ -1510,7 +1510,7 @@ void Tables::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
         "SELECT f.id, fc.id AS column_id " \
         "FROM tables f " \
         "JOIN tables_columns fc ON fc.id_table = f.id " \
-        "WHERE f.identifier = ? AND id_space = ? AND fc.identifier = 'id'"
+        "WHERE f.identifier = ? AND id_database = ? AND fc.identifier = 'id'"
     );
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
@@ -1535,7 +1535,7 @@ void Tables::Data::Delete::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
@@ -1545,7 +1545,7 @@ void Tables::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
         "FROM tables_columns fc " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
     action->set_final(false);
     action->AddParameter_("table-identifier", "", true)
@@ -1559,7 +1559,7 @@ void Tables::Data::Delete::A2(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Tables::Data::Delete::A3(StructBX::Functions::Action::Ptr action)
@@ -1657,7 +1657,7 @@ void Tables::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& 
             auto file_manager = self.get_file_manager();
             auto new_file_manager = std::make_shared<StructBX::Files::FileManager>();
             file_manager->set_directory_base(
-                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_space) + "/" + table_id->ToString_()
+                StructBX::Tools::SettingsManager::GetSetting_("directory_for_uploaded_files", "/var/www/structbx-web-uploaded") + "/" + std::string(id_database) + "/" + table_id->ToString_()
             );
             new_file_manager->set_directory_base(file_manager->get_directory_base());
 
@@ -1707,7 +1707,7 @@ void Tables::Data::ParameterConfiguration::Setup(StructBX::Functions::Function& 
                 auto action2_1 = StructBX::Functions::Action::Ptr(new StructBX::Functions::Action("a2_1"));
                 action2_1->set_sql_code(
                     "SELECT _structbx_column_" + id->ToString_() + " "
-                    "FROM _structbx_space_" + id_space + "._structbx_table_" + table_id->ToString_() + " " \
+                    "FROM _structbx_database_" + id_database + "._structbx_table_" + table_id->ToString_() + " " \
                     "WHERE _structbx_column_" + column_id->ToString_() + " = ?"
                 );
                 action2_1->AddParameter_("id", "", true)
@@ -1855,19 +1855,19 @@ bool Tables::Data::FileProcessing::Delete()
     return true;
 }
 
-void Tables::Data::ChangeInt::Change(std::string row_id, std::string operation, std::string table_identifier, std::string space_id)
+void Tables::Data::ChangeInt::Change(std::string row_id, std::string operation, std::string table_identifier, std::string database_id)
 {
     // Action 1: Get Change int
     auto action1 = StructBX::Functions::Action("a1");
     action1.set_sql_code(
         "INSERT INTO changes (row_id, operation, id_table) "
-        "VALUES (?, ?, (SELECT id FROM tables WHERE identifier = ? AND id_space = ?))"
+        "VALUES (?, ?, (SELECT id FROM tables WHERE identifier = ? AND id_database = ?))"
     );
 
     action1.AddParameter_("row_id", row_id, false);
     action1.AddParameter_("operation", operation, false);
     action1.AddParameter_("table-identifier", table_identifier, false);
-    action1.AddParameter_("id_space", space_id, false);
+    action1.AddParameter_("id_database", database_id, false);
 
     // Execute action
     action1.Work_();
