@@ -38,11 +38,11 @@ void Columns::Read::A1(StructBX::Functions::Action::Ptr action)
         "JOIN tables f ON f.id = fc.id_table " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
-            "id_space = ? AND f.identifier = ? " \
+            "id_database = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
     );
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 
     action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -79,7 +79,7 @@ void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         "JOIN tables f ON f.id = fc.id_table " \
         "JOIN tables_columns_types fct ON fct.id = fc.id_column_type " \
         "WHERE " \
-            "fc.id = ? AND id_space = ? AND f.identifier = ? " \
+            "fc.id = ? AND id_database = ? AND f.identifier = ? " \
         "ORDER BY fc.position ASC"
     );
     action->AddParameter_("id", "", true)
@@ -92,7 +92,7 @@ void Columns::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
     action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
@@ -152,13 +152,13 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
     auto action6 = function->AddAction_("a6");
 
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3, action4, action5, action6](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1, action2, action3, action4, action5, action6](StructBX::Functions::Function& self)
     {
         // If error, delete the column from the table
         auto delete_column_table = [](int column_id)
         {
-            // Delete space from table
+            // Delete database from table
             StructBX::Functions::Action action("action_delete_column");
             action.set_sql_code("DELETE FROM tables_columns WHERE id = ?");
             action.AddParameter_("id", column_id, false);
@@ -207,13 +207,13 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error e4GBhN1lxk");
             return;
         }
-        std::string space_db = "_structbx_space_" + space_id;
+        std::string database_db = "_structbx_database_" + database_id;
         std::string table_table = "_structbx_table_" + table_id->ToString_();
         std::string column = "_structbx_column_" + std::to_string(column_id);
 
         // Action 4: Add the column in the table
         action4->set_sql_code(
-            "ALTER TABLE " + space_db + "." + table_table + " " +
+            "ALTER TABLE " + database_db + "." + table_table + " " +
             "ADD " + column + " " + variables.column_type + variables.length + " " +
             variables.required + " " + variables.default_value
         );
@@ -232,10 +232,10 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
                 "SELECT fc.id " \
                 "FROM tables_columns fc " \
                 "JOIN tables f ON f.id = fc.id_table " \
-                "WHERE f.id = ? AND f.id_space = ?"
+                "WHERE f.id = ? AND f.id_database = ?"
             );
             action5->AddParameter_("id_table", variables.link_to, false);
-            action5->AddParameter_("id_space", space_id, false);
+            action5->AddParameter_("id_database", database_id, false);
             if(!action5->Work_())
             {
                 self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error " + action5->get_identifier() + ": No se pudo crear la llave foránea");
@@ -251,10 +251,10 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
 
             // Create the foreign key
             action6->set_sql_code(
-                "ALTER TABLE " + space_db + "." + table_table + " " +
+                "ALTER TABLE " + database_db + "." + table_table + " " +
                 "ADD CONSTRAINT _IDX" + column + " " + 
                 "FOREIGN KEY (" + column + ") " +
-                "REFERENCES " + space_db + "._structbx_table_" + variables.link_to + 
+                "REFERENCES " + database_db + "._structbx_table_" + variables.link_to + 
                     "(_structbx_column_" + column_id_link->ToString_() + ") " + 
                     variables.cascade_key_condition
             );
@@ -274,7 +274,7 @@ Columns::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(func
 void Columns::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_database = ?");
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
@@ -297,7 +297,7 @@ void Columns::Add::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
@@ -306,7 +306,7 @@ void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
         "SELECT fc.id " \
         "FROM tables_columns fc " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE fc.identifier = ? AND f.identifier = ? AND id_space = ?"
+        "WHERE fc.identifier = ? AND f.identifier = ? AND id_database = ?"
     );
 
     action->SetupCondition_("verify-column-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
@@ -341,7 +341,7 @@ void Columns::Add::A2(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
@@ -355,7 +355,7 @@ void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
             ",f.id " \
         "FROM tables_columns fc " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE f.identifier = ? AND f.id_space = ?"
+        "WHERE f.identifier = ? AND f.id_database = ?"
     );
 
     action->AddParameter_("identifier", "", true)
@@ -452,7 +452,7 @@ void Columns::Add::A3(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -476,8 +476,8 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
     A3(action3);
 
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2, action3](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute actions
         if(!action1->Work_())
@@ -515,14 +515,14 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
             self.JSONResponse_(HTTP::Status::kHTTP_BAD_REQUEST, "Error WW17KL82QJ");
             return;
         }
-        std::string space_db = "_structbx_space_" + space_id;
+        std::string database_db = "_structbx_database_" + database_id;
         std::string table_table = "_structbx_table_" + table_id->ToString_();
         std::string column = "_structbx_column_" + column_id->get()->ToString_();
 
         // Action 4: Add the column in the table
         auto action4 = self.AddAction_("a4");
         action4->set_sql_code(
-            "ALTER TABLE " + space_db + "." + table_table + " " +
+            "ALTER TABLE " + database_db + "." + table_table + " " +
             "CHANGE COLUMN `" + column + "` " + column + 
             " " + variables.column_type + variables.length + " " + variables.required +
             " " + variables.default_value
@@ -547,7 +547,7 @@ Columns::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionDat
 void Columns::Modify::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_final(false);
-    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_space = ?");
+    action->set_sql_code("SELECT id FROM tables WHERE identifier = ? AND id_database = ?");
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
     {
         if(self.get_results()->size() < 1)
@@ -570,7 +570,7 @@ void Columns::Modify::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Columns::Modify::A2(StructBX::Functions::Action::Ptr action)
@@ -632,7 +632,7 @@ void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
         "UPDATE tables_columns SET " \
             "identifier = ?, name = ?, length = ?, required = ? " \
             ",default_value = ?, description = ?, id_column_type = ?, link_to = ?, position = ? " \
-        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ? LIMIT 1)"
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_database = ? LIMIT 1)"
     );
 
     action->AddParameter_("identifier", "", true)
@@ -748,7 +748,7 @@ void Columns::Modify::A3(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
@@ -775,8 +775,8 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
     A3(action3);
 
     // Setup Custom Process
-    auto space_id = get_space_id();
-    function->SetupCustomProcess_([space_id, action1, action2_0, action2, action3](StructBX::Functions::Function& self)
+    auto database_id = get_database_id();
+    function->SetupCustomProcess_([database_id, action1, action2_0, action2, action3](StructBX::Functions::Function& self)
     {
         // Execute action 1
         if(!action1->Work_())
@@ -803,7 +803,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 
         // Action 2_0: Delete foreign key if exists
         action2_0->set_sql_code(
-            "ALTER TABLE _structbx_space_" + space_id + "._structbx_table_" + table_id->ToString_() + " " +
+            "ALTER TABLE _structbx_database_" + database_id + "._structbx_table_" + table_id->ToString_() + " " +
             "DROP FOREIGN KEY IF EXISTS _IDX_structbx_column_" + column_id->ToString_());
 
         // Execute actions
@@ -815,7 +815,7 @@ Columns::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionDat
 
         // Action 2: Delete columns
         action2->set_sql_code(
-            "ALTER TABLE _structbx_space_" + space_id + "._structbx_table_" + table_id->ToString_() + " " +
+            "ALTER TABLE _structbx_database_" + database_id + "._structbx_table_" + table_id->ToString_() + " " +
             "DROP COLUMN IF EXISTS _structbx_column_" + column_id->ToString_());
 
         // Execute actions
@@ -843,7 +843,7 @@ void Columns::Delete::A1(StructBX::Functions::Action::Ptr action)
         "SELECT fc.id AS column_id, f.id AS table_id " \
         "FROM tables_columns fc " \
         "JOIN tables f ON f.id = fc.id_table " \
-        "WHERE fc.id = ? AND f.identifier = ? AND f.id_space = ?"
+        "WHERE fc.id = ? AND f.identifier = ? AND f.id_database = ?"
     );
     action->set_final(false);
     action->SetupCondition_("verify-table-existence", Query::ConditionType::kError, [](StructBX::Functions::Action& self)
@@ -879,7 +879,7 @@ void Columns::Delete::A1(StructBX::Functions::Action::Ptr action)
         return true;
     });
 
-    action->AddParameter_("id_space", get_space_id(), false);
+    action->AddParameter_("id_database", get_database_id(), false);
 }
 
 void Columns::Delete::A2(StructBX::Functions::Action::Ptr)
