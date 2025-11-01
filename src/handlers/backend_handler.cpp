@@ -7,8 +7,8 @@ using namespace StructBX::Controllers;
 
 BackendHandler::BackendHandler() :
     RootHandler::RootHandler()
-    ,space_id_cookie_(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), "")
-    ,add_space_id_cookie_(false)
+    ,database_id_cookie_(StructBX::Tools::SettingsManager::GetSetting_("database_id_cookie_name", "1f3efd18688d2"), "")
+    ,add_database_id_cookie_(false)
 {
 
 }
@@ -17,7 +17,7 @@ void BackendHandler::AddFunctions_()
 {
     // Functions
     auto general = General::Main(function_data_);
-    auto spaces = Spaces::Main(function_data_);
+    auto databases = Databases::Main(function_data_);
     auto tables = Tables::Main(function_data_);
 
     // Add all functions
@@ -55,9 +55,9 @@ void BackendHandler::Process_()
         return;
     }
 
-    // Setup space id cookie
-    if(add_space_id_cookie_)
-        get_current_function()->AddCookie_(space_id_cookie_);
+    // Setup database id cookie
+    if(add_database_id_cookie_)
+        get_current_function()->AddCookie_(database_id_cookie_);
 
     // Verify permissions
     if(!VerifyPermissions_())
@@ -108,47 +108,47 @@ void BackendHandler::SetupFunctionData_()
     // Setup User ID
     function_data_.set_id_user(get_users_manager().get_current_user().get_id());
     
-    // Get Cookie Space ID
+    // Get Cookie Database ID
     Poco::Net::NameValueCollection cookies;
     get_http_server_request().value()->getCookies(cookies);
-    auto cookie_space_id = cookies.find(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"));
+    auto cookie_database_id = cookies.find(StructBX::Tools::SettingsManager::GetSetting_("database_id_cookie_name", "1f3efd18688d2"));
 
-    // Set Space ID if exists in Cookies
-    if(cookie_space_id != cookies.end())
+    // Set Database ID if exists in Cookies
+    if(cookie_database_id != cookies.end())
     {
-        auto space_id_decoded = StructBX::Tools::Base64Tool().Decode_(cookie_space_id->second);
-        function_data_.set_space_id(space_id_decoded);
+        auto database_id_decoded = StructBX::Tools::Base64Tool().Decode_(cookie_database_id->second);
+        function_data_.set_database_id(database_id_decoded);
     }
     else
     {
-        add_space_id_cookie_ = true;
+        add_database_id_cookie_ = true;
 
-        // Get Space ID Cookie if not exists in Cookies
+        // Get Database ID Cookie if not exists in Cookies
         auto action = StructBX::Functions::Action("a1");
         action.set_sql_code(
             "SELECT s.id " \
-            "FROM spaces s " \
-            "JOIN spaces_users su ON su.id_space = s.id " \
+            "FROM `databases` s " \
+            "JOIN databases_users su ON su.id_database = s.id " \
             "WHERE su.id_naf_user = ? LIMIT 1"
         );
         action.AddParameter_("id_naf_user", function_data_.get_id_user(), false);
         if(action.Work_())
         {
-            auto space_id = action.get_results()->First_();
-            if(!space_id->IsNull_())
+            auto database_id = action.get_results()->First_();
+            if(!database_id->IsNull_())
             {
-                // Set Space ID
-                function_data_.set_space_id(space_id->ToString_());
+                // Set Database ID
+                function_data_.set_database_id(database_id->ToString_());
 
-                // Save Space ID to Cookie
-                auto space_id_encoded = StructBX::Tools::Base64Tool().Encode_(space_id->ToString_());
+                // Save Database ID to Cookie
+                auto database_id_encoded = StructBX::Tools::Base64Tool().Encode_(database_id->ToString_());
 
-                Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("space_id_cookie_name", "1f3efd18688d2"), space_id_encoded);
+                Net::HTTPCookie cookie(StructBX::Tools::SettingsManager::GetSetting_("database_id_cookie_name", "1f3efd18688d2"), database_id_encoded);
                 cookie.setPath("/");
                 cookie.setSameSite(Net::HTTPCookie::SAME_SITE_STRICT);
                 cookie.setSecure(true);
                 cookie.setHttpOnly();
-                space_id_cookie_ = HTTP::Cookie(cookie);
+                database_id_cookie_ = HTTP::Cookie(cookie);
             }
         }
     }

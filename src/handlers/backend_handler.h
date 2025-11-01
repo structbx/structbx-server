@@ -7,7 +7,7 @@
 #include "query/results.h"
 #include "tools/function_data.h"
 #include "controllers/general/main.h"
-#include "controllers/spaces/main.h"
+#include "controllers/databases/main.h"
 #include "controllers/tables/main.h"
 
 
@@ -37,8 +37,8 @@ class StructBX::Handlers::BackendHandler : public RootHandler
 
     private:
         Tools::FunctionData function_data_;
-        HTTP::Cookie space_id_cookie_;
-        bool add_space_id_cookie_;
+        HTTP::Cookie database_id_cookie_;
+        bool add_database_id_cookie_;
 };
 
 #endif // STRUCTBX_HANDLERS_BACKENDHANDLER
