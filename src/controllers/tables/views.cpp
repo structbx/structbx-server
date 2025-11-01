@@ -1,7 +1,7 @@
 
-#include "controllers/forms/views.h"
+#include "controllers/tables/views.h"
 
-using namespace StructBX::Controllers::Forms;
+using namespace StructBX::Controllers::Tables;
 
 Views::Views(Tools::FunctionData& function_data) :
     FunctionData(function_data)
@@ -16,9 +16,9 @@ Views::Views(Tools::FunctionData& function_data) :
 
 Views::Read::Read(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/views/read
+    // Function GET /api/tables/views/read
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/views/read", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/views/read", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -30,17 +30,17 @@ void Views::Read::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "v.id AS id, v.name AS name, v.conditions AS conditions, v.`order` AS 'order', v.id_form AS id_form " \
+            "v.id AS id, v.name AS name, v.conditions AS conditions, v.`order` AS 'order', v.id_table AS id_table " \
         "FROM views v " \
-        "JOIN forms f ON f.id = v.id_form " \
+        "JOIN tables f ON f.id = v.id_table " \
         "WHERE " \
             "f.id_space = ? AND f.identifier = ? "
     );
 
     action->AddParameter_("id_space", get_space_id(), false);
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -53,9 +53,9 @@ void Views::Read::A1(StructBX::Functions::Action::Ptr action)
 
 Views::ReadSpecific::ReadSpecific(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function GET /api/forms/views/read/id
+    // Function GET /api/tables/views/read/id
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/views/read/id", HTTP::EnumMethods::kHTTP_GET);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/views/read/id", HTTP::EnumMethods::kHTTP_GET);
 
     auto action = function->AddAction_("a1");
     A1(action);
@@ -67,17 +67,17 @@ void Views::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
         "SELECT " \
-            "v.id AS id, v.name AS name, v.conditions AS conditions, v.`order` AS 'order', v.id_form AS id_form " \
+            "v.id AS id, v.name AS name, v.conditions AS conditions, v.`order` AS 'order', v.id_table AS id_table " \
         "FROM views v " \
-        "JOIN forms f ON f.id = v.id_form " \
+        "JOIN tables f ON f.id = v.id_table " \
         "WHERE " \
             "f.id_space = ? AND f.identifier = ? AND v.id = ?"
     );
 
     action->AddParameter_("id_space", get_space_id(), false);
 
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")
         {
@@ -100,9 +100,9 @@ void Views::ReadSpecific::A1(StructBX::Functions::Action::Ptr action)
 
 Views::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function POST /api/forms/views/add
+    // Function POST /api/tables/views/add
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/views/add", HTTP::EnumMethods::kHTTP_POST);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/views/add", HTTP::EnumMethods::kHTTP_POST);
     
     auto action1 = function->AddAction_("a1");
     A1(action1);
@@ -113,10 +113,10 @@ Views::Add::Add(Tools::FunctionData& function_data) : Tools::FunctionData(functi
 void Views::Add::A1(StructBX::Functions::Action::Ptr action)
 {
     action->set_sql_code(
-        "INSERT INTO views (name, conditions, `order`, id_form) "
+        "INSERT INTO views (name, conditions, `order`, id_table) "
         "SELECT "
             "?, ?, ? "
-            ",(SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            ",(SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
     );
     action->AddParameter_("name", "", true)
     ->SetupCondition_("condition-name", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
@@ -130,8 +130,8 @@ void Views::Add::A1(StructBX::Functions::Action::Ptr action)
     });
     action->AddParameter_("conditions", "", true);
     action->AddParameter_("order", "", true);
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
@@ -145,9 +145,9 @@ void Views::Add::A1(StructBX::Functions::Action::Ptr action)
 
 Views::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function PUT /api/forms/views/modify
+    // Function PUT /api/tables/views/modify
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/views/modify", HTTP::EnumMethods::kHTTP_PUT);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/views/modify", HTTP::EnumMethods::kHTTP_PUT);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
@@ -155,7 +155,7 @@ Views::Modify::Modify(Tools::FunctionData& function_data) : Tools::FunctionData(
         "SET name = ?, conditions = ?, `order` = ? "
         "WHERE "
             "id = ? "
-            "AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?) "
+            "AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?) "
     );
     A1(action1);
     get_functions()->push_back(function);
@@ -185,8 +185,8 @@ void Views::Modify::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
-    ->SetupCondition_("condition-form-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
+    action->AddParameter_("table-identifier", "", true)
+    ->SetupCondition_("condition-table-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->ToString_() == "")
         {
@@ -200,14 +200,14 @@ void Views::Modify::A1(StructBX::Functions::Action::Ptr action)
 
 Views::Delete::Delete(Tools::FunctionData& function_data) : Tools::FunctionData(function_data)
 {
-    // Function DEL /api/forms/views/delete
+    // Function DEL /api/tables/views/delete
     StructBX::Functions::Function::Ptr function = 
-        std::make_shared<StructBX::Functions::Function>("/api/forms/views/delete", HTTP::EnumMethods::kHTTP_DEL);
+        std::make_shared<StructBX::Functions::Function>("/api/tables/views/delete", HTTP::EnumMethods::kHTTP_DEL);
     
     auto action1 = function->AddAction_("a1");
     action1->set_sql_code(
         "DELETE FROM views " \
-        "WHERE id = ? AND id_form = (SELECT id FROM forms WHERE identifier = ? AND id_space = ?)"
+        "WHERE id = ? AND id_table = (SELECT id FROM tables WHERE identifier = ? AND id_space = ?)"
     );
     A1(action1);
 
@@ -226,7 +226,7 @@ void Views::Delete::A1(StructBX::Functions::Action::Ptr action)
         }
         return true;
     });
-    action->AddParameter_("form-identifier", "", true)
+    action->AddParameter_("table-identifier", "", true)
     ->SetupCondition_("condition-identifier", Query::ConditionType::kError, [](Query::Parameter::Ptr param)
     {
         if(param->get_value()->ToString_() == "")

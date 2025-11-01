@@ -1,6 +1,6 @@
 
-#ifndef STRUCTBX_CONTROLLERS_FORMS_VIEWS_H
-#define STRUCTBX_CONTROLLERS_FORMS_VIEWS_H
+#ifndef STRUCTBX_CONTROLLERS_TABLES_VIEWS_H
+#define STRUCTBX_CONTROLLERS_TABLES_VIEWS_H
 
 #include "tools/base_action.h"
 #include "tools/function_data.h"
@@ -9,7 +9,7 @@ namespace StructBX
 {
     namespace Controllers
     {
-        namespace Forms
+        namespace Tables
         {
             class Views;
         }
@@ -18,7 +18,7 @@ namespace StructBX
 
 using namespace StructBX;
 
-class StructBX::Controllers::Forms::Views : public Tools::FunctionData
+class StructBX::Controllers::Tables::Views : public Tools::FunctionData
 {
     public:
         Views(Tools::FunctionData& function_data);
@@ -63,4 +63,4 @@ class StructBX::Controllers::Forms::Views : public Tools::FunctionData
         Delete struct_delete_;
 };
 
-#endif //STRUCTBX_CONTROLLERS_FORMS_VIEWS_H
+#endif //STRUCTBX_CONTROLLERS_TABLES_VIEWS_H
