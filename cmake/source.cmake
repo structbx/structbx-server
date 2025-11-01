@@ -30,11 +30,11 @@ set(
     ${PROJECT_SOURCE_DIR}/src/controllers/general/permissions.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/spaces/main.cpp
     ${PROJECT_SOURCE_DIR}/src/controllers/spaces/users.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/forms/main.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/forms/data.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/forms/columns.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/forms/permissions.cpp
-    ${PROJECT_SOURCE_DIR}/src/controllers/forms/views.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/tables/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/tables/data.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/tables/columns.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/tables/permissions.cpp
+    ${PROJECT_SOURCE_DIR}/src/controllers/tables/views.cpp
     ${PROJECT_SOURCE_DIR}/src/core/core.cpp
     ${PROJECT_SOURCE_DIR}/src/core/handler_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/core/server.cpp
