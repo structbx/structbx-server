@@ -17,7 +17,7 @@ COPY . .
 
 # Build application
 RUN mkdir build && cd build && \
-    cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
+    cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/ && \
     cmake --build . --parallel $(nproc) && \
     cmake --build . --target install
 
@@ -37,20 +37,15 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /etc/structbx /var/www/structbx-web /var/www/structbx-web-uploaded /var/log/structbx /var/lib/structbx
 
 # Clone and prepare web interface
-RUN git clone https://github.com/structbx/structbx-web.git /usr/src/structbx-web
+RUN git clone https://github.com/structbx/structbx-web.git /var/www/structbx-web
 
 # Copy built application from build stage
 COPY --from=build /usr/bin/structbx-server /usr/bin/
 
 # Copy configuration files if they exist in source
-COPY --from=build /usr/src/structbx/properties.yaml /etc/structbx/properties.yaml
-
-# Create non-root user for security
-RUN useradd -r -s /bin/false structbx && \
-    chown -R structbx:structbx /etc/structbx /var/www/structbx-web /var/www/structbx-web-uploaded /var/log/structbx /var/lib/structbx
-
-# Switch to non-root user
-USER structbx
+COPY --from=build /etc/structbx/properties.yaml /etc/structbx/properties.yaml
+COPY --from=build /etc/structbx/cert.pem /etc/structbx/cert.pem
+COPY --from=build /etc/structbx/key.pem /etc/structbx/key.pem
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
